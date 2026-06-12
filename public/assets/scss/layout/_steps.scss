@@ -1,0 +1,279 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  STEPS CSS START
+/*----------------------------------------*/
+
+.step-active {
+	color: $primary !important;
+}
+
+.steps__title {
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--clr-common-black);
+
+	&:hover {
+		color: var(--clr-theme-primary);
+	}
+}
+
+.steps__form {
+	display: table;
+	width: 100%;
+	position: relative;
+}
+
+.steps__row {
+	&::before {
+		top: 50%;
+		bottom: 0;
+		position: absolute;
+		content: " ";
+		width: 99%;
+		height: 2px;
+		background-color: var(--clr-bg-light);
+		z-index: 1;
+		left: 2px;
+		transform: translateY(-50%);
+	}
+
+	&.style_two {
+		&::before {
+			display: none;
+		}
+	}
+}
+
+.steps__step {
+	text-align: center;
+	position: relative;
+	z-index: 9;
+
+	&.style_two {
+		display: block;
+		text-align: start;
+
+		&:not(:last-child) {
+			margin-bottom: 20px;
+		}
+	}
+}
+
+.step-active {
+	span {
+		background-color: var(--clr-theme-primary);
+		color: $white;
+		border-color: var(--clr-theme-primary);
+	}
+}
+
+.step-grid {
+	display: grid;
+	grid-template-columns: 350px auto;
+	align-items: center;
+	gap: 30px;
+}
+
+
+.bg-steps {
+	// background-color: rgba($color: $primary, $alpha: .10);
+	padding: 10px 0px;
+}
+
+.btn-blue-grey {
+	background-color: rgba($color: $primary, $alpha: .15);
+	padding: 10px 10px;
+
+	&.step-active-bg {
+		background-color: var(--clr-theme-primary);
+		color: $white !important;
+	}
+}
+
+.setup-panel-4 {
+	display: flex;
+	justify-content: space-between;
+
+	@media #{$sm,$xs} {
+		display: block;
+	}
+
+	&.steps__row {
+		&::before {
+			display: none;
+		}
+	}
+
+	.steps__step {
+		@media #{$xxl,$lg,$md} {
+			display: grid;
+			text-align: center;
+
+			&:not(:last-child) {
+				margin-right: 10px;
+			}
+		}
+
+		@media #{$sm,$xs} {
+			display: grid;
+			text-align: center;
+			margin-right: 0;
+			margin-bottom: 10px;
+		}
+	}
+
+	.steps__title {
+		color: var(--clr-common-black);
+
+		&:hover {
+			color: var(--clr-common-black);
+		}
+	}
+}
+
+.step__btn-end {
+	text-align: end;
+
+	@media #{$xs} {
+		text-align: start;
+	}
+}
+
+.step-circle {
+	span {
+		width: 70px;
+		height: 70px;
+		font-size: 22px;
+		color: var(--clr-theme-primary);
+		background-color: $white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		border: 1px solid var(--clr-border-1);
+	}
+
+	&.step-active {
+		span {
+			color: $white;
+			background-color: var(--clr-theme-primary);
+			border-color: var(--clr-theme-primary);
+		}
+	}
+}
+
+
+.steps{
+	&-grid {
+		&-3 {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+		}
+		&-4 {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 20px;
+		}
+	}
+	&-item {
+		position: relative;
+		padding: 12px 20px;
+		margin: 0;
+		font-size: inherit;
+		color: var(--clr-text-label);
+		vertical-align: top;
+		background-color: rgba($color: $primary, $alpha: .10);
+		cursor: pointer;
+		transition: all 0.3s ease-in-out;
+		&.current {
+			color: $white;
+			background-color: var(--clr-theme-primary);
+			.steps-number {
+				color: var(--clr-theme-primary);
+				background-color: $white;
+			}
+			.steps-title {
+				color: $white;
+			}
+			p {
+				color: $white;
+			}
+		}
+		&.done {
+			color: $white;
+			background-color: var(--clr-theme-primary);
+			.steps-number {
+				color: var(--clr-theme-primary);
+				background-color: $white;
+			}
+			.steps-title {
+				color: $white;
+			}
+			p {
+				color: $white;
+			}
+		}
+		&.error {
+			color: $white;
+			background-color: var(--clr-action-warning);
+			.steps-number {
+				color: var(--clr-action-warning);
+				background-color: $white;
+			}
+			.steps-title {
+				color: $white;
+			}
+			p {
+				color: $white;
+			}
+		}
+		&.active {
+			color: $white;
+			background-color: var(--clr-action-success);
+			.steps-number {
+				color: var(--clr-action-success);
+				background-color: $white;
+			}
+			.steps-title {
+				color: $white;
+			}
+			p {
+				color: $white;
+			}
+		}
+		&.disabled {
+			color: $white;
+			pointer-events: none;
+			cursor: auto;
+		  }
+	}
+	&-number {
+		position: absolute;
+		top: 50%;
+		left: 20px;
+		width: 40px;
+		height: 40px;
+		font-size: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $white;
+		text-align: center;
+		background: $primary;
+		border-radius: 50%;
+		-webkit-transform: translateY(-50%);
+		transform: translateY(-50%);
+	}
+	&-content {
+		min-height: 40px;
+		margin-left: 50px;
+		text-align: left;
+	}
+	&-title {
+		margin-bottom: 0;
+		font-size: 20px;
+		color: var(--clr-text-label);
+		font-weight: 600;
+	}
+}

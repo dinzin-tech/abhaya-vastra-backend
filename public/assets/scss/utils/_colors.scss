@@ -1,0 +1,78 @@
+$colors: (
+    common: (
+        "white":#FFFFFF,
+        "lightest":#99A5B5,
+        "medium":#424242,
+        "dark":#2E2E2E,
+        "black":#362a2a,
+        "placeholder":#acaab1,
+    ),
+    heading: (
+        "primary":#444050,
+    ),
+    text: (
+        "body": #878a99,
+        "label": #495057,
+        "muted": #acaab1,
+        "taxonomy": #A9ABB6,
+        "secondary":#525252,
+        "rating":#EC8D1D,
+    ),
+    theme: (
+        "primary":#6C5FFC,
+        "secondary":#1ABC9C,
+        "tertiary":#ABA3FD,
+    ),
+    action: (
+        "danger":#FF3A29,
+        "info":#80CAFF,
+        "link":#9747FF,
+        "success":#34B53A,
+        "warning":#FFB200,
+    ),
+    bg: (
+        "primary":#6C5FFC,
+        "secondary":#1ABC9C,
+        "body": #f8f8fb,
+        "card": #FFFFFF,
+        "label": #f8f9fd,
+        "light": #B8B8B8,
+    ),
+    alert: (
+        "success":#d1e7dd,
+        "danger": #f8d7da,
+        "warning": #fff3cd,
+        "info": #cff4fc,
+        "light": #efefef,
+        "dark": #ced4da,
+    ),
+    border: (
+        "1": #EAEAEA,
+        "2": #404040,
+        "3": #CECECE,
+    ),
+    chart: (
+        "1": #7A7A7A,
+        "2": #262a2a,
+    ),
+    footer: ("1": #878787,
+    ),
+    gradient: (
+        "1":linear-gradient(90deg, #6C5FFC 0%, #003cff 100%),
+        "2":linear-gradient(90deg, #FF6339 0%, #FF2259 100%),
+    )
+);
+
+/* If you need to use the main color in RGBA format, you will need this color code. */
+$white: #FFFFFF;
+$light: #B8B8B8;
+$lightest: #99A5B5;
+$dark: #2E2E2E;
+$primary: #6C5FFC;
+$secondary: #1ABC9C;
+$tertiary: #ABA3FD;
+$success: #34B53A;
+$info: #0dcaf0;
+$link: #9747FF;
+$warning: #FFB200;
+$danger: #FF3A29;

@@ -1,0 +1,196 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  ribbon CSS START
+/*----------------------------------------*/
+
+.ribbon__wrapper {
+    margin-bottom: 20px;
+}
+.ribbon {
+    padding: 0 20px;
+    height: 30px;
+    line-height: 30px;
+    clear: left;
+    position: absolute;
+    top: 0px;
+    inset-inline-start: 0px;
+    color: var(--clr-common-white);
+    z-index: 2;
+    @include dark {
+        color: var(--clr-common-black);
+    }
+}
+.ribbon-clip {
+    inset-inline-start: -14px;
+
+    &:before {
+        position: absolute;
+        top: 30px;
+        inset-inline-start: 0;
+        width: 0;
+        height: 0;
+        content: "";
+        border: 7px solid transparent;
+        border-top-color: var(--clr-theme-primary);
+        border-right-color: var(--clr-theme-primary);
+    }
+    &.ribbon-primary {
+        &:before {
+            border-top-color: var(--clr-theme-primary);
+            border-right-color: var(--clr-theme-primary);
+        }
+    }
+    
+    &.ribbon-secondary {
+        &:before {
+            border-top-color: var(--clr-theme-secondary);
+            border-right-color: var(--clr-theme-secondary);
+        }
+    }
+    
+    &.ribbon-success {
+        &:before {
+            border-top-color: var(--clr-action-success);
+            border-right-color: var(--clr-action-success);
+        }
+    }
+    
+    &.ribbon-info {
+        &:before {
+            border-top-color: var(--clr-action-info);
+            border-right-color: var(--clr-action-info);
+        }
+    }
+    
+    &.ribbon-warning {
+        &:before {
+            border-top-color: var(--clr-action-warning);
+            border-right-color: var(--clr-action-warning);
+        }
+    }
+    
+    &.ribbon-danger {
+        &:before {
+            border-top-color: var(--clr-action-danger);
+            border-right-color: var(--clr-action-danger);
+        }
+    }
+    
+    &.ribbon-light {
+        &:before {
+            border-top-color: var(--clr-bg-light);
+            border-right-color: var(--clr-bg-light);
+        }
+    }
+    
+    &.ribbon-dark {
+        &:before {
+            border-top-color: var(--clr-common-dark);
+            border-right-color: var(--clr-common-dark);
+        }
+    }
+}
+.ribbon-bookmark {
+    &:before {
+        position: absolute;
+        top: 0;
+        inset-inline-start: 100%;
+        display: block;
+        width: 0;
+        height: 0;
+        content: "";
+        border: 15px solid var(--clr-theme-primary);
+        border-inline-end: 10px solid transparent;
+    }
+    &.ribbon-primary {
+        &:before {
+            border-color: var(--clr-theme-primary);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-secondary {
+        &:before {
+            border-color: var(--clr-theme-secondary);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-success {
+        &:before {
+            border-color: var(--clr-action-success);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-info {
+        &:before {
+            border-color: var(--clr-action-info);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-warning {
+        &:before {
+            border-color: var(--clr-action-warning);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-danger {
+        &:before {
+            border-color: var(--clr-action-danger);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-light {
+        &:before {
+            border-color: var(--clr-bg-light);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+    
+    &.ribbon-dark {
+        &:before {
+            border-color: var(--clr-common-dark);
+            border-inline-end: 10px solid transparent;
+        }
+    }
+}
+.ribbon-bookmark {
+
+    &.ribbon-vertical-left:before,
+    &.ribbon-vertical-right:before {
+        top: 100%;
+        inset-inline-start: 0;
+        margin-top: -14px;
+        border-inline-end: 15px solid red;
+        border-bottom: 10px solid transparent;
+    }
+}
+.ribbon-primary {
+    background-color: var(--clr-theme-primary);
+}
+.ribbon-secondary {
+    background-color: var(--clr-theme-secondary);
+}
+.ribbon-success {
+    background-color: var(--clr-action-success);
+}
+.ribbon-info {
+    background-color: var(--clr-action-info);
+}
+.ribbon-warning {
+    background-color: var(--clr-action-warning);
+}
+.ribbon-danger {
+    background-color: var(--clr-action-danger);
+}
+.ribbon-light {
+    background-color: var(--clr-bg-light);
+}
+.ribbon-dark {
+    background-color: var(--clr-common-dark);
+}

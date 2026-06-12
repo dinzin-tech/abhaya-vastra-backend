@@ -1,0 +1,35 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  contact CSS START
+/*----------------------------------------*/
+
+.contact__list {
+    &:not(:last-child) {
+        margin-bottom: 12px;
+    }
+    &.style_two {
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+    &-icon {
+        span {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            align-items: center;
+            &:nth-child(1) {
+                color: var(--clr-action-success);
+                background-color: rgba($color: $success, $alpha: .10)
+            }
+            &:nth-child(2) {
+                color: var(--clr-action-danger);
+                background-color: rgba($color: $danger, $alpha: .10)
+            }
+        }
+    }
+}

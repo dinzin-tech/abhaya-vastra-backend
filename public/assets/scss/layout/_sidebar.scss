@@ -1,0 +1,326 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  SIDEBAR CSS START
+/*----------------------------------------*/
+.app__slide-wrapper {
+	min-height: 775px;
+}
+.page__body-wrapper {
+  position: absolute;
+  inset-inline-end: 0;
+  width: calc(100% - 280px);
+  transition: all 0.5s ease;
+  top: 100px;
+  padding: 0px 25px 0px 0px;
+  @include rtl {
+    padding: 0px 0px 0px 25px;
+  }
+  @media #{$lg,$md,$sm,$xs} {
+    width: calc(100% - 20px);
+  }
+}
+
+.header-logo {
+  img {
+    height: 100%;
+    width: 150px;
+  }
+  .main-logo {
+    @include dark {
+      display: none;
+    }
+  }
+  .dark-logo {
+    display: none;
+    @include dark {
+      display: block;
+    }
+  }
+}
+.app-sidebar {
+  width: 256px;
+  height: 100%;
+  background-color: var(--clr-common-white);
+  // position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 103;
+  transition: all 0.3s ease-in-out;
+  @include dark {
+    background-color: var(--clr-bg-card);
+}
+  .main-sidebar-header {
+    height: 70px;
+    width: 256px;
+    position: fixed;
+    display: flex;
+    background-color: var(--clr-common-white);
+    z-index: 9;
+    align-items: center;
+    justify-content: start;
+    padding: 10px 20px;
+    transition: all 0.05s ease;
+    border-inline-end: 1px solid var(--clr-border-1);
+    border-bottom: 1px solid var(--clr-border-1);
+    @include dark {
+      background-color: var(--clr-bg-card);
+  }
+  }
+  .sidebar-menu.child1 .sidebar__menu-item:hover,
+  .sidebar-menu.child2 .sidebar__menu-item:hover,
+  .sidebar-menu.child3 .sidebar__menu-item:hover {
+    color: var(--clr-theme-primary);
+  }
+  .sidebar__menu-category {
+    color: var(--clr-text-body);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .sidebar__menu-item {
+    padding: 12px 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--clr-text-body);
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    &.active {
+      color: var(--clr-theme-primary);
+      .sidebar__menu-label,
+      .side-menu__angle {
+        color: var(--clr-theme-primary);
+      }
+      .side-menu__icon {
+        color: var(--clr-theme-primary);
+      }
+    }
+    &:hover {
+      background-color: rgba($color: $light, $alpha: .05);
+    }
+  }
+  .sidebar-menu {
+
+    &.child1,
+    &.child2,
+    &.child3 {
+      .sidebar__menu-item {
+        background-color: transparent !important;
+        &.active {
+          background-color: transparent !important;
+        }
+      }
+    }
+  }
+  .sidebar-menu {
+    padding: 0;
+  }
+  .sidebar-menu {
+
+    &.child1,
+    &.child2 {
+      .sidebar__menu-item {
+        padding: 6px 6px;
+      }
+    }
+  }
+  .sidebar-menu {
+
+    &.child1,
+    &.child2,
+    &.child3 {
+
+      .sidebar__menu-item {
+        &:before {
+          position: absolute;
+          content: "\e404";
+          font-family: "Font Awesome 6 Pro";
+          font-size: 12px;
+          inset-inline-start: -10px;
+          opacity: 0.8;
+        }
+      }
+
+      li {
+        padding: 0;
+        position: relative;
+      }
+    }
+
+    &.child1 li {
+      padding-inline-start: 56px;
+    }
+
+    &.child2 li {
+      padding-inline-start: 12px;
+    }
+
+    &.child3 li {
+      padding-inline-start: 16px;
+    }
+  }
+  .sidebar__menu-label {
+    white-space: nowrap;
+    color: var(--clr-text-body);
+    position: relative;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+    font-weight: 700;
+  }
+  .side-menu__icon {
+    margin-inline-end: 10px;
+    line-height: 0;
+    font-size: 14px;
+    text-align: center;
+    color: var(--clr-text-body);
+    border-radius: 4px;
+  }
+  .side-menu__angle {
+    transform-origin: center;
+    position: absolute;
+    inset-inline-end: 20px;
+    line-height: 1;
+    font-size: 14px;
+    color: var(--clr-text-body);
+    transition: all 0.05s ease;
+    opacity: 0.8;
+  }
+}
+
+.slide.has-sub .sidebar-menu {
+  transform: translate(0, 0) !important;
+  visibility: visible !important;
+}
+
+.nav ul li {
+  list-style-type: none;
+}
+
+.nav>ul {
+  padding-inline-start: 0px;
+}
+
+.sidebar-menu {
+  display: none;
+}
+
+.slide.has-sub {
+  display: grid;
+
+  &.open {
+    >.sidebar__menu-item .side-menu__angle {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .main-menu {
+    margin: 0 !important;
+  }
+}
+.sidebar-left,
+.sidebar-right {
+  display: none;
+}
+
+.main-menu>.slide {
+  &.active,
+  &:hover {
+
+    .sidebar-menu .sidebar__menu-item:hover {
+      .side-menu__angle {
+        color: var(--clr-theme-primary) !important;
+      }
+    }
+  }
+}
+.nav ul li {
+  list-style-type: none;
+}
+
+.nav>ul {
+  padding-inline-start: 0px;
+}
+
+.sidebar-menu {
+  display: none;
+}
+
+.slide.has-sub {
+  display: grid;
+
+  &.open {
+    >.sidebar__menu-item .side-menu__angle {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+
+.app-sidebar.collapsed~.page__body-wrapper .app__header__area {
+  inset-inline-start: 0;
+  width: 100%;
+  .app__header-inner {
+    width: 100% !important;
+  }
+  @media #{$xs,$sm,$md} {
+    width: calc(100% - 0px) !important;
+  }
+}
+
+.app-sidebar.collapsed~.page__body-wrapper {
+  width: calc(100% - 20px);
+}
+.app-sidebar {
+  @media #{$lg,$md,$sm,$xs} {
+    inset-inline-start: -300px;
+  }
+  &.collapsed {
+    inset-inline-start: -300px;
+    .page__body-wrapper {
+      width: calc(100% - 80px);
+    }
+  }
+}
+.close_sidebar {
+  &.app-sidebar {
+    @media #{$lg,$md,$sm,$xs} {
+      inset-inline-start: 0px;
+    }
+  }
+}
+
+.sidebar-bg {
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow: hidden;
+  background-size: cover;
+  margin-top: 50px;
+}
+.sidebar__thumb-content {
+	padding: 30px 25px 25px 25px;
+	background-size: cover;
+}
+.sidebar__thumb-title {
+	color: var(--clr-common-white);
+	text-align: center;
+	font-size: 16px;
+	font-weight: 700;
+	margin-bottom: 20px;
+  @include dark{
+    color: var(--clr-common-black);
+  }
+}

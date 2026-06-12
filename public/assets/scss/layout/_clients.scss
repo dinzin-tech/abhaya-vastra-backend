@@ -1,0 +1,27 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Clients CSS START
+/*----------------------------------------*/
+
+.client {
+    &__thumb {
+        img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+    }
+    &__meta {
+        span {
+            display: block;
+            font-size: 16px;
+            color: var(--clr-common-medium);
+            margin-bottom: 5px;
+        }
+        p {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    }
+}

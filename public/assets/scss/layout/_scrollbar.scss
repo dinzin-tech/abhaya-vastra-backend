@@ -1,0 +1,127 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  SCROLLBAR CSS START
+/*----------------------------------------*/
+
+// Scroll
+.scrollbar-track-y {
+    width: 7px !important;
+    @include rtl {
+		right: auto !important;
+		left: 0 !important;
+	}
+}
+
+.scrollbar-thumb {
+    width: 7px !important;
+}
+
+.scrollbar-track {
+    @include border-radius(6px);
+}
+
+.height-318 {
+    height: 318px;
+}
+
+.widget-timeline {
+    position: relative;
+}
+
+.scroll-h-1 {
+    height: 299px;
+}
+
+.scroll-h-2 {
+    height: 295px;
+}
+
+.scroll-h-3 {
+    height: 325px;
+}
+
+.scroll-h-4 {
+    height: 335px;
+}
+
+.scroll-h-5 {
+    height: 400px;
+}
+
+.scroll-h-6 {
+    height: 345px;
+}
+
+.scroll-h-7 {
+    height: 580px;
+}
+
+.scroll-h-8 {
+    height: 512px;
+}
+
+.scroll-h-9 {
+    height: 575px;
+}
+
+.table-height {
+    height: 148px;
+}
+
+.table-height-2 {
+    height: 320px;
+}
+
+.table-height-3 {
+    height: 250px;
+}
+
+.table-height-4 {
+    height: 177px;
+}
+
+/**=====================
+    Scrollbar CSS Start
+==========================**/
+[data-simplebar] {
+    position: unset;
+}
+
+.simplebar-mask {
+    top: 80px;
+}
+
+.simplebar-track {
+    right: -2px;
+
+    &.simplebar-vertical {
+        top: 100px;
+        width: 10px;
+    }
+
+    &.simplebar-horizontal {
+        visibility: hidden !important;
+    }
+}
+
+.simplebar-scrollbar {
+    &:before {
+        background: rgba($primary, 0.2);
+    }
+}
+
+/**=====================
+     Scrollbar CSS Ends
+==========================**/
+
+.scrollbar-thumb {
+    background: var(--clr-bg-body) !important;
+}
+
+.scrollbar-thumb {
+    @include rtl {
+       left: auto;
+        right: 0;
+    }
+}

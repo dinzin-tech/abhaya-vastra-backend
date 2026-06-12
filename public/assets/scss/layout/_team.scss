@@ -1,0 +1,300 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Tab CSS START
+/*----------------------------------------*/
+
+.team {
+  &-thumb {
+    border-radius: 10px;
+  }
+  &-member-designation {
+    font-size: 16px;
+  }
+  &-style-one {
+    text-align: center;
+    &:hover {
+      .team-social {
+        opacity: 1;
+        .icon-one {
+          transform: translateY(-40px);
+          opacity: 1;
+        }
+        .icon-two {
+          transform: translateY(-40px);
+          opacity: 1;
+        }
+        .icon-three {
+          transform: translateY(-40px);
+          opacity: 1;
+        }
+        .icon-four {
+          transform: translateY(-40px);
+          opacity: 1;
+        }
+      }
+      .team-thumb {
+        a {
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+    }
+    .team-thumb-wrap {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    .team-social {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      z-index: 5;
+      opacity: 0;
+      transform: translateX(-50%);
+      transition: all 0.3s ease-in-out;
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  &-style-two {
+    position: relative;
+    &:hover {
+      .team-thumb {
+        a {
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+      .team-social {
+        .icon-one {
+          transform: translateY(-40px);
+          opacity: 1;
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+        .icon-two {
+          transform: translateY(-40px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+        .icon-three {
+          transform: translateY(-40px);
+          opacity: 1;
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+        .icon-four {
+          transform: translateY(-40px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+      }
+    }
+    .team-content {
+      position: absolute;
+      bottom: 40px;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      z-index: 1;
+    }
+    .team-member-name{
+      color: var(--clr-common-white);
+      @include dark {
+        color: var(--clr-common-black);
+      }
+    }
+    .team-member-designation {
+      color: rgba($color: $white, $alpha: .90);
+      @include dark {
+        color: rgba($color: $white, $alpha: .70);
+      }
+    }
+    .team-social {
+      position: absolute;
+      bottom: 21%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      @media #{$sm,$xs} {
+        bottom: 35%;
+      }
+    }
+  }
+  &-style-three {
+    position: relative;
+
+    &:hover {
+      .team-thumb {
+        a {
+          &::before {
+            opacity: 1;
+          }
+        }
+      }
+
+      .team-social {
+        .icon-one {
+          transform: translateX(25px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+
+        .icon-two {
+          transform: translateX(25px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+
+        .icon-three {
+          transform: translateX(25px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+
+        .icon-four {
+          transform: translateX(25px);
+          opacity: 1;
+
+          @media #{$sm,$xs} {
+            transform: translateX(0px);
+          }
+        }
+      }
+    }
+    .team-member-designation {
+      color: rgba($color: $white, $alpha: .90);
+    }
+
+    .team-social {
+      margin-left: -25px;
+
+      @media #{$sm,$xs} {
+        margin-left: 0;
+      }
+
+      .icon-one {
+        transform: translateY(0px);
+      }
+
+      .icon-two {
+        transform: translateY(0px);
+      }
+
+      .icon-three {
+        transform: translateY(0px);
+      }
+
+      .icon-four {
+        transform: translateY(0px);
+      }
+    }
+  }
+  &-social {
+    display: flex;
+    gap: 10px;
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background-color: var(--clr-theme-secondary);
+      font-size: 16px;
+      border-radius: 50%;
+      color: var(--clr-common-white);
+      @include dark {
+        color: var(--clr-common-black);
+    }
+      &:hover {
+        background-color: var(--clr-theme-primary);
+      }
+    }
+    .icon-one {
+      opacity: 0;
+      transform: translateX(0px);
+      transition: all 0.3s ease-in-out;
+
+      @media #{$sm,$xs} {
+        opacity: 1;
+      }
+    }
+
+    .icon-two {
+      opacity: 0;
+      transform: translateX(0px);
+      transition: all 0.4s ease-in-out;
+
+      @media #{$sm,$xs} {
+        opacity: 1;
+      }
+    }
+
+    .icon-three {
+      opacity: 0;
+      transform: translateX(0px);
+      transition: all 0.5s ease-in-out;
+
+      @media #{$sm,$xs} {
+        opacity: 1;
+      }
+    }
+
+    .icon-four {
+      opacity: 0;
+      transform: translateX(0px);
+      transition: all 0.6s ease-in-out;
+
+      @media #{$sm,$xs} {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.image-overly {
+  position: relative;
+  overflow: hidden;
+  a {
+    &::before {
+      position: absolute;
+      content: "";
+      display: block;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      opacity: .8;
+      border-radius: 10px;
+      transition: all 0.3s ease-in-out;
+      background: linear-gradient(180deg, rgba($color: $primary, $alpha: .0) 17.61%, $primary 100%);
+    }
+
+    &:hover {
+      &::before {
+        opacity: 0;
+      }
+    }
+  }
+}

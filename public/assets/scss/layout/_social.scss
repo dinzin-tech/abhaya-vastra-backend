@@ -1,0 +1,29 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  social CSS START
+/*----------------------------------------*/
+
+.common-social {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    a {
+        color: var(--clr-common-black);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: rgba($color: $primary, $alpha: .1);
+        font-size: 16px;
+        border-radius: 50%;
+        &:hover {
+            color: var(--clr-common-white);
+            background-color: var(--clr-theme-primary);
+            @include dark {
+				color: var(--clr-common-black);
+			}
+        }
+    }
+}

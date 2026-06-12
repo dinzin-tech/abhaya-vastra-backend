@@ -1,0 +1,16 @@
+/*----------------------------------------*/
+/*  FOOTER CSS START
+/*----------------------------------------*/
+@use '../utils' as *;
+
+.footer {
+	background-color: transparent;
+	padding: 15px 30px;
+	width: 100%;
+}
+
+.card__footer {
+	p {
+		margin-bottom: 0;
+	}
+}

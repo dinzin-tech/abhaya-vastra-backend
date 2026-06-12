@@ -1,0 +1,116 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  SIGN CSS START
+/*----------------------------------------*/
+
+.authentication-wrapper {
+    display: flex;
+    flex-basis: 100%;
+    min-height: 100vh;
+    width: 100%;
+
+    &.basic-authentication {
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.cover-authentication {
+        align-items: flex-start;
+
+        .authentication-inner {
+            width: 100%;
+            height: 100%;
+            margin: auto 0;
+
+            .authentication-image {
+                width: 100%;
+                margin: 32px 0 32px 32px;
+                height: 100vh;
+                height: calc(100vh - 4rem);
+                position: relative;
+            }
+        }
+    }
+}
+.authentication-inner {
+    .card__wrapper {
+        width: 400px;
+        @media #{$sm,$xs} {
+            width: 100%;
+        }
+    }
+}
+.authentication-logo {
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 15px;
+
+    img {
+        max-width: 160px;
+    }
+
+    &.logo-white {
+        img {
+            display: none;
+        }
+    }
+
+    @include dark {
+        &.logo-white {
+            img {
+                display: block;
+            }
+        }
+
+        &.logo-black {
+            img {
+                display: none;
+            }
+        }
+    }
+}
+
+.coming-soon-form {
+    text-align: center;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    gap: 0 10px;
+    @media #{$xs} {
+        flex-wrap: wrap;
+        button {
+            width: 100%;
+            margin-top: 10px;
+        }
+    }
+    .form-control {
+        width: 360px;
+    }
+}
+.countdown {
+    margin-bottom: 30px;
+    &-title {
+        font-size: 26px;
+        font-weight: 500;
+        margin-bottom: 30px;
+        color: var(--clr-common-black);
+        @media #{$xs} {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+    }
+    span {
+        font-size: 50px;
+        font-weight: 500;
+        color: var(--clr-theme-primary);
+        @media #{$sm,$xs} {
+            font-size: 30px;
+        }
+    }
+}
+.coming-soon {
+    .card__wrapper {
+        width: 100%;
+    }
+}

@@ -1,0 +1,268 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  PROGRESS CSS START
+/*----------------------------------------*/
+
+.progress,
+.progress-stacked {
+    height: 5px !important;
+    font-size: var(--bs-progress-font-size) !important;
+    background-color: rgba($color: $primary, $alpha: .10) !important
+}
+.progress-showcase {
+    .progress {
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+}
+
+.mz {
+    &-progress {
+        &-bar {
+            overflow: hidden;
+
+            & .progress {
+                height: 10px !important;
+                overflow: visible;
+
+                & .progress-bar {
+                    background-color: var(--clr-theme-primary);
+                    border-radius: 10px;
+                    position: relative;
+                    overflow: visible !important;
+
+                    &.bg-2 {
+                        background-color: var(--clr-theme-secondary);
+                    }
+
+                    &.bg-3 {
+                        background-color: var(--clr-action-success);
+                    }
+
+                    &.bg-4 {
+                        background-color: var(--clr-action-warning);
+                    }
+
+                    &.bg-5 {
+                        background-color: var(--clr-action-info);
+                    }
+
+                    &.bg-6 {
+                        background-color: var(--clr-action-danger);
+                    }
+
+                    &.bg-6 {
+                        background-color: var(--clr-action-link);
+                    }
+                }
+            }
+
+            &.lg-progress-bar {
+                & .progress {
+                    height: 15px !important;
+                }
+            }
+
+            &.sm-progress-bar {
+                & .progress {
+                    height: 5px !important;
+                }
+            }
+
+            @media #{$md, $sm, $xs} {
+                padding-left: 0 !important;
+            }
+
+            &.multi-progress-bar {
+                .progress-bar {
+                    border-radius: 0;
+                }
+            }
+        }
+
+        &.style_two {
+            .mz-progress-wrapper:not(:last-child) {
+                margin-bottom: 11px;
+            }
+        }
+
+        &-wrapper {
+            &:not(:last-child) {
+                margin-bottom: 17px;
+            }
+
+            &.space-bottom {
+                &:not(:last-child) {
+                    margin-bottom: 14px;
+                }
+            }
+        }
+
+        &-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--clr-text-label);
+
+            span {
+                color: var(--clr-text-body);
+                font-size: 16px;
+                font-weight: 500;
+            }
+        }
+
+        &-head {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        &-percentage {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--clr-text-body);
+        }
+    }
+}
+
+.progress-bar-striped {
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+}
+
+.progress-bar-animated {
+    -webkit-animation: 1s linear infinite progress-bar-stripes;
+    animation: 1s linear infinite progress-bar-stripes;
+}
+
+@keyframes progress-bar-stripes {
+    0% {
+        background-position-x: -1rem;
+    }
+}
+
+.seller__progress {
+    & .progress {
+        background: transparent;
+        overflow: visible;
+    }
+    & .progress-bar {
+        background-color: var(--clr-theme-primary);
+        border-radius: 50px;
+        height: 8px;
+
+        &.bg-2 {
+            background-color: var(--clr-theme-secondary);
+        }
+
+        &.bg-3 {
+            background-color: var(--clr-action-success);
+        }
+    }
+}
+
+.work-progress {
+    .progress__item {
+        margin-bottom: 15px;
+
+        p {
+            margin-bottom: 10px;
+        }
+    }
+    .progress {
+        height: 15px !important;
+        font-size: 12px !important;
+        background-color: rgba($color: $primary, $alpha: .10) !important
+    }
+
+    .progress-bar {
+        background-color: var(--clr-theme-primary);
+
+        &.bg-2 {
+            background-color: var(--clr-theme-secondary);
+        }
+
+        &.bg-3 {
+            background-color: var(--clr-action-success);
+        }
+
+        &.bg-4 {
+            background-color: var(--clr-action-danger);
+        }
+
+        &.bg-5 {
+            background-color: var(--clr-action-info);
+        }
+
+        &.bg-6 {
+            background-color: var(--clr-action-link);
+        }
+
+        &.bg-6 {
+            background-color: var(--clr-action-warning);
+        }
+    }
+}
+
+#toaster-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 99;
+}
+
+.toaster {
+    display: block;
+    position: fixed;
+    padding: 10px;
+    background-color: var(--clr-common-black);
+    color: var(--clr-common-white);
+    border-radius: 5px;
+    z-index: 1000;
+    opacity: 0.9;
+    pointer-events: auto;
+    margin: 10px;
+}
+
+.top-left {
+    top: 20px;
+    left: 20px;
+}
+
+.top-right {
+    top: 20px;
+    right: 20px;
+}
+.top-center {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+.bottom-center {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+.toast-placement {
+    .toast:not(.show) {
+        display: block;
+    }
+    .bd-example-toasts {
+        min-height: 360px;
+    }
+    .bg-body-secondary {
+        --bs-bg-opacity: 1;
+        background-color: var(--clr-bg-body) !important;
+    }
+}

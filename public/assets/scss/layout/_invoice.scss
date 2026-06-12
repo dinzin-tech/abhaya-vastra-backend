@@ -1,0 +1,111 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  INVOICES CSS START
+/*----------------------------------------*/
+
+.invoice-line {
+	border-top: 1px solid var(--clr-border-1);
+	padding-top: 25px;
+	margin-top: 25px;
+	margin-left: -20px;
+	width: calc(100% + 40px);
+}
+
+.input-step {
+	display: -webkit-inline-box;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	overflow: visible;
+	height: 37.5px;
+	border-radius: 0;
+	background: transparent;
+	padding: 4px;
+}
+
+.input-step button {
+	width: 1.4em;
+	font-weight: 300;
+	height: 100%;
+	line-height: .1em;
+	font-size: 1.4em;
+	padding: .2em !important;
+	background: gray;
+	color: red;
+	border: none;
+	border-radius: 0;
+}
+
+.product__removal-btn {
+	span {
+		display: inline-flex;
+		width: 36px;
+		color: var(--clr-common-black);
+		background-color: rgba($color: $danger, $alpha: .5);
+		height: 36px;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		font-size: 18px;
+		transition: all .3s ease-in-out;
+
+		&:hover {
+			color: var(--clr-common-white);
+			background-color: var(--clr-action-danger);
+		}
+	}
+}
+.invoice__logo {
+	@include dark {
+		& .light-logo {
+			display: none;
+		}
+		& .dark-logo {
+			display: block;
+		}
+	}
+	& .dark-logo {
+		display: none;
+	}	
+	img {
+		max-width: 200px;
+	}
+}
+.invoice__payment-details {
+	
+	span {
+		color: var(--clr-text-body);
+		font-weight: 400;
+	}
+}
+
+.invoice__address {
+	span {
+		color: var(--clr-text-body);
+		font-weight: 400;
+	}
+	p {
+		color: var(--clr-text-label);
+		font-weight: 500;
+		&:not(:last-child) {
+
+			margin-bottom: 5px;
+		}
+	}
+}
+
+.invoice__print {
+	min-width: 960px !important;
+	font-size: 12px !important;
+}
+
+.invoice__payment-details {
+	p {
+		color: var(--clr-text-label);
+		font-weight: 500;
+		&:not(:last-child) {
+		  margin-bottom: 5px;
+		}
+		
+	}
+}

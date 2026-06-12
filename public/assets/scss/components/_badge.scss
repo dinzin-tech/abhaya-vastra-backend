@@ -1,0 +1,192 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Badge CSS START
+/*----------------------------------------*/
+
+.bd-badge {
+    font-size: 12px;
+    font-weight: var(--bd-fw-regular);
+    padding: 4px 10px 4px 10px;
+    color: var(--clr-common-white);
+    height: 26px;
+    min-width: 75px;
+    display: inline-flex;
+    text-align: center;
+    border-radius: 6px;
+    justify-content: center;
+    align-items: center;
+    @include dark {
+        color: var(--clr-common-black);
+    }
+    &.border-none {
+        border-radius: 0 !important;
+    }
+
+    &.badge-circle {
+        padding: 0 0;
+        width: 25px;
+        height: 25px;
+        min-width: auto;
+        border-radius: 50%;
+        margin-inline-start: 10px;
+        color: var(--clr-common-black);
+
+        i {
+            font-size: 14px;
+            margin-inline-end: 0;
+        }
+    }
+
+    &.bg-success {
+        background-color: var(--clr-action-success) !important;
+    }
+
+    &.bg-theme {
+        background-color: var(--clr-theme-primary) !important;
+    }
+
+    &.bg-secondary {
+        background-color: var(--clr-theme-secondary) !important;
+    }
+
+    &.bg-danger {
+        background-color: var(--clr-action-danger) !important;
+    }
+
+    &.bg-info {
+        background-color: var(--clr-action-info) !important;
+    }
+
+    &.bg-link {
+        background-color: var(--clr-action-link) !important;
+    }
+
+    &.bg-warning {
+        background-color: var(--clr-action-warning) !important;
+    }
+
+    &.bg-white {
+        background-color: linear-gradient(180deg, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0.50) 100%);
+    }
+
+    &.bg-light {
+        background-color: var(--clr-bg-light) !important;
+    }
+
+    &.bg-white {
+        background-color: var(--clr-common-white);
+    }
+
+    &.bg-dark {
+        background-color: var(--clr-common-dark) !important;
+    }
+}
+
+/* alert-badge */
+.alert-badge {
+    font-size: 12px;
+    font-weight: var(--bd-fw-regular);
+    padding: 4px 10px 4px 10px;
+    color: var(--clr-common-black);
+    height: 26px;
+    min-width: 75px;
+    display: inline-flex;
+    text-align: center;
+    border-radius: 6px;
+    justify-content: center;
+    align-items: center;
+
+    &.border-none {
+        border-radius: 0 !important;
+    }
+
+    &.bg-success {
+        background-color: var(--clr-alert-success) !important;
+    }
+
+    &.bg-theme {
+        background-color: rgb(108, 95, 252, .5) !important;
+    }
+
+    &.bg-secondary {
+        background-color: var(--clr-theme-secondary) !important;
+    }
+
+    &.bg-danger {
+        background-color: var(--clr-alert-danger) !important;
+    }
+
+    &.bg-info {
+        background-color: var(--clr-alert-info) !important;
+    }
+
+    &.bg-link {
+        background-color: var(--clr-alert-link) !important;
+    }
+
+    &.bg-warning {
+        background-color: var(--clr-alert-warning) !important;
+    }
+
+    &.bg-light {
+        background-color: var(--clr-alert-light) !important;
+    }
+
+    &.bg-dark {
+        background-color: var(--clr-alert-dark) !important;
+    }
+}
+
+/* tag badge */
+.tag-badge {
+    font-size: 12px;
+    padding: 4px 10px 4px 10px;
+    line-height: 1;
+    color: var(--clr-common-black);
+    background-color: var(--clr-alert-light) !important;
+    display: inline-flex;
+    min-width: 86px;
+    text-align: center;
+    justify-content: center;
+    border-radius: 6px;
+    @include dark {
+        color: var(--clr-common-white);
+    }
+    &.bg-success {
+        background-color: var(--clr-alert-success) !important;
+    }
+
+    &.bg-theme {
+        background-color: var(--clr-theme-primary) !important;
+        color: var(--clr-common-white);
+    }
+
+    &.bg-secondary {
+        background-color: var(--clr-theme-secondary) !important;
+    }
+
+    &.bg-danger {
+        background-color: var(--clr-alert-danger) !important;
+    }
+
+    &.bg-info {
+        background-color: var(--clr-alert-info) !important;
+    }
+
+    &.bg-link {
+        background-color: var(--clr-alert-link) !important;
+    }
+
+    &.bg-warning {
+        background-color: var(--clr-alert-warning) !important;
+    }
+
+    &.bg-light {
+        background-color: var(--clr-alert-light) !important;
+    }
+
+    &.bg-dark {
+        background-color: var(--clr-alert-dark) !important;
+    }
+}

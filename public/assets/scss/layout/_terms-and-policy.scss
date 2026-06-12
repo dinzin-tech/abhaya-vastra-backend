@@ -1,0 +1,59 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Terms and Policy CSS START
+/*----------------------------------------*/
+
+.policy {
+    &-title {
+        margin-bottom: 8px;
+    }
+    &-item {
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+        ul {
+            li {
+                font-size: 16px;
+                position: relative;
+                padding-inline-start: 15px;
+                list-style: none;
+                &::after {
+                    position: absolute;
+                    content: "";
+                    inset-inline-start: 0;
+                    top: 8px;
+                    width: 6px;
+                    height: 6px;
+                    background-color: var(--clr-theme-primary);
+                    border-radius: 50%;
+                }
+                &:not(:last-child) {
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+    &-subitem {
+        margin-inline-start: 40px;
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+    }
+    &-contact {
+        ul {
+            margin-bottom: 10px;
+            li {
+                list-style: none;
+                font-size: 16px;
+                color: var(--clr-common-black);
+            }
+        }
+    }
+    &-address {
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    }
+}

@@ -1,0 +1,251 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Models\PaymentGateway;
+use App\Models\WalletTransaction;
+use App\Services\RewardService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderPlacedMail;
+use Razorpay\Api\Api;
+
+class RazorpayController extends Controller
+{
+    private $razorpayApi;
+
+    public function __construct()
+    {
+        // Get Razorpay credentials from database
+        $gateway = PaymentGateway::where('gateway_name', 'razorpay')->first();
+        
+        if ($gateway) {
+            $this->razorpayApi = new Api($gateway->api_key, $gateway->api_secret);
+        }
+    }
+
+    /**
+     * Create Razorpay order
+     */
+    public function createOrder(Request $request)
+    {
+        try {
+            $request->validate([
+                'order_id' => 'required|exists:orders,id',
+                'amount' => 'required|numeric',
+            ]);
+
+            $order = Order::find($request->order_id);
+            $user = Auth::guard('sanctum')->user();
+
+            if (!$user || $order->user_id !== $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            // Get gateway settings
+            $gateway = PaymentGateway::where('gateway_name', 'razorpay')->first();
+            
+            if (!$gateway) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment gateway not configured'
+                ], 500);
+            }
+
+            // Create Razorpay order
+            $razorpayOrder = $this->razorpayApi->order->create([
+                'amount' => $request->amount * 100, // Amount in paise
+                'currency' => $gateway->currency,
+                'receipt' => $order->order_number,
+                'notes' => [
+                    'order_id' => $order->id,
+                    'user_id' => $user->id,
+                ]
+            ]);
+
+            // Create payment record
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'user_id' => $user->id,
+                'payment_method' => 'razorpay',
+                'amount' => $request->amount,
+                'currency' => $gateway->currency,
+                'status' => 'pending',
+                'razorpay_order_id' => $razorpayOrder['id'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Razorpay order created successfully',
+                'data' => [
+                    'razorpay_order_id' => $razorpayOrder['id'],
+                    'razorpay_key' => $gateway->api_key,
+                    'amount' => $request->amount,
+                    'currency' => $gateway->currency,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'contact' => $user->phone,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating Razorpay order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify Razorpay payment
+     */
+    public function verifyPayment(Request $request)
+    {
+        try {
+            $request->validate([
+                'razorpay_order_id' => 'required|string',
+                'razorpay_payment_id' => 'required|string',
+                'razorpay_signature' => 'required|string',
+            ]);
+
+            // Find payment record
+            $payment = Payment::where('razorpay_order_id', $request->razorpay_order_id)->first();
+
+            if (!$payment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment not found'
+                ], 404);
+            }
+
+            // Verify signature
+            $attributes = [
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature
+            ];
+
+            try {
+                $this->razorpayApi->utility->verifyPaymentSignature($attributes);
+                
+                // Update payment record
+                $payment->update([
+                    'razorpay_payment_id' => $request->razorpay_payment_id,
+                    'razorpay_signature' => $request->razorpay_signature,
+                    'status' => 'completed',
+                    'paid_at' => now(),
+                ]);
+
+                // Update order payment status
+                $order = Order::find($payment->order_id);
+                $order->update([
+                    'payment_status' => 'completed'
+                ]);
+
+                // Approve pending reward points
+                $this->approvePendingRewards($order);
+
+                Mail::to($order->email)->queue(new OrderPlacedMail($order));
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Payment verified successfully',
+                    'data' => [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'payment_status' => 'completed'
+                    ]
+                ]);
+
+            } catch (\Razorpay\Api\Errors\SignatureVerificationError $e) {
+                // Signature verification failed
+                $payment->update([
+                    'status' => 'failed',
+                    'payment_details' => [
+                        'error' => 'Signature verification failed',
+                        'message' => $e->getMessage()
+                    ]
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment verification failed'
+                ], 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error verifying payment: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle payment failure
+     */
+    public function paymentFailed(Request $request)
+    {
+        try {
+            $request->validate([
+                'razorpay_order_id' => 'required|string',
+                'error' => 'nullable|array',
+            ]);
+
+            $payment = Payment::where('razorpay_order_id', $request->razorpay_order_id)->first();
+
+            if ($payment) {
+                $payment->update([
+                    'status' => 'failed',
+                    'payment_details' => $request->error ?? ['message' => 'Payment failed']
+                ]);
+
+                // Update order payment status
+                $order = Order::find($payment->order_id);
+                $order->update([
+                    'payment_status' => 'failed'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment failure recorded'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error recording payment failure: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Approve pending reward points for completed order
+     */
+    protected function approvePendingRewards(Order $order)
+    {
+        try {
+            // Find pending reward transaction for this order
+            $pendingTransaction = WalletTransaction::where('reference', 'order_' . $order->id)
+                ->where('status', 'pending')
+                ->where('type', 'credit')
+                ->first();
+
+            if ($pendingTransaction) {
+                $rewardService = new RewardService($order->user_id);
+                $rewardService->approveTransaction($pendingTransaction);
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the payment
+            \Log::error('Failed to approve pending rewards: ' . $e->getMessage());
+        }
+    }
+}

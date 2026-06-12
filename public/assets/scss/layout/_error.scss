@@ -1,0 +1,30 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  EVENT CSS START
+/*----------------------------------------*/
+
+.error-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.error-content {
+    max-width: 650px;
+    h2 {
+        margin-bottom: 20px;
+        font-size: 48px;
+        @media #{$sm,$xs} {
+            font-size: 32px;
+        }
+    }
+    p {
+        font-size: 20px;
+        font-weight: var(--bd-fw-medium);
+        margin-bottom: 30px;
+    }
+}

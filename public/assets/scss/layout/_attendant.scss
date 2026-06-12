@@ -1,0 +1,145 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/* ATTENDENT CSS START
+/*----------------------------------------*/
+.attendant {
+  &__wrapper {
+    @media #{$xs,$sm,$md,$lg,$xl}{
+      overflow-x: scroll;
+    }
+  }
+  &__action{
+    padding-inline-start: 15px;
+  }
+  &__seminer {
+    span {
+      color: var(--clr-common-black);;
+      font-weight: var(--bd-fw-medium);
+      a {
+        &:hover {
+          color: var(--clr-theme-primary);
+        }
+      }
+    }
+  }
+  &__time {
+    color: var(--clr-heading-primary);
+  }
+  &__date {
+    span {
+      color: var(--clr-heading-primary);
+    }
+  }
+  &__action{
+    span {
+      color: var(--clr-common-lightest);
+    }
+  }
+  &__wrapper {
+    table {
+      width: 100%;
+      border-spacing: 0px 10px;
+      border-collapse: separate;
+      @media #{$xs,$sm,$md,$lg,$xl}{
+        width: 1350px;
+      }
+      thead {
+        background-color: var(--clr-bg-label);
+        tr {
+          th {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--clr-common-black);
+            padding: 15px 20px;
+          }
+        }
+      }
+      & > :not(caption) {
+        & > * {
+          & > * {
+            padding: 10.5px 20px;
+            border-radius: 4px;
+            background-clip: padding-box;
+          }
+        }
+      }
+    }
+    .table {
+      td {
+        padding: 0.73rem;
+      }
+    }
+    tbody {
+      tr {
+        background-color: var(--clr-common-white);
+        border-radius: 4px;
+        @include transition(.3s);
+        @include dark {
+          background: var(--clr-bg-label);
+        }
+        &:hover {
+          background-color: rgba($color: $primary, $alpha: 0.10);
+        }
+      }
+    }
+  }
+  &__dot {
+    stroke: var(--clr-common-lightest);
+  }
+  &__speakers {
+    &-thumb {
+      @include flexbox();
+      img {
+        margin-inline-end: -20px;
+        max-width: 38px;
+      }
+    }
+  }
+  &__meta {
+    &-count {
+      width: 40px;
+      height: 40px;
+      background: var(--clr-common-white);
+      @include flexbox();
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: var(--bd-fw-sbold);
+    }
+  }
+  &__location {
+    span {
+      color: var(--clr-heading-primary);
+    }
+  }
+}
+.registration {
+  &__user-thumb {
+    img {
+      max-width: 40px;
+    }
+  }
+}
+.event {
+  &__information {
+    &-title {
+      font-size: 18px;
+      color: var(--clr-text-secondary);
+      font-weight: var(--bd-fw-sbold);
+      text-transform: capitalize;
+    }
+  }
+}
+.attendants-table {
+  table.dataTable thead > tr > th.sorting {
+    cursor: default;
+    &::before{
+      display: none;
+    }
+    &::after {
+      display: none;
+    }
+  }
+}

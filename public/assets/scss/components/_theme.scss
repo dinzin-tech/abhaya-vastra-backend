@@ -1,0 +1,613 @@
+@use '../utils' as *;
+
+/*-----------------------------------------------------------------------------------
+
+    Theme Name: Manez - HRM & CRM HTML5 Dashboard Template
+    Author: Bdevs
+    Support: https://support.bdevs.net
+    Description: Manez - HRM & CRM HTML5 Dashboard Template
+    Version: 1.0
+	Developer: @mazharulislamt2
+
+-----------------------------------------------------------------------------------
+
+
+/************ TABLE OF CONTENTS ***************
+
+	01. THEME DEFAULT CSS START
+  	02. ANIMATION CSS START
+	03. BACKGROUND COLOR CSS START
+	04. BREAADCRUMB CSS START
+	05. BUTTTON CSS START
+	06. CAROUSEL CSS START
+	07. MEAN MENU CSS START
+	08. OFFCANVAS CSS START
+	09. Preloader CSS START
+	10. SECTION TITLE CSS START
+	11. SETTING CSS START
+	12. ABOUT CSS START
+	13. ACCORDIONG CSS START
+	14.	ATTENDANT CSS START
+	15.	BANNER CSS START
+	16.	BLOG CSS START
+	17.	CALENDAR CSS START
+	18.	CARD CSS START
+	19. CHART CSS START
+	20. CHATBOX CSS START
+	21. COUNTER CSS START
+	22.	DARK-LIGHT CSS START
+	23. DROPDOWN CSS START
+	24. EVENT CSS START
+	25. FOOTER CSS START
+	26. GALLERY CSS START
+	27.	HEADER CSS START
+	28. JOIN CSS START
+	29. NOTICE CSS START
+	30.	NOTIFICATION CSS START
+	31.	PARTNER CSS START
+	32. POPUP CSS START
+	33. PRICE CSS START
+	34. PROFILE CSS START
+	35. SCHEDULE CSS START
+	36. SCROLLBAR CSS START
+	37. SIDEBAR CSS START
+	38. SIGN CSS START
+	39. SPEAKER CSS START
+	40. TESTIMONIAL CSS START
+
+**********************************************/
+
+
+/*----------------------------------------*/
+/*  01. THEME DEFAULT CSS START
+/*----------------------------------------*/
+
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+/*---------------------------------
+    Typography css start 
+---------------------------------*/
+body {
+	font-family: var(--bd-ff-body);
+	font-size: var(--bd-fs-body);
+	font-weight: normal;
+	color: var(--clr-text-body);
+	line-height: 22px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--bd-ff-heading);
+	color: var(--clr-heading-primary);
+	font-weight: var(--bd-fw-bold);
+	margin-top: 0px;
+	line-height: 1;
+	margin-bottom: 0;
+}
+
+h1 {
+	font-size: var(--bd-fs-h1);
+	@media #{$xs} {
+		font-size: 22px;
+	}
+}
+
+h2 {
+	font-size: var(--bd-fs-h2);
+	@media #{$xl} {
+		font-size: 20px;
+	}
+	@media #{$lg} {
+		font-size: 18px;
+	}
+	@media #{$md,$sm,$xs} {
+		font-size: 16px;
+	}
+}
+
+h3 {
+	font-size: var(--bd-fs-h3);
+}
+
+h4 {
+	font-size: var(--bd-fs-h4);
+}
+
+h5 {
+	font-size: var(--bd-fs-h5);
+
+	&.small {
+		font-size: 15px;
+	}
+}
+
+h6 {
+	font-size: var(--bd-fs-h6);
+	&.large {
+		font-size: 16px;
+	}
+	&.small {
+		font-size: 13px;
+	}
+}
+
+// font size
+.fs-12 {
+	font-size: 12px;
+}
+.fs-14 {
+	font-size: 14px;
+}
+.fs-13 {
+	font-size: 13px;
+}
+.fs-15 {
+	font-size: 15px;
+}
+
+// font weight
+.fw-300 {
+	font-weight: var(--bd-fw-light);
+}
+
+.fw-400 {
+	font-weight: var(--bd-fw-regular);
+}
+
+.fw-500 {
+	font-weight: var(--bd-fw-medium);
+}
+
+.fw-600 {
+	font-weight: var(--bd-fw-sbold);
+}
+
+.fw-700 {
+	font-weight: var(--bd-fw-bold);
+}
+
+.fw-800 {
+	font-weight: var(--bd-fw-ebold);
+}
+
+ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+li {
+	list-style: none;
+}
+
+p {
+	font-size: var(--bd-fs-p);
+	font-weight: var(--bd-fw-normal);
+	color: var(--clr-text-body);
+	margin-bottom: 15px;
+	line-height: 22px;
+}
+p:last-child {
+	margin-bottom: 0;
+}
+a {
+	text-decoration: none;
+}
+
+a,
+.btn,
+button,
+svg,
+p,
+input,
+select,
+textarea,
+li,
+img,
+svg,
+.transition-3,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	@include transition(.3s);
+}
+label {
+	display: inline-block;
+}
+a:focus,
+.button:focus {
+	text-decoration: none;
+	outline: none;
+}
+textarea:focus,
+input:focus{
+    outline: none;
+}
+// a:focus,
+// a:hover {
+// 	color: inherit;
+// 	text-decoration: none;
+// }
+
+a,
+button {
+	color: inherit;
+	outline: none;
+	border: none;
+	background: transparent;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+button:focus {
+	outline: 0;
+}
+
+.uppercase {
+	text-transform: uppercase;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+
+input {
+	outline: none;
+}
+
+input[type="color"] {
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	border-radius: 6px;
+}
+
+*::-moz-selection {
+	background: var(--clr-theme-primary);
+	color: var(--clr-common-white);
+	text-shadow: none;
+}
+
+::-moz-selection {
+	background: var(--clr-theme-primary);
+	color: var(--clr-common-white);
+	text-shadow: none;
+}
+
+::selection {
+	background: var(--clr-theme-primary);
+	color: var(--clr-common-white);
+	text-shadow: none;
+}
+
+*::-moz-placeholder {
+	color: var(--clr-common-placeholder);
+	opacity: 1;
+	font-size: 16px;
+}
+
+*::placeholder {
+	color: var(--clr-common-placeholder);
+	opacity: 1;
+	font-size: 14px;
+}
+
+/*----------------------------------------
+    Nice select
+-----------------------------------------*/
+.nice-select {
+	&::after {
+		border: none;
+		background-color: transparent;
+		@include transform(translateY(-50%));
+		margin-top: 0;
+		inset-inline-end: 25px;
+		content: '\f107';
+		font-family: var(--bd-ff-fontawesome);
+		transform-origin: center;
+		font-weight: 500;
+		height: auto;
+		width: auto;
+		;
+		@include transition(.3s);
+		font-size: 16px;
+		color: var(--clr-common-white);
+	}
+
+	&.open {
+		&::after {
+			@include transform(translateY(-50%) rotate(-180deg));
+		}
+	}
+}
+
+/*----------------------------------------
+   Gutter customize
+-----------------------------------------*/
+.gy-10 {
+	--bs-gutter-y: 10px;
+}
+.g-20 {
+	--bs-gutter-x: 20px;
+}
+.gy-20 {
+	--bs-gutter-y: 20px;
+}
+.g-60 {
+	--bs-gutter-x: 60px;
+}
+.g-30,
+.gx-30 {
+	--bs-gutter-x: 30px;
+}
+.g-30,
+.gy-30 {
+	--bs-gutter-y: 30px;
+}
+/*---------------------------------
+    common classes css start 
+---------------------------------*/
+
+.w-img {
+	& img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.m-img {
+	& img {
+		max-width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.fix {
+	overflow: hidden
+}
+
+.clear {
+	clear: both;
+}
+
+.f-left {
+	float: left
+}
+
+.f-right {
+	float: right
+}
+
+.z-index-1 {
+	z-index: 1;
+}
+
+.z-index-11 {
+	z-index: 11;
+}
+
+.overflow-y-visible {
+	overflow-x: hidden;
+	overflow-y: visible;
+}
+
+.p-relative {
+	position: relative;
+}
+
+.p-absolute {
+	position: absolute;
+}
+
+.include__bg {
+	@include background();
+}
+
+.hr-1 {
+	border-top: 1px solid rgb(232, 232, 232);
+}
+
+/*----------------------------------------
+    Progress Wrap
+-----------------------------------------*/
+
+.progress-wrap {
+	@media #{$xs} {
+		right: 15px;
+		bottom: 15px;
+	}
+}
+
+/*----------------------------------------
+   Basic-pagaination
+-----------------------------------------*/
+.basic {
+	&__pagination {
+		padding: 20px 0 0 0;
+		border-top: 1px solid var(--clr-border-1);
+
+		ul {
+			@include flexbox();
+			align-items: center;
+			gap: 5px;
+			justify-content: center;
+			flex-wrap: wrap;
+
+			@media #{$xs,$sm,$md} {
+				justify-content: start;
+			}
+
+			li {
+				list-style: none;
+
+				&:last-child {
+					margin-inline-start: 15px;
+				}
+
+				a {
+					width: 30px;
+					height: 30px;
+					@include flexbox();
+					align-items: center;
+					justify-content: center;
+					@include border-radius(4px);
+					position: relative;
+					color: var(--clr-text-body);
+					inset-inline-end: 0;
+					top: 50%;
+					font-size: 14px;
+					font-weight: 600;
+					background-color: var(--clr-bg-body);
+					overflow: hidden;
+					z-index: 5;
+					&:before {
+						position: absolute;
+						content: "";
+						height: 100%;
+						width: 100%;
+						background: var(--clr-gradient-1);
+						opacity: 0;
+						visibility: hidden;
+						z-index: -1;
+						@include transition(.3s);
+					}
+
+					&:hover {
+						border-color: var(--clr-theme-primary);
+						color: var(--clr-common-white);
+						&::before {
+							opacity: 1;
+							visibility: visible;
+						}
+					}
+				}
+
+				span {
+					width: 30px;
+					height: 30px;
+					@include flexbox();
+					align-items: center;
+					justify-content: center;
+					@include border-radius(6px);
+					position: relative;
+					inset-inline-end: 0;
+					top: 50%;
+					font-weight: var(--bd-fw-sbold);
+					font-size: 16px;
+					background: var(--clr-gradient-1);
+					overflow: hidden;
+					color: var(--clr-common-white);
+					z-index: 5;
+				}
+			}
+		}
+	}
+}
+
+.pagination {
+	ul {
+		@include flexbox();
+		align-items: center;
+		gap: 10px;
+		justify-content: center;
+		flex-wrap: wrap;
+
+		@media #{$xs,$sm,$md} {
+			justify-content: start;
+		}
+
+		li {
+			list-style: none;
+
+			&:last-child {
+				width: inherit;
+				height: inherit;
+			}
+
+			a {
+				width: 36px;
+				height: 36px;
+				@include flexbox();
+				align-items: center;
+				justify-content: center;
+				@include border-radius(50%);
+				position: relative;
+				inset-inline-end: 0;
+				top: 50%;
+				font-size: 14px;
+				overflow: hidden;
+				font-weight: var(--bd-fw-sbold);
+				color: var(--clr-text-body);
+				border: 1px solid var(--clr-border-3);
+				z-index: 5;
+				&:before {
+					position: absolute;
+					content: "";
+					height: 100%;
+					width: 100%;
+					background: var(--clr-gradient-1);
+					opacity: 0;
+					visibility: hidden;
+					z-index: -1;
+					@include transition(.3s);
+				}
+
+				&:hover {
+					border-color: transparent;
+					color: var(--clr-common-black);
+					&::before {
+						opacity: 1;
+						visibility: visible;
+					}
+				}
+			}
+
+			span {
+				width: 36px;
+				height: 36px;
+				@include flexbox();
+				align-items: center;
+				justify-content: center;
+				@include border-radius(50%);
+				position: relative;
+				inset-inline-end: 0;
+				top: 50%;
+				font-weight: var(--bd-fw-sbold);
+				font-size: 16px;
+				background: var(--clr-gradient-1);
+				overflow: hidden;
+				color: var(--clr-common-black);
+				z-index: 5;
+				font-weight: var(--bd-fw-sbold);
+			}
+		}
+	}
+}
+
+input[type="file"] {
+	color: var(--clr-text-body);
+}

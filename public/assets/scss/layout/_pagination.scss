@@ -1,0 +1,186 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Pagination CSS START
+/*----------------------------------------*/
+.pagination{
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	padding-left: 0;
+	list-style: none;
+	&-primary {
+		.page-link {
+			color: var(--clr-theme-primary);
+			&:hover {
+				color: var(--clr-theme-primary);
+				background-color: rgba($color: $primary, $alpha: .10);
+				border-color: var(--clr-theme-primary);
+			}
+		}
+	}
+	&-secondary {
+		.page-link {
+			color: var(--clr-theme-secondary);
+			&:hover {
+				color: var(--clr-theme-secondary);
+				background-color: rgba($color: $secondary, $alpha: .10);
+				border-color: var(--clr-theme-secondary);
+			}
+		}
+	}
+	&-success {
+		.page-link {
+			color: var(--clr-action-success);
+			&:hover {
+				color: var(--clr-action-success);
+				background-color: rgba($color: $success, $alpha: .10);
+				border-color: var(--clr-action-success);
+			}
+		}
+	}
+	&-info {
+		.page-link {
+			color: var(--clr-action-info);
+			&:hover {
+				color: var(--clr-action-info);
+				background-color: rgba($color: $info, $alpha: .10);
+				border-color: var(--clr-action-info);
+			}
+		}
+	}
+	&-warning {
+		.page-link {
+			color: var(--clr-action-warning);
+			&:hover {
+				color: var(--clr-action-warning);
+				background-color: rgba($color: $warning, $alpha: .10);
+				border-color: var(--clr-action-warning);
+			}
+		}
+	}
+	&-danger {
+		.page-link {
+			color: var(--clr-action-danger);
+			&:hover {
+				color: var(--clr-action-danger);
+				background-color: rgba($color: $danger, $alpha: .10);
+				border-color: var(--clr-action-danger);
+			}
+		}
+	}
+	&-light {
+		.page-link {
+			color: var(--clr-bg-light);
+			&:hover {
+				color: var(--clr-bg-light);
+				background-color: rgba($color: $light, $alpha: .10);
+				border-color: var(--clr-bg-light);
+			}
+		}
+	}
+	&-dark {
+		.page-link {
+			color: var(--clr-common-dark);
+			@include dark {
+				color: var(--clr-common-white);
+			}
+			&:hover {
+				color: var(--clr-common-dark);
+				background-color: rgba($color: $dark, $alpha: .10);
+				border-color: var(--clr-common-dark);
+			}
+		}
+	}
+	&-lg {
+		& .page-link {
+			padding: 15px 24px;
+			font-size: 20px;
+		}
+		.page-item:first-child .page-link {
+			border-top-left-radius: 6px;
+			border-bottom-left-radius: 6px;
+			@include rtl {
+				border-top-left-radius: 0;
+				border-bottom-left-radius: 0;
+				border-top-right-radius: 6px;
+				border-bottom-right-radius: 6px;
+			}
+		}
+		.page-item:last-child .page-link {
+			border-top-right-radius: 6px;
+			border-bottom-right-radius: 6px;
+			@include rtl {
+				border-top-left-radius: 6px;
+				border-bottom-left-radius: 6px;
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+		}
+	}
+	&-sm {
+		& .page-link {
+			padding: 4px 8px;
+			font-size: 14px;
+		}
+		.page-item:first-child .page-link {
+			border-top-left-radius: 4px;
+			border-bottom-left-radius: 4px;
+		}
+		.page-item:last-child .page-link {
+			border-top-right-radius: 4px;
+			border-bottom-right-radius: 4px;
+		}
+	}
+}
+.page-link {
+	position: relative;
+	display: block;
+	color: var(--clr-theme-primary);
+	text-decoration: none;
+	background-color: $white;
+	border: 1px solid var(--clr-border-1);
+	padding: 6px 12px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+    transition: all 0.3s ease-in-out;
+	&:hover {
+		z-index: 2;
+		color: var(--clr-theme-primary);
+		background-color: rgba($color: $primary, $alpha: .10);
+		border-color: var(--clr-theme-primary);
+	}
+}
+.page-item{
+	&:first-child .page-link {
+		border-top-left-radius: 6px;
+		border-bottom-left-radius: 6px;
+		@include rtl {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+			border-top-right-radius: 6px;
+			border-bottom-right-radius: 6px;
+		}
+	}
+	&:last-child .page-link {
+		border-top-right-radius: 6px;
+		border-bottom-right-radius: 6px;
+		@include rtl {
+			border-top-left-radius: 6px;
+			border-bottom-left-radius: 6px;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
+	&.active .page-link {
+		color: $white;
+		background-color: var(--clr-theme-primary);
+		border-color: var(--clr-theme-primary);
+	}
+}
+.disabled {
+	cursor: not-allowed;
+	opacity: .5;
+}

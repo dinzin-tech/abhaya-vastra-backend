@@ -1,0 +1,429 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  ACCORDION CSS START
+/*----------------------------------------*/
+
+.form__accordion {
+	.accordion-item {
+		background-color: var(--clr-bg-body);
+		border: none;
+		margin-bottom: 25px;
+		border-radius: 10px;
+		@include dark {
+			background: var(--clr-bg-label);
+		}
+	}
+
+	.accordion-button {
+		background-color: var(--clr-bg-body);
+		padding: 20px 40px 20px 20px;
+		font-size: 18px;
+		color: var(--clr-heading-primary);
+		font-weight: 500;
+		border-radius: 10px;
+		@include dark {
+			background: var(--clr-bg-label);
+		}
+
+		&:not(.collapsed) {
+			background-color: transparent;
+			box-shadow: none;
+			@include dark {
+				background: var(--clr-bg-label);
+			}
+		}
+
+		&:focus {
+			z-index: 3;
+			border-color: 0;
+			outline: 0;
+			box-shadow: none;
+		}
+
+		&::after {
+			-webkit-flex-shrink: 0;
+			-ms-flex-negative: 0;
+			flex-shrink: 0;
+			width: 0;
+			height: 0;
+			margin-inline-start: auto;
+			content: "\2b";
+			font-family: var(--bd-ff-fontawesome);
+			font-size: 18px;
+			-webkit-transition: all 0.2s ease-in-out;
+			transition: all 0.2s ease-in-out;
+			position: absolute;
+			inset-inline-end: 35px;
+			top: 21px;
+			transform: translateY(-50%);
+		}
+
+		&:not(.collapsed)::after {
+			content: "\f068";
+			font-family: var(--bd-ff-fontawesome);
+		}
+
+		span {
+			font-size: 20px;
+			font-weight: var(--bd-fw-medium);
+			color: var(--clr-theme-primary);
+			margin-inline-end: 5px;
+		}
+	}
+
+	.accordion-body {
+		padding: 0 40px 20px 20px;
+		font-size: 16px;
+		color: var(--clr-common-black);
+		@include dark {
+			color: var(--clr-text-body);
+		}
+
+		p {
+			font-size: 16px;
+			color: var(--clr-common-black);
+		}
+
+		ul {
+			margin: 20px 0;
+
+			li {
+				font-size: 16px;
+				color: var(--clr-chart-1);
+				position: relative;
+				padding-inline-start: 15px;
+			}
+		}
+	}
+}
+
+.accordion-style {
+	.accordion {
+		--bs-accordion-border-color: var(--clr-border-1);
+
+		&.accordion-border-primary {
+			.accordion-item {
+				border: 1px solid var(--clr-theme-primary);
+			}
+
+			.accordion-button {
+				background-color: transparent;
+				color: var(--clr-theme-primary);
+				border-block-end: 0px;
+
+				&:not(.collapsed) {
+					border-block-end: 1px solid var(--clr-theme-primary);
+				}
+			}
+		}
+
+		&.accordions-items-separate {
+			.accordion-item {
+				border-block-start: 1px solid var(--clr-theme-primary);
+				border-radius: 0.3rem;
+				overflow: hidden;
+			}
+
+			.accordion-item:not(:first-of-type) {
+				margin-block-start: 0.5rem;
+			}
+		}
+
+		&.accordion-icon {
+			.accordion-button {
+				span {
+					color: var(--clr-theme-primary);
+					display: inline-flex;
+					justify-content: center;
+					align-items: center;
+					width: 50px;
+					height: 50px;
+					background-color: rgba($color: $primary, $alpha: .10);
+					text-align: center;
+					border-radius: 50%;
+					margin-inline-end: 15px;
+
+					i {
+						font-size: 30px;
+					}
+				}
+
+				&:not(.collapsed) span {
+					color: $white;
+					background-color: var(--clr-theme-primary);
+				}
+
+				&:after {
+					top: 40px;
+				}
+			}
+		}
+	}
+
+	.accordion-button {
+		border-radius: 0;
+		color: var(--clr-common-black);
+		background-color: var(--clr-bg-body);
+		&:not(.collapsed) {
+			color: var(--clr-common-black);
+			background-color: var(--clr-bg-body);
+			box-shadow: none;
+		}
+
+		&:focus {
+			z-index: 3;
+			outline: 0;
+			box-shadow: none;
+		}
+
+		&::after {
+			-webkit-flex-shrink: 0;
+			-ms-flex-negative: 0;
+			flex-shrink: 0;
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			margin-inline-start: auto;
+			content: "\e95d";
+			font-family: var(--bd-ff-icomoon);
+			font-size: 18px;
+			-webkit-transition: all 0.2s ease-in-out;
+			transition: all 0.2s ease-in-out;
+			position: absolute;
+			inset-inline-end: 30px;
+			top: 23px;
+			transform: translateY(-50%);
+			background-image: none;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		&:not(.collapsed)::after {
+			content: "\e965";
+			font-family: var(--bd-ff-icomoon);
+		}
+	}
+
+	.accordion-body {
+		padding: 20px 40px 20px 20px;
+		font-size: 16px;
+		color: var(--clr-common-black);
+		background-color: var(--clr-bg-body);
+	}
+}
+
+.accordion-primary {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: var(--clr-theme-primary);
+			color: $white;
+
+			&::after {
+				color: $white;
+				background-color: transparent;
+				border: 1px solid var(--clr-border-1);
+			}
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-theme-primary);
+		}
+
+	}
+}
+
+.accordion-secondary {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $secondary, $alpha: .10);
+			color: var(--clr-theme-secondary);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-theme-secondary);
+		}
+	}
+}
+
+.accordion-success {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $success, $alpha: .10);
+			color: var(--clr-action-success);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-success);
+		}
+
+	}
+}
+
+.accordion-danger {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $danger, $alpha: .10);
+			color: var(--clr-action-danger);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-danger);
+		}
+
+	}
+}
+
+.accordion-warning {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $warning, $alpha: .10);
+			color: var(--clr-action-warning);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-warning);
+		}
+
+	}
+}
+
+.accordion-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $light, $alpha: .10);
+			color: var(--clr-bg-light);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-bg-light);
+		}
+
+	}
+}
+
+.accordion-dark {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $dark, $alpha: .10);
+			color: var(--clr-common-dark);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-common-dark);
+		}
+
+	}
+}
+
+.accordion-primary-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $primary, $alpha: .10);
+			color: var(--clr-theme-primary);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-theme-primary);
+		}
+
+	}
+}
+
+.accordion-secondary-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $secondary, $alpha: .10);
+			color: var(--clr-theme-secondary);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-theme-secondary);
+		}
+	}
+}
+
+.accordion-success-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $success, $alpha: .10);
+			color: var(--clr-action-success);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-success);
+		}
+
+	}
+}
+
+.accordion-danger-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $danger, $alpha: .10);
+			color: var(--clr-action-danger);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-danger);
+		}
+
+	}
+}
+
+.accordion-warning-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $warning, $alpha: .10);
+			color: var(--clr-action-warning);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-action-warning);
+		}
+
+	}
+}
+
+.accordion-light-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $light, $alpha: .10);
+			color: var(--clr-bg-light);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-bg-light);
+		}
+
+	}
+}
+
+.accordion-dark-light {
+	.accordion-button {
+		&:not(.collapsed) {
+			background-color: rgba($color: $dark, $alpha: .10);
+			color: var(--clr-common-dark);
+		}
+
+		&::after {
+			color: $white;
+			background-color: var(--clr-common-dark);
+		}
+
+	}
+}

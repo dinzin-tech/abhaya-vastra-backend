@@ -1,0 +1,64 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  BACKGROUND COLOR CSS START
+/*----------------------------------------*/
+.white-bg {
+	background-color: var(--clr-common-black);
+}
+.black-bg {
+	background-color:var(--clr-common-black) !important;
+}
+.dark-bg {
+	background-color: var(--clr-heading-primary);
+}
+.grey-bg {
+	background-color: var(--clr-bg-gray-1);
+}
+.footer-bg {
+	background-color: var(--clr-bg-footer);
+}
+.card-bg {
+	background: var(--clr-bg-card);
+}
+.card-bg-sec {
+	background: rgba($color: $primary, $alpha: .10) !important;
+}
+.theme-bg {
+	background: var(--clr-theme-primary) !important;
+}
+
+.alert-bg-1 {
+	background: #FFF0F0;
+}
+.alert-bg-2 {
+	background: #FFF7EA;
+}
+.alert-bg-3 {
+	background: #FAFFF8;
+}
+
+.bg-primary {
+	background-color: var(--clr-theme-primary) !important;
+}
+.bg-secondary {
+	background-color: var(--clr-theme-secondary) !important;
+}
+.bg-success {
+	background-color: var(--clr-action-success) !important;
+}
+.bg-info {
+	background-color: var(--clr-action-info) !important;
+}
+.bg-warning {
+	background-color: var(--clr-action-warning) !important;
+}
+.bg-danger {
+	background-color: var(--clr-action-danger) !important;
+}
+.bg-light {
+	background-color: var(--clr-bg-light) !important;
+}
+.bg-dark {
+	background-color: var(--clr-common-dark) !important;
+}

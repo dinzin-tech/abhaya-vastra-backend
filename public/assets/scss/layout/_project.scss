@@ -1,0 +1,226 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Project CSS
+/*----------------------------------------*/
+
+.project__top-content {
+    span {
+        color: var(--clr-common-black);
+    }
+    i {
+        font-size: 10px;
+    }
+}
+
+.project__meta-title {
+    color: var(--clr-common-black);
+    font-weight: var(--bd-fw-medium);
+    display: block;
+}
+
+.project-table-file {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+
+    &-icon {
+        font-size: 22px;
+        width: 48px;
+        height: 48px;
+        color: var(--clr-theme-primary);
+        background-color: var(--clr-bg-label);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        @include dark {
+            background-color: var(--clr-bg-label);
+        }
+        &.mp4 {
+            color: var(--clr-theme-secondary);
+        }
+
+        &.foleder {
+            color: var(--clr-action-warning);
+        }
+
+        &.doc {
+            color: var(--clr-action-info);
+        }
+
+        &.excel {
+            color: var(--clr-action-success);
+        }
+
+        &.image {
+            color: var(--clr-action-danger);
+        }
+
+        &.figma {
+            color: var(--clr-action-link);
+        }
+    }
+}
+
+.project-grid {
+    display: grid;
+    gap: 30px 50px;
+    grid-template-columns: 50% 50%;
+    justify-content: space-between;
+}
+
+/* Project Milestones */
+.milestones {
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--clr-border-1);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        p {
+            margin: 0;
+            flex-grow: 1;
+        }
+    }
+
+    &__icon {
+        font-size: 20px;
+        color: var(--clr-theme-primary);
+        margin-right: 10px;
+    }
+
+    &__date {
+        font-size: 14px;
+        color: var(--clr-text-taxonomy);
+    }
+}
+
+/* Team Discussions */
+.discussions {
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--clr-border-1);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        h6 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--clr-text-label);
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--clr-text-taxonomy);
+
+            a {
+                color: var(--clr-theme-primary);
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+/* Project Milestones */
+.milestone {
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--clr-border-1);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        p {
+            margin: 0;
+            flex-grow: 1;
+        }
+    }
+
+    &__icon {
+        font-size: 20px;
+        color: var(--clr-theme-primary);
+        margin-right: 10px;
+    }
+
+    &__date {
+        font-size: 14px;
+        color: var(--clr-text-label);
+    }
+}
+
+/* Team Discussions */
+.discussion {
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        padding: 15px 0;
+        border-bottom: 1px solid var(--clr-border-1);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        h6 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--clr-text-label);
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--clr-text-taxonomy);
+        }
+
+        a {
+            color: var(--clr-theme-primary);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

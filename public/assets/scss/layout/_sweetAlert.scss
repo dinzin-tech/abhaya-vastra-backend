@@ -1,0 +1,78 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  sweetsAlert2 CSS START
+/*----------------------------------------*/
+
+.swal2-popup {
+	display: none;
+	position: relative;
+	box-sizing: border-box;
+	grid-template-columns: minmax(0,100%);
+	width: 32em;
+	max-width: 100%;
+	padding: 0 0 1.25em;
+	border: none;
+	border-radius: 0 !important;
+	background: var(--clr-common-white) !important;
+	color: var(--clr-heading-primary) !important;
+	font-family: inherit;
+	font-size: 1rem;
+	@include dark {
+		background-color: var(--clr-bg-card) !important;
+	}
+}
+
+.swal2-styled.swal2-confirm {
+	border: 0;
+	border-radius: 0 !important;
+	background: initial;
+	background-color: var(--clr-theme-primary) !important;
+	color: var(--clr-common-white) !important;
+	font-size: 16px !important;
+    transition: all 0.3s linear;
+	@include dark {
+		color: var(--clr-common-black) !important;
+	}
+}
+.swal2-actions:not(.swal2-loading) .swal2-styled:hover {
+	background-color: var(--clr-theme-secondary) !important;
+}
+.swal2-styled:focus {
+	box-shadow: none !important;
+}
+.swal2-actions:not(.swal2-loading) .swal2-styled:active {
+	background-image: none !important;
+}
+.swal2-styled.swal2-cancel {
+	border: 0;
+	border-radius: 0 !important;
+	background: initial;
+	background-color: var(--clr-action-danger) !important;
+	color: var(--clr-common-white) !important;
+	font-size: 16px !important;
+	@include dark {
+		color: var(--clr-common-black) !important;
+	}
+}
+div:where(.swal2-container) button:where(.swal2-styled) {
+	margin: .3125em;
+	padding: .625em 1.1em;
+	transition: box-shadow .1s;
+	box-shadow: 0 0 0 3px rgba(0,0,0,0);
+	font-weight: 500;
+}
+.swal2-styled {
+	margin: .3125em;
+	transition: box-shadow .1s;
+	box-shadow: 0 0 0 3px transparent;
+	font-weight: 500;
+    height: 36px !important;
+    padding: 0px 20px !important;
+}
+.swal2-title {
+	color: var(--clr-heading-primary) !important;
+}
+.swal2-html-container {
+	color: var(--clr-text-body) !important;
+}

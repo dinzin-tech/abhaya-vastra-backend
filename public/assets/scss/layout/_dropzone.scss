@@ -1,0 +1,68 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  DROPZONE CSS START
+/*----------------------------------------*/
+
+.dropzone {
+	min-height: 200px;
+	background: var(--clr-bg-body);
+	padding: 20px 20px;
+	border: 2px dashed var(--clr-border-2);
+  	border-radius: 10px;
+	@include dark {
+	background: var(--clr-bg-label);
+	}
+    i {
+        font-size: 50px;
+        color: var(--clr-theme-primary);
+		margin-bottom: 20px;
+    }
+	h6 {
+		margin-bottom: 10px;
+	}
+}
+
+.dropzone .dz-preview .dz-image {
+	border-radius: 8px;
+	overflow: hidden;
+	width: 175px;
+	height: 175px;
+	position: relative;
+	display: block;
+	z-index: 5;
+}
+.dropzone .dz-preview .dz-image img {
+	display: block;
+	width: 175px;
+	height: 175px;
+	object-fit: cover;
+}
+.dropzone .dz-preview.dz-image-preview {
+	background: transparent;
+}
+
+.dz-remove {
+	color: var(--clr-common-black);
+	transition: all 0.3s linear;
+	margin-top: 5px;
+	font-size: 18px !important;
+}
+.dz-remove:hover {
+	color: var(--clr-action-danger);
+}
+
+.dropzone.dz-started .dz-message {
+	display: none;
+}
+
+.dropzone .dz-preview .dz-progress {
+	background: var(--clr-action-success);
+}
+.dropzone .dz-preview:not(.dz-processing) .dz-progress {
+	animation: none;
+}
+.dropzone .dz-preview.dz-file-preview .dz-image {
+	border-radius: 0;
+	background: $white !important;
+}

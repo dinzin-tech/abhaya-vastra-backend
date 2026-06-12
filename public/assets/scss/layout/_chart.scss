@@ -1,0 +1,43 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  CHART CSS START
+/*----------------------------------------*/
+
+.card__chart {
+	padding-right: 10px;
+	margin-left: -10px;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+	border: 1px solid var(--clr-border-1);
+	background: rgba(255, 255, 255, 0.96);
+}
+.apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {
+	border-bottom: 1px solid var(--clr-border-1);
+	background: var(--clr-common-white) !important;
+	color: var(--clr-text-body) !important;
+	font-size: 14px !important;
+	font-weight: 500 !important;
+}
+
+.apexcharts-tooltip.apexcharts-theme-light {
+	border: 1px solid var(--clr-border-1);
+	background: rgba(255, 255, 255, 0.96);
+}
+.apexcharts-legend {
+	@include flexbox();
+	overflow: hidden !important;
+	padding: 0 10px;
+}
+.apexcharts-menu {
+	@include dark {
+		background: var(--clr-bg-body) !important;
+		border-color: var(--clr-border-1) !important;
+	}
+}
+
+.apexcharts-theme-light .apexcharts-menu-item:hover {
+	color: var(--clr-theme-primary);
+	background-color: rgba(108, 95, 252, 0.15) !important;
+}

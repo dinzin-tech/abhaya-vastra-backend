@@ -1,0 +1,13 @@
+vendor
+node_modules
+.env
+.DS_Store
+storage/*
+composer.phar
+public/storage
+public/hot
+public/vendor
+Homestead.yaml
+composer.lock
+package-lock.json
+yarn.lock

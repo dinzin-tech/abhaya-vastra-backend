@@ -1,0 +1,240 @@
+@use '../utils' as *;
+
+// color short code 
+
+.me-2 {
+	margin-inline-end: .5rem !important;
+}
+.me-3 {
+	margin-inline-end: 1rem !important;
+}
+// display flex short code
+.flex-center {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+// image width
+.w-30 {
+	width: 30px;
+}
+.img-24 {
+	width: 24px !important;
+}
+.img-30 {
+	width: 30px !important;
+}
+.img-36 {
+	width: 36px !important;
+}
+.img-40 {
+	width: 40px !important;
+}
+.img-48 {
+	width: 48px !important;
+	@media #{$xs} {
+		width: 36px !important;
+	}
+}
+.img-50 {
+	width: 50px !important;
+}
+.img-55 {
+	width: 55px !important;
+}
+.img-60 {
+	width: 60px !important;
+}
+.img-70 {
+	width: 70px !important;
+}
+.img-80 {
+	width: 80px !important;
+}
+.img-90 {
+	width: 90px !important;
+}
+.img-100 {
+	width: 100px !important;
+}
+.img-110 {
+	width: 110px !important;
+}
+.img-120 {
+	width: 120px !important;
+}
+.img-130 {
+	width: 140px !important;
+}
+.img-160 {
+	width: 160px !important;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+// height 
+.h-30 {
+	height: 30px;
+}
+
+.h-55 {
+	height: 55px;
+}
+
+// line height 
+.lh-105 {
+	line-height: 1.5;
+}
+
+// border
+.border-none {
+	border: none !important;
+}
+
+.border-circle {
+	border-radius: 50% !important;
+}
+
+.rounded-pill {
+	border-radius: 50rem !important;
+}
+
+.radius-10 {
+	border-radius: 10px !important;
+}
+
+.card-border {
+	border: 1px solid var(--clr-border-1);
+	border-radius: 5px;
+	border: 1px solid var(--clr-border-1);
+	border-radius: 10px;
+	box-shadow: 0 6px 30px rgba(182, 186, 203, 0.3);
+	@include dark {
+		box-shadow: none;
+	}
+}
+.border-right-none {
+	border-right: none;
+}
+.border-left-none {
+	border-left: none;
+}
+.border-top-none {
+	border-top: none;
+}
+
+.border-bottom-none {
+	border-bottom: none;
+}
+
+.chart-spacing {
+	padding: 0 15px 0 0;
+}
+
+.sells-space {
+	padding: 0 20px 20px;
+}
+
+// grid
+.card-grid-style {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	justify-content: space-between;
+	gap: 20px;
+}
+
+// gap 
+.g-3 {
+	gap: 3px;
+}
+
+.g-5 {
+	gap: 5px;
+}
+
+.gap-8 {
+	gap: 8px;
+}
+
+.gap-10 {
+	gap: 10px;
+}
+
+.gap-15 {
+	gap: 15px;
+}
+
+.gap-20 {
+	gap: 20px;
+
+	@media #{$xs} {
+		gap: 10px;
+	}
+}
+
+.gap-150 {
+	gap: 30px;
+
+	@media #{$xs} {
+		gap: 10px;
+	}
+}
+
+.gap-sm {
+	gap: 30px;
+
+	@media #{$sm} {
+		gap: 10px;
+	}
+}
+
+.dac-text-end {
+	text-align: end;
+
+	@media #{$xs} {
+		text-align: start;
+	}
+}
+.resize-textarea {
+	resize: vertical !important;
+}
+
+.cursor {
+	cursor: pointer;
+}
+
+.list__dot ul li {
+	padding-left: 15px;
+	position: relative;
+	&:not(:last-child){
+		margin-bottom: 10px;
+	}
+	&::before {
+		position: absolute;
+		content: "";
+		width: 7px;
+		height: 7px;
+		background-color: var(--clr-common-black);
+		border-radius: 50%;
+		left: 0;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}
+.grid-showcase span {
+	display: block;
+	border: 1px solid var(--clr-border-1);
+	padding: 10px;
+	margin-bottom: 10px;
+	text-align: center;
+	background-color: var(--clr-common-white);
+	@include dark {
+        background: var(--clr-bg-label);
+    }
+}
+.position-sticky {
+    position: sticky !important;
+    top: 100px !important;
+}

@@ -1,0 +1,66 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  Range Slider CSS
+/*----------------------------------------*/
+
+.irs--flat .irs-min, .irs--flat .irs-max {
+	top: 0;
+	padding: 2px 6px;
+	color: var(--clr-common-white);
+	font-size: 14px;
+	line-height: initial;
+	text-shadow: none;
+	background-color: var(--clr-theme-primary) !important;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+
+.irs--flat .irs-line {
+	height: 10px;
+	background-color: rgba($color: $primary, $alpha: .1) !important;
+	border-radius: 4px;
+}
+.irs--flat .irs-bar {
+	height: 10px;
+	background-color: var(--clr-theme-primary) !important;
+}
+
+
+.irs--flat .irs-handle {
+	top: 20px;
+}
+.irs--flat .irs-handle > i:first-child {
+	background-color: var(--clr-theme-primary) !important;
+}
+
+
+.irs--flat .irs-from, .irs--flat .irs-to, .irs--flat .irs-single {
+	color: $white;
+	font-size: 14px;
+	line-height: 1.333;
+	text-shadow: none;
+	padding: 2px 6px;
+	background-color: var(--clr-theme-primary) !important;
+	border-radius: 4px;
+}
+.irs-from, .irs-to, .irs-single {
+	top: -10px;
+}
+.irs--flat .irs-from::before, .irs--flat .irs-to::before, .irs--flat .irs-single::before {
+	bottom: -10px;
+	margin-left: -5px;
+	border: 5px solid transparent;
+	border-top-color: var(--clr-theme-primary) !important;
+}
+
+.irs-grid-text {
+	font-size: 10px;
+	color: var(--clr-common-black);
+}
+.irs--flat .irs-grid-text {
+	color: var(--clr-bg-light);
+}

@@ -1,0 +1,128 @@
+@use '../utils' as *;
+
+/*----------------------------------------*/
+/*  PAYSLIP CSS START
+/*----------------------------------------*/
+
+.payslip-line {
+	border-top: 1px solid var(--clr-border-1);
+	padding-top: 25px;
+	margin-top: 25px;
+}
+
+.input-step {
+	display: -webkit-inline-box;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	overflow: visible;
+	height: 37.5px;
+	border-radius: 0;
+	background: transparent;
+	padding: 4px;
+}
+
+.input-step button {
+	width: 1.4em;
+	font-weight: 300;
+	height: 100%;
+	line-height: .1em;
+	font-size: 1.4em;
+	padding: .2em !important;
+	background: gray;
+	color: var(--clr-action-danger);
+	border: none;
+	border-radius: 0;
+}
+
+.payslip__office-address {
+	p {
+		&:not(:last-child) {
+			margin-bottom: 5px;
+		}
+	}
+}
+.payslip__serial-number {
+	span {
+		font-size: 14px;
+	}
+}
+.product__removal-btn {
+	span {
+		display: inline-flex;
+		width: 36px;
+		color: var(--clr-common-black);
+		background-color: rgba($color: $danger, $alpha: .5);
+		height: 36px;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		font-size: 18px;
+		transition: all .3s ease-in-out;
+		border-radius: 6px;
+		&:hover {
+			color: var(--clr-common-white);
+			background-color: var(--clr-action-danger);
+			@include dark {
+				color: var(--clr-common-black);
+			}
+		}
+	}
+}
+.payslip__logo {
+	@include dark {
+		& .light-logo {
+			display: none;
+		}
+		& .dark-logo {
+			display: block;
+		}
+	}
+	& .dark-logo {
+		display: none;
+	}
+	img {
+		max-width: 200px;
+	}
+}
+.payslip__employee-address {
+	p {
+		&:not(:last-child) {
+			margin-bottom: 5px;
+		}
+	}
+}
+
+.payslip__print {
+	min-width: 960px !important;
+	font-size: 12px !important;
+}
+
+.payslip__payment-details {
+	p {
+		&:not(:last-child) {
+			margin-bottom: 5px;
+		}
+	}
+}
+
+.payslip__table {
+	.table__title th {
+		font-size: 16px;
+		background-color: var(--clr-border-1);
+	}
+	.payslip-amount {
+		font-weight: 600;
+		font-size: 16px;
+	}
+	.payslip-total {
+		td {
+			color: var(--clr-common-black);
+			font-weight: 700;
+			font-size: 16px;
+		}
+	}
+
+}
+.b-bottom-transparent {
+	border-bottom: transparent !important;
+}

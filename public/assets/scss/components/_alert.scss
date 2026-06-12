@@ -1,0 +1,313 @@
+@use '../utils' as *;
+
+/**=====================
+     15. Alert CSS start
+==========================**/
+
+.alert {
+    padding: 10px 16px;
+    display: inline-flex;
+    width: 100%;
+    align-items: center;
+    border-radius: 6px;
+    i {
+        margin-inline-end: 5px;
+        font-size: 14px;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    .close {
+        opacity: 1;
+
+        span {
+            font-size: 24px;
+            font-weight: 400;
+            display: inline-block;
+            border-radius: 3px;
+            text-shadow: none;
+            padding: 0 5px;
+            padding-inline-end: 0;
+        }
+    }
+}
+
+.alert-dismissible {
+    .close {
+        padding: 10px 20px;
+        top: 4px;
+        padding-inline-end: 13px;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transition: all 0.3s ease;
+            opacity: 1;
+            color: inherit;
+        }
+    }
+}
+
+.card__wrapper {
+    button {
+        &:focus {
+            outline: none;
+        }
+    }
+    .alert {
+        &:last-child {
+            margin-bottom: 0;
+        }
+        i {
+            width: 14px;
+            height: 14px;
+            margin-inline-end: 4px;
+            position: absolute;
+            top: 13px;
+
+            &~p {
+                padding-inline-start: 20px;
+            }
+        }
+    }
+}
+
+strong {
+    display: inline-block;
+
+    &~p {
+        display: inline-block;
+    }
+}
+
+$alert-types: primary, secondary, success, danger, warning, info, light, dark;
+
+$alert-color: $primary, $secondary, $success, $danger, $warning, $info, $light, $dark;
+
+@each $var in $alert-types {
+    $index: index($alert-types, $var);
+
+    .alert-#{$var} {
+        background-color: rgba(nth($alert-color, $index), 1);
+        border-color: rgba(nth($alert-color, $index), 1);
+        color: $white;
+
+        p {
+            color: $white;
+        }
+
+        .btn-close {
+            filter: brightness(1) invert(1);
+        }
+
+        .alert-link {
+            color: nth($alert-color, $index);
+
+            @if ($var=="light") {
+                color: var(--clr-common-dark);
+            }
+        }
+
+        @if ($var=="light") {
+            color: var(--clr-common-dark);
+            background-color: var(--clr-bg-light);
+
+            p {
+                color: var(--clr-common-dark);
+                @include dark {
+                    color: var(--clr-common-black);
+                }
+            }
+
+            .btn-close {
+                filter: unset;
+            }
+        }
+
+        hr {
+            border-top-color: nth($alert-color, $index);
+        }
+    }
+
+    .alert-#{$var}.outline,
+    .alert-#{$var}.outline-2x {
+        background-color: transparent;
+        border-color: nth($alert-color, $index);
+        color: nth($alert-color, $index);
+
+        p {
+            color: var(--clr-common-dark);
+            @include dark {
+                color: var(--clr-common-black);
+            }
+        }
+
+        .btn-close {
+            filter: unset;
+        }
+
+        @if ($var=="light") {
+            color: var(--clr-common-dark);
+        }
+    }
+
+    .alert-#{$var}.inverse {
+        p {
+            color: var(--clr-common-dark);
+            @include dark {
+                color: var(--clr-common-black);
+            }
+        }
+
+        &:before {
+            top: 16px;
+            content: "";
+            position: absolute;
+            inset-inline-start: 50px;
+            width: 0;
+            height: 0;
+            border-inline-start: 7px solid nth($alert-color, $index);
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+        }
+
+        background-color: transparent;
+        padding: 13px 20px 13px 65px;
+        border-color: nth($alert-color, $index);
+        color: var(--clr-action-danger);
+        @include rtl {
+            padding: 13px 65px 13px 30px;
+        }
+        i {
+            padding: 17px 20px;
+            display: inline-block;
+            background-color: nth($alert-color, $index);
+            color: $white;
+            border-radius: 3px 0 0 3px;
+            position: absolute;
+            inset-inline-start: 0;
+            top: 0;
+            height: 100%;
+            width: 50px;
+        }
+
+        .btn-close {
+            filter: unset;
+            top: 50%;
+            transform: translateY(-50%);
+            &:focus {
+                outline: 0;
+                box-shadow: none;
+            }
+        }
+    }
+}
+
+.dismiss-text {
+    .alert {
+        .btn-close {
+            background: unset;
+            opacity: 1;
+            top: 50%;
+            transform: translateY(-50%);
+            inset-inline-end: 15px;
+            width: fit-content;
+            height: fit-content;
+            padding: 0;
+            @include rtl {
+            left: 10px !important;
+            }
+            span {
+                display: inline-block;
+                border-radius: 3px;
+                text-shadow: none;
+                padding: 0 5px;
+                color: $white;
+            }
+        }
+    }
+}
+
+.outline-2x {
+    border-width: 2px;
+    padding: 11px 20px;
+}
+
+.alert-img {
+    display: flex;
+    align-items: center;
+
+    img {
+        border-radius: 50%;
+    }
+    .btn-close {
+        top: auto;
+    }
+}
+
+.alert-avatar {
+    position: relative;
+    height: 42px;
+    width: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: $white;
+    font-weight: 500;
+    border-radius: 50%;
+
+    &.avatar-xs {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 10px;
+    }
+
+    &.avatar-sm {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        font-size: 10px;
+    }
+
+    &.avatar-md {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 12px;
+    }
+
+    &.avatar-lg {
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+        font-size: 1rem;
+    }
+
+    &.avatar-xl {
+        width: 64px;
+        height: 64px;
+        line-height: 64px;
+        font-size: 20px;
+    }
+}
+
+.btn-close {
+    width: 40px;
+    height: 40px;
+    padding: 0 0 !important;
+    @include rtl {
+        left: 0 !important;
+        right: auto !important;
+    }
+    &:hover {
+        opacity: 1;
+    }
+    &:focus {
+        outline: 0;
+        box-shadow: none;
+    }
+}
