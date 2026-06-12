@@ -2,7 +2,7 @@ vendor
 node_modules
 .env
 .DS_Store
-storage/*
+#storage/*
 composer.phar
 public/storage
 public/hot
