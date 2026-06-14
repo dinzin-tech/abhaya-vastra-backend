@@ -108,7 +108,7 @@
         <div class="form__input">
             <input type="number" name="weight" id="weight" class="form-control"
                    step="0.01" min="0"
-                   value="{{ $item->weight }}" {{ $item ? 'readonly' : '' }}>
+                   value="{{ $item->weight ?? 0 }}" {{ $item ? 'readonly' : '' }}>
         </div>
     </div>
 </div>
