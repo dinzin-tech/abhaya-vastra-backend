@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Products;
+use App\Models\Order;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -188,7 +192,8 @@ class ProductController extends Controller
                 $query = Products::with([
                     'category:id,name,gender',
                     'colors:id,product_id,color,images',
-                    'variants:id,product_id,color_id,size,stock,price,discount,total_price'
+                    'variants:id,product_id,color_id,size,stock,price,discount,total_price',
+                    'reviews:id,product_id,user_id,name,review,rating,image,created_at'
                 ])
                 ->select('id', 'category_id', 'gender',  'name', 'main_image', 'zoomed_image', 'description');
                 
@@ -308,6 +313,7 @@ class ProductController extends Controller
 
                 $response['multipleImages'] = array_values(array_unique($allImages));
                 $response['colors'] = $colorImages;
+                $response['reviews'] = $product->reviews ?? [];
             }
 
             return response()->json([
@@ -720,6 +726,155 @@ public function search(Request $request)
     ]);
 }
 
+/**
+ * Submit a product review (Available only after order delivery).
+ */
+public function storeReview(Request $request, $id)
+{
+    try {
+        $product = Products::findOrFail($id);
+        $user = Auth::guard('sanctum')->user();
 
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        // Verify that the user has a delivered order containing this product
+        $deliveredOrders = Order::where('user_id', $user->id)
+            ->where('status', 'delivered')
+            ->get();
+
+        $hasPurchased = $deliveredOrders->contains(function ($order) use ($product) {
+            $items = is_array($order->items) ? $order->items : (json_decode($order->items, true) ?: []);
+            foreach ($items as $item) {
+                if (isset($item['product_id']) && $item['product_id'] == $product->id) {
+                    return true;
+                }
+                if (isset($item['product']['id']) && $item['product']['id'] == $product->id) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        if (!$hasPurchased) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You can only review products that have been delivered to you.'
+            ], 403);
+        }
+
+        // Check if user has already reviewed this product
+        $existing = Review::where('product_id', $product->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already reviewed this product.'
+            ], 422);
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'required|string|max:1000',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('reviews', 'public');
+        }
+
+        $review = Review::create([
+            'product_id' => $product->id,
+            'user_id'    => $user->id,
+            'name'       => $user->name,
+            'rating'     => $request->rating,
+            'review'     => $request->review,
+            'image'      => $imagePath
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Review submitted successfully',
+            'data'    => $review
+        ], 201);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Product not found'
+        ], 404);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error',
+            'errors'  => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error submitting review: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Check if the user is eligible to write a review.
+ */
+public function checkReviewEligibility($id)
+{
+    try {
+        $product = Products::findOrFail($id);
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'eligible' => false,
+                'message'  => 'Unauthorized'
+            ]);
+        }
+
+        // Verify delivered order
+        $deliveredOrders = Order::where('user_id', $user->id)
+            ->where('status', 'delivered')
+            ->get();
+
+        $hasPurchased = $deliveredOrders->contains(function ($order) use ($product) {
+            $items = is_array($order->items) ? $order->items : (json_decode($order->items, true) ?: []);
+            foreach ($items as $item) {
+                if (isset($item['product_id']) && $item['product_id'] == $product->id) {
+                    return true;
+                }
+                if (isset($item['product']['id']) && $item['product']['id'] == $product->id) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        // Check if already reviewed
+        $alreadyReviewed = Review::where('product_id', $product->id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        return response()->json([
+            'eligible'         => $hasPurchased && !$alreadyReviewed,
+            'already_reviewed' => $alreadyReviewed,
+            'purchased'        => $hasPurchased
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'eligible' => false,
+            'message'  => 'Error: ' . $e->getMessage()
+        ]);
+    }
+}
 
 }

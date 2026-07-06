@@ -22,12 +22,27 @@ class ProductColorController extends Controller
     {
         $query = ProductColor::with('product');
 
+        if ($request->q) {
+            $query->where(function ($q) use ($request) {
+                $q->where('color', 'like', "%{$request->q}%")
+                  ->orWhereHas('product', function ($q2) use ($request) {
+                      $q2->where('name', 'like', "%{$request->q}%");
+                  });
+            });
+        }
+
         $items = $query->orderBy('id','desc')->paginate($request->offset ?? 10);
+
+        $stats = [
+            'total'           => ProductColor::count(),
+            'unique_products' => ProductColor::distinct('product_id')->count('product_id'),
+        ];
 
         $data = [
             'rows'       => view('admin.modules.product-colors.list_rows', ['items' => $items])->render(),
             'items'      => $items,
             'pagination' => view('admin.inc.pagination', ['result' => $items])->render(),
+            'stats'      => $stats,
         ];
 
         return response()->json($data, 200);

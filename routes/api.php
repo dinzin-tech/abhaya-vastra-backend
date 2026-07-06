@@ -47,7 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/user/profile', [ProfileController::class, 'profile']);
     Route::post('/user/profile', [ProfileController::class, 'updateProfile']);
-
+    
+    // Submit review for a product after delivery
+    Route::post('/products/{id}/reviews', [ProductController::class, 'storeReview']);
+    Route::get('/products/{id}/review-eligibility', [ProductController::class, 'checkReviewEligibility']);
 });
 
 

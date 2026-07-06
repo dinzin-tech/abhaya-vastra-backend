@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Review;
+use App\Models\Products;
 use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
@@ -25,12 +26,17 @@ class ReviewController extends Controller
      */
     public function listReview(Request $request)
     {
-        $query = Review::query();
+        $query = Review::with('product');
         $offset = $request->offset ?? 10;
 
         if ($request->q) {
-            $query->where('name', 'like', "%{$request->q}%")
-                  ->orWhere('review', 'like', "%{$request->q}%");
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', "%{$request->q}%")
+                  ->orWhere('review', 'like', "%{$request->q}%")
+                  ->orWhereHas('product', function($q2) use ($request) {
+                      $q2->where('name', 'like', "%{$request->q}%");
+                  });
+            });
         }
 
         $items = $query->orderBy('id', 'desc')->paginate($offset);
@@ -49,8 +55,10 @@ class ReviewController extends Controller
      */
     public function create()
     {
+        $products = Products::all();
         return view('admin.modules.review.add', [
-            'item' => false
+            'item' => false,
+            'products' => $products
         ]);
     }
 
@@ -59,17 +67,15 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-
-        // dd($request);
         $request->validate([
-            'name'   => 'required|string|max:100',
-            'rating' => 'required|integer|min:1|max:5',
-            'review' => 'required|string|max:500',
-            'image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'name'       => 'required|string|max:100',
+            'product_id' => 'nullable|exists:products,id',
+            'rating'     => 'required|integer|min:1|max:5',
+            'review'     => 'required|string|max:500',
+            'image'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        // Upload image if provided
-        $data = $request->only(['name', 'rating', 'review']);
+        $data = $request->only(['name', 'product_id', 'rating', 'review']);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('reviews', 'public');
@@ -78,9 +84,12 @@ class ReviewController extends Controller
         if ($request->id) {
             $review = Review::findOrFail($request->id);
 
-            // Delete old image if replaced
-            if ($request->hasFile('image') && $review->image) {
+            // Delete old image if replaced or explicitly requested to be removed
+            if (($request->remove_image == '1' || $request->hasFile('image')) && $review->image) {
                 Storage::disk('public')->delete($review->image);
+                if ($request->remove_image == '1' && !$request->hasFile('image')) {
+                    $data['image'] = null;
+                }
             }
 
             $review->update($data);
@@ -103,9 +112,11 @@ class ReviewController extends Controller
     public function edit($id)
     {
         $item = Review::findOrFail($id);
+        $products = Products::all();
 
         return view('admin.modules.review.add', [
-            'item' => $item
+            'item' => $item,
+            'products' => $products
         ]);
     }
 

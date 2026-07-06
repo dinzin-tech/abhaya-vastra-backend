@@ -28,17 +28,29 @@ class ProductVariantController extends Controller
         $query = ProductVariant::with('product', 'color');
 
         if ($request->q) {
-            $query->whereHas('product', function($q) use ($request){
-                $q->where('name','like',"%{$request->q}%");
+            $query->where(function($q) use ($request) {
+                $q->whereHas('product', function($q2) use ($request) {
+                    $q2->where('name', 'like', "%{$request->q}%");
+                })->orWhere('size', 'like', "%{$request->q}%")
+                  ->orWhereHas('color', function($q3) use ($request) {
+                      $q3->where('color', 'like', "%{$request->q}%");
+                  });
             });
         }
 
         $items = $query->orderBy('id','desc')->paginate($request->offset ?? 10);
 
+        $stats = [
+            'total'        => ProductVariant::count(),
+            'out_of_stock' => ProductVariant::where('stock', 0)->count(),
+            'low_stock'    => ProductVariant::where('stock', '>', 0)->where('stock', '<', 5)->count(),
+        ];
+
         $data = [
             'rows'       => view('admin.modules.product-variants.list_rows', ['items' => $items])->render(),
             'items'      => $items,
             'pagination' => view('admin.inc.pagination', ['result' => $items])->render(),
+            'stats'      => $stats,
         ];
 
         return response()->json($data,200);

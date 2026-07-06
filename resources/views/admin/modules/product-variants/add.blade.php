@@ -6,322 +6,290 @@
 <meta content="{{ config('app.name') }}" name="author" />
 @endpush
 
+@push('appendCss')
+<style>
+    .pvf-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .pvf-header h4 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .pvf-header .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        background: #fff;
+        color: #475569;
+        text-decoration: none;
+        transition: all .2s;
+    }
+    .pvf-header .btn-back:hover { background:#f1f5f9; color:#0f172a; }
+
+    .pvf-row { display:grid; gap:20px; margin-bottom:20px; }
+    .pvf-row-1 { grid-template-columns: 1fr; }
+    .pvf-row-2 { grid-template-columns: 1fr 1fr; }
+    .pvf-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media(max-width:768px) {
+        .pvf-row-2, .pvf-row-3 { grid-template-columns:1fr; }
+    }
+
+    .pvf-field label {
+        display:block; font-size:0.8rem; font-weight:600;
+        color:#374151; margin-bottom:6px; letter-spacing:.3px;
+    }
+    .pvf-field label .req { color:#ef4444; margin-left:2px; }
+    .pvf-field .form-control, .pvf-field select {
+        width:100%; padding:10px 14px; font-size:0.9rem;
+        border:1.5px solid #e2e8f0; border-radius:8px;
+        background:#f8fafc; color:#1e293b; transition: border-color .2s, box-shadow .2s;
+        outline:none;
+    }
+    .pvf-field .form-control:focus, .pvf-field select:focus {
+        border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.1);
+        background:#fff;
+    }
+
+    .btn-pf-save {
+        display:inline-flex; align-items:center; gap:8px;
+        background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;
+        border:none; border-radius:10px; padding:12px 28px;
+        font-size:0.9rem; font-weight:700; cursor:pointer;
+        box-shadow:0 4px 14px rgba(99,102,241,.35); transition: transform .15s, box-shadow .15s;
+    }
+    .btn-pf-save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(99,102,241,.4); }
+    .btn-pf-edit {
+        display:inline-flex; align-items:center; gap:8px;
+        background:#fff; color:#6366f1; border:2px solid #6366f1;
+        border-radius:10px; padding:10px 24px; font-size:0.9rem;
+        font-weight:700; cursor:pointer; transition: background .2s;
+    }
+    .btn-pf-edit:hover { background:#eef2ff; }
+</style>
+@endpush
+
 @section('content')
 <div class="app__slide-wrapper">
-    <div class="breadcrumb__area">
-        <div class="breadcrumb__wrapper mb-25">
-            <nav>
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $item ? 'Update' : 'Add' }} Product Variant</li>
-                </ol>
-            </nav>
+    <div class="pvf-header">
+        <div>
+            <h4>
+                <i class="fa-regular fa-boxes-stacked me-2" style="color:#6366f1"></i>
+                {{ $item ? 'Update Product Variant' : 'Add New Product Variant' }}
+            </h4>
         </div>
+        <a href="{{ route('product-variants.index') }}" class="btn-back">
+            <i class="fa-regular fa-arrow-left"></i> Back to Variants
+        </a>
     </div>
 
-    <div class="row">
-        <div class="col-xxl-12 col-xl-12 col-lg-12">
-            <form class="card__wrapper" action="{{ route('product-variants.store') }}" method="post" 
-                  enctype="multipart/form-data" onsubmit="return submitVariantForm(this)">
-                @csrf
-                <input type="hidden" name="id" value="{{ $item ? $item->id : '' }}">
-                {{-- REMOVED: <input type="hidden" name="removed_images" id="removed_images" value="[]"> --}}
-
-                <div class="card__title-wrap mb-20 d-flex justify-content-end">
-                    <a href="{{ route('product-variants.index') }}" class="btn btn-info me-2">
-                        <i class="la la-arrow-left"></i> Back
-                    </a>
-                    <button type="button" id="editBtn" class="btn btn-primary" 
-                            style="{{ $item ? '' : 'display:none;' }}" onclick="enableEdit(this);">
-                        Edit
-                    </button>
-                </div>
-
-                <div class="row gx-0 g-20 gy-20 mt-3">
-                    <div class="col-lg-12">
-                        <div class="from__input-box">
-                            <div class="form__input-title">
-                                <label for="product_id">Product <span>*</span></label>
-                            </div>
-                            <div class="form__input">
-                                {{-- The 'productColors' loop is removed from here as it's now populated dynamically --}}
-                                <select name="product_id" id="product_id" class="form-control select2" 
-                                        {{ $item ? 'disabled' : '' }} required>
-                                    <option value="">Select Product</option>
-                                    @foreach($products as $product)
-                                        <option value="{{ $product->id }}" 
-                                            {{ ($item && $item->product_id == $product->id) ? 'selected' : '' }}>
-                                            {{ $product->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row gx-0 g-20 gy-20 mt-3">
-                    <div class="col-lg-6">
-                        <div class="from__input-box">
-                            <div class="form__input-title"><label for="color_id">Color <span>*</span></label></div>
-                            <div class="form__input">
-                                <select name="color_id" id="color_id" class="form-control" {{ $item ? 'disabled' : '' }} required>
-                                    {{-- Initial options are placeholders, they will be loaded by JS --}}
-                                    <option value="">Select Product First</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="from__input-box">
-                            <div class="form__input-title"><label for="size">Size <span>*</span></label></div>
-                            <div class="form__input">
-                                <select name="size" id="size" class="form-control" {{ $item ? 'disabled' : '' }} required>
-                                    @php $sizes = ['XS','S','M','L','XL','XXL']; @endphp
-                                    <option value="">Select Size</option>
-                                    @foreach($sizes as $size)
-                                        <option value="{{ $size }}" {{ ($item && $item->size == $size) ? 'selected' : '' }}>
-                                            {{ $size }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row gx-0 g-20 gy-20 mt-3">
-                    <div class="col-lg-6">
-                        <div class="from__input-box">
-                            <div class="form__input-title"><label for="stock">Stock</label></div>
-                            <div class="form__input">
-                                <input type="number" name="stock" id="stock" class="form-control"
-                                       value="{{ $item->stock ?? 0 }}" {{ $item ? 'readonly' : '' }}>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-    <div class="from__input-box">
-        <div class="form__input-title"><label for="weight">Weight</label></div>
-        <div class="form__input">
-            <input type="number" name="weight" id="weight" class="form-control"
-                   step="0.01" min="0"
-                   value="{{ $item->weight ?? 0 }}" {{ $item ? 'readonly' : '' }}>
+    <div class="card__wrapper" style="border-radius:16px;padding:28px;">
+        @if($item)
+        <div class="alert d-flex align-items-center gap-2 mb-4" style="background:#fef3c7;border:1.5px solid #fcd34d;border-radius:10px;font-size:.85rem;color:#92400e;padding:12px 18px;">
+            <i class="fa-solid fa-lock"></i>
+            <span>Form is in <strong>view mode</strong>. Click <strong>Enable Edit</strong> to make changes.</span>
+            <button type="button" id="editBtn" class="btn-pf-edit ms-auto" onclick="enableEdit(this)">
+                <i class="fa-regular fa-pen"></i> Enable Edit
+            </button>
         </div>
-    </div>
-</div>
+        @endif
 
+        <form id="variantForm" action="{{ route('product-variants.store') }}" method="post" onsubmit="return submitForm()">
+            @csrf
+            <input type="hidden" name="id" value="{{ $item ? $item->id : '' }}">
 
-                    <!-- <div class="col-lg-6">
-                        <div class="from__input-box">
-                            <div class="form__input-title"><label for="price">Variant Price <span>*</span></label></div>
-                            <div class="form__input">
-                                <input type="number" step="0.01" name="price" id="price" class="form-control"
-                                       value="{{ $item->price ?? '' }}" {{ $item ? 'readonly' : '' }} required>
-                            </div>
-                        </div>
-                    </div> -->
-                      <div class="row gx-0 g-20 gy-20 align-items-center justify-content-center mt-3">
-                    <div class="col-lg-4">
-                        <div class="from__input-box">
-                            <div class="form__input-title">
-                                <label for="price">Price<span>*</span></label>
-                            </div>
-                            <div class="form__input">
-                                <input type="number" step="0.01" name="price" id="price" class="form-control"
-                                    value="{{ $item->price ?? '' }}" {{ $item ? 'readonly' : '' }} required />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="from__input-box">
-                            <div class="form__input-title">
-                                <label for="discount">Discount (%)</label>
-                            </div>
-                            <div class="form__input">
-                                <input type="number" step="0.01" name="discount" id="discount" class="form-control"
-                                    value="{{ $item->discount ?? '' }}" {{ $item ? 'readonly' : '' }} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="from__input-box">
-                            <div class="form__input-title">
-                                <label for="total_price">Total Price</label>
-                            </div>
-                            <div class="form__input">
-                                <input type="number" step="0.01" id="total_price" class="form-control"
-                                    value="{{ $item->total_price ?? ($item->price ?? '') }}"
-                                    readonly />
-                            </div>
-                        </div>
-                    </div>
+            <div class="pvf-row pvf-row-1">
+                <div class="pvf-field">
+                    <label for="product_id">Product <span class="req">*</span></label>
+                    <select name="product_id" id="product_id" {{ $item ? 'disabled' : '' }} required>
+                        <option value="">Select Product</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}" 
+                                {{ ($item && $item->product_id == $product->id) ? 'selected' : '' }}>
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
+            </div>
+
+            <div class="pvf-row pvf-row-2">
+                <div class="pvf-field">
+                    <label for="color_id">Color <span class="req">*</span></label>
+                    <select name="color_id" id="color_id" {{ $item ? 'disabled' : '' }} required>
+                        <option value="">Select Product First</option>
+                    </select>
                 </div>
 
-                {{-- REMOVED: Variant Images section --}}
+                <div class="pvf-field">
+                    <label for="size">Size <span class="req">*</span></label>
+                    <input type="text" name="size" id="size" class="form-control"
+                           value="{{ $item->size ?? '' }}" {{ $item ? 'readonly' : '' }} required
+                           placeholder="e.g. S, M, XL, Free Size">
+                </div>
+            </div>
 
-                <button class="btn btn-primary w-auto saveBtn mt-5" type="submit" style="{{ $item ? 'display:none;' : '' }}">
-                    {{ $item ? 'Update' : 'Add' }}
+            <div class="pvf-row pvf-row-2">
+                <div class="pvf-field">
+                    <label for="stock">Stock (Quantity) <span class="req">*</span></label>
+                    <input type="number" name="stock" id="stock" class="form-control"
+                           value="{{ $item->stock ?? 0 }}" {{ $item ? 'readonly' : '' }} required min="0">
+                </div>
+
+                <div class="pvf-field">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" step="0.01" name="weight" id="weight" class="form-control"
+                           value="{{ $item->weight ?? '' }}" {{ $item ? 'readonly' : '' }} min="0" placeholder="e.g. 0.25">
+                </div>
+            </div>
+
+            <div class="pvf-row pvf-row-3">
+                <div class="pvf-field">
+                    <label for="price">Price (₹) <span class="req">*</span></label>
+                    <input type="number" step="0.01" name="price" id="price" class="form-control"
+                           value="{{ $item->price ?? '' }}" {{ $item ? 'readonly' : '' }} required min="0">
+                </div>
+
+                <div class="pvf-field">
+                    <label for="discount">Discount (%)</label>
+                    <input type="number" step="0.01" name="discount" id="discount" class="form-control"
+                           value="{{ $item->discount ?? 0 }}" {{ $item ? 'readonly' : '' }} min="0" max="100">
+                </div>
+
+                <div class="pvf-field">
+                    <label for="total_price">Calculated Total Price (₹)</label>
+                    <input type="number" step="0.01" id="total_price" class="form-control"
+                           value="{{ $item->total_price ?? '' }}" readonly style="background:#f1f5f9;font-weight:700;">
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;">
+                <a href="{{ route('product-variants.index') }}" class="btn-back" style="padding:11px 24px;border-radius:10px;">Cancel</a>
+                <button type="submit" class="btn-pf-save saveBtn" id="saveBtn" style="{{ $item ? 'display:none;' : '' }}">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    {{ $item ? 'Save Changes' : 'Add Variant' }}
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 @stop
 
 @push('appendJs')
-<script src="{{ asset('assets/js/plugins/select2.full.min.js') }}"></script>
-
 <script>
-// Define the AJAX endpoint URL using the route helper
-const fetchColorUrl = "{{ route('product-variants.get-colors') }}";
+    const fetchColorUrl = "{{ route('product-variants.get-colors') }}";
 
-// var enableEdit = function(ele){
-//     $('input, textarea, select').attr('readonly', false).attr('disabled', false);
-    
-//     // In edit mode, if the product/color/size fields should be changeable, re-enable them.
-//     // However, typically product and color links are kept disabled/readonly after creation.
-//     // If you need them to be editable, you can specifically re-enable them here.
-//     $('#product_id').prop('disabled', false).trigger('change');
-//     $('#color_id').prop('disabled', false).trigger('change');
-    
-//     $('.saveBtn').show();
-//     $(ele).hide();
-// }
-
-
-var enableEdit = function(ele){
-    $('input, textarea, select').attr('readonly', false).attr('disabled', false);
-
-    // Show the Save button and hide Edit
-    $('.saveBtn').show();
-    $(ele).hide();
-
-    // Show the remove buttons if any image wrappers exist
-    document.querySelectorAll('.customize-img-wrapper button').forEach(btn=>{
-        btn.classList.remove('d-none');
-    });
-
-    // 🔹 Re-load colors for the selected product to preserve selection
-    const productId = $('#product_id').val();
-    const selectedColorId = "{{ $item->color_id ?? '' }}"; // Blade variable
-    if(productId){
-        loadProductColors(productId, selectedColorId);
-    }
-}
-
-@if(!$item)
-enableEdit();
-@endif
-
-
-// Function to handle fetching and updating the Color dropdown
-function loadProductColors(productId, selectedColorId = null) {
-    const colorSelect = $('#color_id');
-    
-    // Clear existing options and show a loading message
-    colorSelect.empty().append('<option value="">Loading Colors...</option>').prop('disabled', true);
-    
-    if (!productId) {
-        colorSelect.empty().append('<option value="">Select Product First</option>');
-        return;
-    }
-
-    axios.post(fetchColorUrl, { product_id: productId })
-        .then(response => {
-            colorSelect.empty().append('<option value="">Select Color</option>');
-            
-            if (response.data.length > 0) {
-                response.data.forEach(color => {
-                    // Check if the current color should be selected (for Edit mode)
-                    const isSelected = selectedColorId && selectedColorId == color.id ? 'selected' : '';
-                    colorSelect.append(`<option value="${color.id}" ${isSelected}>${color.color}</option>`);
-                });
-            } else {
-                colorSelect.append('<option value="">No Colors Found for this Product</option>');
-            }
-            
-            // Re-enable the dropdown
-            colorSelect.prop('disabled', false);
-            
-            // Re-trigger select2 refresh if necessary
-            // colorSelect.select2();
-        })
-        .catch(error => {
-            console.error("Error fetching colors:", error);
-            colorSelect.empty().append('<option value="">Error Loading Colors</option>');
-            colorSelect.prop('disabled', true);
+    function enableEdit(btn) {
+        document.querySelectorAll('input:not([type="hidden"]), select').forEach(el => {
+            el.removeAttribute('readonly');
+            el.removeAttribute('disabled');
         });
-}
+        document.getElementById('saveBtn').style.display = 'inline-flex';
+        btn.style.display = 'none';
 
-// Initialization Logic
-$(document).ready(function() {
-    // 1. Attach listener to the Product dropdown
-    $('#product_id').on('change', function() {
-        const selectedProductId = $(this).val();
-        loadProductColors(selectedProductId);
-    });
+        const productId = $('#product_id').val();
+        const selectedColorId = "{{ $item->color_id ?? '' }}";
+        if(productId){
+            loadProductColors(productId, selectedColorId);
+        }
+    }
 
-    // 2. Initial load for Edit mode or pre-selected products
-    const initialProductId = $('#product_id').val();
-    const initialColorId = "{{ $item->color_id ?? '' }}";
-    
-    // If we have a product selected initially, load the colors
-    if (initialProductId) {
-        // Only load if in Create mode OR in Edit mode and the dropdown is currently enabled/not explicitly disabled
-        @if(!$item || ($item && !($item ? 'disabled' : '')))
+    function loadProductColors(productId, selectedColorId = null) {
+        const colorSelect = $('#color_id');
+        colorSelect.empty().append('<option value="">Loading Colors...</option>').prop('disabled', true);
+        
+        if (!productId) {
+            colorSelect.empty().append('<option value="">Select Product First</option>');
+            return;
+        }
+
+        axios.post(fetchColorUrl, { product_id: productId })
+            .then(response => {
+                colorSelect.empty().append('<option value="">Select Color</option>');
+                if (response.data.length > 0) {
+                    response.data.forEach(color => {
+                        const isSelected = selectedColorId && selectedColorId == color.id ? 'selected' : '';
+                        colorSelect.append(`<option value="${color.id}" ${isSelected}>${color.color}</option>`);
+                    });
+                } else {
+                    colorSelect.append('<option value="">No Colors Found</option>');
+                }
+                colorSelect.prop('disabled', false);
+            })
+            .catch(error => {
+                colorSelect.empty().append('<option value="">Error Loading Colors</option>');
+            });
+    }
+
+    $(document).ready(function() {
+        $('#product_id').on('change', function() {
+            loadProductColors($(this).val());
+        });
+
+        const initialProductId = $('#product_id').val();
+        const initialColorId = "{{ $item->color_id ?? '' }}";
+        if (initialProductId) {
             loadProductColors(initialProductId, initialColorId);
-        @endif
-    }
-});
-
-
-
-
-
-function submitVariantForm(form){
-    let formData = new FormData(form);
-
-    // Disable the submit button to prevent double-click
-    $('.saveBtn').prop('disabled', true);
-
-    axios.post(form.action, formData, {
-        // Content-Type is correct for FormData
-    }).then(res=>{
-        if(res.data.redirect){
-            window.location.href = res.data.redirect;
-        }else{
-            alert(res.data.message);
         }
-    }).catch(err=>{
-        alert(err.response?.data?.message || 'Something went wrong');
-    }).finally(()=>{
-        // Re-enable the submit button
-        $('.saveBtn').prop('disabled', false);
+
+        // Live calculation
+        function calculateTotal() {
+            let price = parseFloat($('#price').val()) || 0;
+            let discount = parseFloat($('#discount').val()) || 0;
+            let total = price;
+            if(discount > 0){
+                total = price - (price * (discount/100));
+            }
+            $('#total_price').val(total.toFixed(2));
+        }
+
+        $('#price, #discount').on('input', calculateTotal);
+        calculateTotal();
     });
 
-    return false;
-}
+    function submitForm() {
+        event.preventDefault();
+        const form = document.getElementById('variantForm');
+        const formData = new FormData(form);
 
- function calculateTotal(){
-        let price = parseFloat($('#price').val()) || 0;
-        let discount = parseFloat($('#discount').val()) || 0;
-        let total = price;
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Saving…';
 
-        if(discount > 0){
-            total = price - (price * (discount/100));
-        }
-        $('#total_price').val(total.toFixed(2));
+        axios.post(form.action, formData)
+            .then(res => {
+                if (res.data.success) {
+                    toastr.success(res.data.message || 'Saved successfully!');
+                    setTimeout(() => { window.location.href = res.data.redirect || '/admin/product-variants'; }, 1000);
+                } else {
+                    toastr.error(res.data.message || 'Something went wrong.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Save';
+                }
+            })
+            .catch(err => {
+                const errors = err.response?.data?.errors;
+                if (errors) {
+                    const msgs = Object.values(errors).flat().join('<br>');
+                    toastr.error(msgs, 'Validation Error', { timeOut: 6000 });
+                } else {
+                    toastr.error('Failed to save variant.');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-regular fa-floppy-disk"></i> Save';
+            });
+
+        return false;
     }
-
-    $('#price, #discount').on('input', calculateTotal);
-
-    // run once on page load
-    calculateTotal();
 </script>
 @endpush

@@ -30,8 +30,8 @@ class User extends Authenticatable
         'zip',
         'password',
         'shipping_address',
-        'shipping_address',
         'shipping_city',
+        'shipping_state',
         'shipping_zip'
     ];
 

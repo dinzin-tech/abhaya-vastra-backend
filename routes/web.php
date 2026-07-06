@@ -56,6 +56,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('categories-list', 'App\Http\Controllers\Admin\CategoryController@listCategories')->name('categories.list');
     Route::delete('/delete-category', 'App\Http\Controllers\Admin\CategoryController@delete')->name('categories.delete');
 
+    // Bulk Product Import Routes (MUST be before resource to avoid {product} parameter capture)
+    Route::get('products/bulk-import', 'App\Http\Controllers\Admin\BulkProductImportController@index')->name('products.bulk-import');
+    Route::post('products/bulk-import', 'App\Http\Controllers\Admin\BulkProductImportController@import')->name('products.bulk-import.store');
+    Route::get('products/bulk-import/template', 'App\Http\Controllers\Admin\BulkProductImportController@downloadTemplate')->name('products.bulk-import.template');
+
     Route::resource('products', 'App\Http\Controllers\Admin\ProductController');
     Route::get('products-list', 'App\Http\Controllers\Admin\ProductController@listProducts')->name('products.list');
     Route::delete('/delete-product', 'App\Http\Controllers\Admin\ProductController@delete')->name('products.delete');

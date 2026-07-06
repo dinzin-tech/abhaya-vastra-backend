@@ -26,12 +26,24 @@ class CustomizedController extends Controller
     {
         $query = Customized::query();
 
+        if ($request->q) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', "%{$request->q}%")
+                  ->orWhere('description', 'like', "%{$request->q}%");
+            });
+        }
+
         $items = $query->orderBy('id','desc')->paginate($request->offset ?? 10);
+
+        $stats = [
+            'total' => Customized::count(),
+        ];
 
         $data = [
             'rows'       => view('admin.modules.customized.list_rows', ['items' => $items])->render(),
             'items'      => $items,
             'pagination' => view('admin.inc.pagination', ['result' => $items])->render(),
+            'stats'      => $stats,
         ];
 
         return response()->json($data,200);
@@ -103,26 +115,26 @@ public function store(Request $request)
         // Update case
         $custom = Customized::findOrFail($request->id);
 
+        $existingImages = is_array($custom->images) ? $custom->images : [];
+
         // Remove old images if requested
         if($request->removed_images){
-            foreach(json_decode($request->removed_images) as $img){
+            $removed = json_decode($request->removed_images, true) ?? [];
+            foreach($removed as $img){
                 Storage::disk('public')->delete($img);
             }
-            $existingImages = $custom->images ? json_decode($custom->images,true) : [];
-            $existingImages = array_diff($existingImages, json_decode($request->removed_images,true));
-        } else {
-            $existingImages = $custom->images ? json_decode($custom->images,true) : [];
+            $existingImages = array_diff($existingImages, $removed);
         }
 
         // Merge old + new
         $allImages = array_merge($existingImages, $imagesArray);
 
-        // ❌ If no images left at all
+        // If no images left at all
         if(count($allImages) < 1){
             return response()->json(['success'=>false,'message'=>'Please select at least one image'],400);
         }
 
-        $data['images'] = json_encode($allImages);
+        $data['images'] = $allImages; // Model casting will handle this automatically
         $custom->update($data);
 
         $message = 'Customize Product Updated';
@@ -132,7 +144,7 @@ public function store(Request $request)
             return response()->json(['success'=>false,'message'=>'Please select at least one image'],400);
         }
 
-        $data['images'] = json_encode($imagesArray);
+        $data['images'] = $imagesArray; // Model casting will handle this automatically
         Customized::create($data);
 
         $message = 'Customize Product Added';
@@ -145,7 +157,6 @@ public function store(Request $request)
     ]);
 }
 
-
     /**
      * Delete customize product
      */
@@ -153,10 +164,9 @@ public function store(Request $request)
     {
         $custom = Customized::findOrFail($request->id);
 
-        if($custom->images){
-            foreach(json_decode($custom->images,true) as $img){
-                Storage::disk('public')->delete($img);
-            }
+        $images = is_array($custom->images) ? $custom->images : [];
+        foreach($images as $img){
+            Storage::disk('public')->delete($img);
         }
 
         $custom->delete();

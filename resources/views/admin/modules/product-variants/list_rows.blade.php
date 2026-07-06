@@ -1,58 +1,75 @@
 @forelse($items as $item)
 <tr>
     <!-- Serial Number -->
-    <td>{{ (($items->currentPage() - 1) * $items->perPage()) + $loop->iteration }}</td>
+    <td style="font-weight:700;color:#94a3b8;">
+        {{ (($items->currentPage() - 1) * $items->perPage()) + $loop->iteration }}
+    </td>
 
     <!-- Product Name -->
-    <td>{{ $item->product->name ?? '-' }}</td>
+    <td style="font-weight:700;color:#1e293b;font-size:.9rem;">
+        {{ $item->product->name ?? '-' }}
+    </td>
 
     <!-- Color -->
-    {{-- FIX 1: Access the color name via the 'color' relationship. $item->color is the ProductColor model. --}}
-    <td>{{ $item->color->color ?? '-' }}</td>
+    <td>
+        <span class="color-swatch-circle" style="background: {{ ($item->color && str_starts_with($item->color->color, '#')) ? $item->color->color : '#e2e8f0' }}"></span>
+        <span style="font-weight:600;color:#475569;">{{ ucfirst($item->color->color ?? '-') }}</span>
+    </td>
 
     <!-- Size -->
-    <td>{{ $item->size ?? '-' }}</td>
+    <td>
+        <span class="variant-size-badge">{{ $item->size ?? '-' }}</span>
+    </td>
 
     <!-- Price -->
-    <td>₹{{ number_format($item->price, 2) }}</td>
+    <td style="font-weight:700;color:#1e293b;">
+        ₹{{ number_format($item->price, 2) }}
+        @if($item->discount > 0)
+            <div style="font-size:0.75rem;color:#16a34a;">-{{ number_format($item->discount, 1) }}%</div>
+        @endif
+    </td>
 
     <!-- Stock -->
-    <td>{{ $item->stock }}</td>
-    <td>{{ $item->weight }}</td>
+    <td>
+        @if($item->stock == 0)
+            <span style="background:#fee2e2;color:#ef4444;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;">Out of Stock</span>
+        @elseif($item->stock < 5)
+            <span style="background:#fffbeb;color:#d97706;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;">Low Stock ({{ $item->stock }})</span>
+        @else
+            <span style="background:#f0fdf4;color:#16a34a;border-radius:6px;padding:4px 10px;font-size:.78rem;font-weight:700;">In Stock ({{ $item->stock }})</span>
+        @endif
+    </td>
 
+    <!-- Weight -->
+    <td style="color:#64748b;font-weight:600;">
+        {{ $item->weight ? $item->weight . ' kg' : '—' }}
+    </td>
 
     <!-- Images -->
     <td>
-        {{-- FIX 2: Access images from the related ProductColor model ($item->color).
-             Since we enabled casting in the ProductColor model, $item->color->images should be a PHP array.
-        --}}
         @php
             $variantImages = $item->color->images ?? [];
-            // Show max 4 images for cleanliness
             $displayImages = array_slice($variantImages, 0, 4);
         @endphp
 
         @if(!empty($displayImages))
             @foreach($displayImages as $img)
-                <img src="{{ asset('storage/'.$img) }}" 
-                     alt="{{ $item->product->name ?? 'Variant' }} Image" 
-                     width="50" height="50" 
-                     style="object-fit:cover; margin-right:5px; border-radius:4px;">
+                <img class="variant-thumb" src="{{ asset('storage/'.$img) }}" alt="Variant Image">
             @endforeach
         @else
-            -
+            <span style="color:#94a3b8;font-size:.8rem;">—</span>
         @endif
     </td>
 
     <!-- Actions -->
     <td>
-        <div class="d-flex align-items-center justify-content-start gap-10">
+        <div class="d-flex align-items-center gap-2">
             <!-- View / Edit -->
-            <a type="button" class="table__icon edit" href="{{ route('product-variants.edit', $item->id) }}">
+            <a href="{{ route('product-variants.edit', $item->id) }}" class="table__icon edit" title="View / Edit">
                 <i class="fa-regular fa-eye"></i>
             </a>
             <!-- Delete -->
-            <button class="removeBtn table__icon delete" onclick="deleteRecord('{{ $item->id }}', $(this))">
+            <button class="removeBtn table__icon delete" onclick="deleteRecord('{{ $item->id }}', $(this))" title="Delete">
                 <i class="fa-regular fa-trash"></i>
             </button>
         </div>
@@ -60,6 +77,9 @@
 </tr>
 @empty
 <tr>
-    <td colspan="8" align="center">No Product Variants Found!</td>
+    <td colspan="9" style="text-align:center;padding:50px 0;color:#94a3b8;">
+        <div style="font-size:2rem;margin-bottom:10px;">📦</div>
+        <div style="font-weight:700;font-size:.95rem;color:#64748b;">No Variants Found</div>
+    </td>
 </tr>
 @endforelse
