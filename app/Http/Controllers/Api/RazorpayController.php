@@ -158,6 +158,17 @@ class RazorpayController extends Controller
 
                 // Reduce stock for ordered items
                 $this->reduceStock($order);
+ 
+                // Clear cart after successful payment
+                $user = Auth::guard('sanctum')->user();
+                $sessionId = $request->input('session_id');
+                if ($user) {
+                    \App\Models\Cart::where('user_id', $user->id)->delete();
+                } elseif ($order->user_id) {
+                    \App\Models\Cart::where('user_id', $order->user_id)->delete();
+                } elseif ($sessionId) {
+                    \App\Models\Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
+                }
 
                 // Approve pending reward points
                 $this->approvePendingRewards($order);
@@ -219,18 +230,57 @@ class RazorpayController extends Controller
 
             $payment = Payment::where('razorpay_order_id', $request->razorpay_order_id)->first();
 
-            if ($payment) {
-                $payment->update([
-                    'status' => 'failed',
-                    'payment_details' => $request->error ?? ['message' => 'Payment failed']
-                ]);
+             if ($payment) {
+                 $payment->update([
+                     'status' => 'failed',
+                     'payment_details' => $request->error ?? ['message' => 'Payment failed']
+                 ]);
+ 
+                 // Update order payment status
+                 $order = Order::find($payment->order_id);
+                 if ($order && $order->payment_status !== 'failed') {
+                     $order->update([
+                         'payment_status' => 'failed'
+                     ]);
 
-                // Update order payment status
-                $order = Order::find($payment->order_id);
-                $order->update([
-                    'payment_status' => 'failed'
-                ]);
-            }
+                     // Revert used wallet money & loyalty points back to user's wallet
+                     if ($order->wallet_money_used > 0 || $order->loyalty_points_used > 0) {
+                         $wallet = \App\Models\Wallet::where('user_id', $order->user_id)->first();
+                         if ($wallet) {
+                             if ($order->wallet_money_used > 0) {
+                                 $wallet->increment('wallet_balance', $order->wallet_money_used);
+                                 \App\Models\WalletTransaction::create([
+                                     'wallet_id' => $wallet->id,
+                                     'type' => 'credit',
+                                     'points' => 0,
+                                     'status' => 'completed',
+                                     'description' => 'Reverted ₹' . $order->wallet_money_used . ' due to failed payment for order #' . $order->order_number,
+                                     'reference' => 'REVERT_' . $order->id,
+                                 ]);
+                             }
+                             if ($order->loyalty_points_used > 0) {
+                                 $wallet->increment('balance', $order->loyalty_points_used);
+                                 \App\Models\WalletTransaction::create([
+                                     'wallet_id' => $wallet->id,
+                                     'type' => 'credit',
+                                     'points' => $order->loyalty_points_used,
+                                     'status' => 'completed',
+                                     'description' => 'Reverted ' . $order->loyalty_points_used . ' points due to failed payment for order #' . $order->order_number,
+                                     'reference' => 'REVERT_' . $order->id,
+                                 ]);
+                             }
+                         }
+                     }
+
+                     // Revert coupon usage
+                     if (!empty($order->coupon_code)) {
+                         $coupon = \App\Models\Coupon::where('code', $order->coupon_code)->first();
+                         if ($coupon) {
+                             $coupon->decrement('used_count');
+                         }
+                     }
+                 }
+             }
 
             return response()->json([
                 'success' => true,
@@ -313,6 +363,9 @@ class RazorpayController extends Controller
             ]);
 
             Log::info('✅ Payment record updated with refund details');
+
+            // Restore stock for returned items
+            $this->restoreStock($order);
 
             return response()->json([
                 'success' => true,
@@ -835,6 +888,54 @@ class RazorpayController extends Controller
         } catch (\Exception $e) {
             // Log error but don't fail the payment
             \Log::error('Failed to approve pending rewards: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restore stock for returned order items
+     */
+    private function restoreStock($order)
+    {
+        try {
+            Log::info('Starting stock restoration for returned order', ['order_id' => $order->id]);
+
+            foreach ($order->items as $item) {
+                if (!isset($item['product_id']) || !isset($item['size'])) {
+                    continue;
+                }
+
+                $variantQuery = ProductVariant::where('product_id', $item['product_id'])
+                    ->where('size', $item['size']);
+
+                if (!empty($item['color'])) {
+                    $color = ProductColor::where('color', $item['color'])->first();
+                    if ($color) {
+                        $variantQuery->where('color_id', $color->id);
+                    }
+                }
+
+                $variant = $variantQuery->first();
+
+                if ($variant) {
+                    $oldStock = $variant->stock;
+                    $newStock = $oldStock + $item['quantity'];
+                    $variant->update(['stock' => $newStock]);
+
+                    Log::info('Stock restored successfully', [
+                        'product_id' => $item['product_id'],
+                        'variant_id' => $variant->id,
+                        'size' => $item['size'],
+                        'quantity_restored' => $item['quantity'],
+                        'old_stock' => $oldStock,
+                        'new_stock' => $newStock
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to restore stock on refund', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

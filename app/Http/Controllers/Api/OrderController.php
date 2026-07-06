@@ -192,13 +192,7 @@ class OrderController extends Controller
                 }
             }
 
-            // Clear user's cart after successful order
-            $sessionId = $request->input('session_id');
-            if ($user) {
-                Cart::where('user_id', $user->id)->delete();
-            } else if ($sessionId) {
-                Cart::where('session_id', $sessionId)->whereNull('user_id')->delete();
-            }
+
 
             // Update Coupon usage 
             if ($order && !empty($request->coupon_code)) {
@@ -314,6 +308,43 @@ class OrderController extends Controller
                     'success' => false,
                     'message' => 'Cannot delete order with completed payment'
                 ], 403);
+            }
+
+            // Revert used wallet money & loyalty points back to user's wallet
+            if ($order->wallet_money_used > 0 || $order->loyalty_points_used > 0) {
+                $wallet = \App\Models\Wallet::where('user_id', $order->user_id)->first();
+                if ($wallet) {
+                    if ($order->wallet_money_used > 0) {
+                        $wallet->increment('wallet_balance', $order->wallet_money_used);
+                        \App\Models\WalletTransaction::create([
+                            'wallet_id' => $wallet->id,
+                            'type' => 'credit',
+                            'points' => 0,
+                            'status' => 'completed',
+                            'description' => 'Reverted ₹' . $order->wallet_money_used . ' due to cancelled order #' . $order->order_number,
+                            'reference' => 'REVERT_' . $order->id,
+                        ]);
+                    }
+                    if ($order->loyalty_points_used > 0) {
+                        $wallet->increment('balance', $order->loyalty_points_used);
+                        \App\Models\WalletTransaction::create([
+                            'wallet_id' => $wallet->id,
+                            'type' => 'credit',
+                            'points' => $order->loyalty_points_used,
+                            'status' => 'completed',
+                            'description' => 'Reverted ' . $order->loyalty_points_used . ' points due to cancelled order #' . $order->order_number,
+                            'reference' => 'REVERT_' . $order->id,
+                        ]);
+                    }
+                }
+            }
+
+            // Revert coupon usage
+            if (!empty($order->coupon_code)) {
+                $coupon = \App\Models\Coupon::where('code', $order->coupon_code)->first();
+                if ($coupon) {
+                    $coupon->decrement('used_count');
+                }
             }
 
             // Delete associated payment records
