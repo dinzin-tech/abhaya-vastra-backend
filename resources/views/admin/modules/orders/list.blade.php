@@ -206,11 +206,11 @@
                 <tr>
                     <td>${index + 1}</td>
                     <td>${item.name}</td>
-                    <td>${item.price ? '$' + parseFloat(item.price).toFixed(2) : 'N/A'}</td>
+                    <td>₹${parseFloat(item.price).toFixed(2)}</td>
                     <td>${item.quantity || 1}</td>
-                    <td>${item.selectedSize || 'N/A'}</td>
-                    <td>${item.selectedColor || 'N/A'}</td>
-                    <td><strong>$${(item.price * item.quantity).toFixed(2)}</strong></td>
+                    <td>${item.size || item.selectedSize || 'N/A'}</td>
+                    <td>${item.color || item.selectedColor || 'N/A'}</td>
+                    <td><strong>₹${(item.price * item.quantity).toFixed(2)}</strong></td>
                 </tr>
             `;
         });
@@ -244,6 +244,95 @@
             default:
                 orderStatusBadge = '<span class="badge bg-secondary">' + order.status + '</span>';
         }
+
+        // Shiprocket delivery management block
+        let shiprocketHtml = '';
+        if (order.status !== 'cancelled') {
+            shiprocketHtml = `
+                <div class="card border-dark mb-4 mt-4 shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-truck me-2"></i> Shiprocket Delivery Control Panel</h6>
+                        ${order.shiprocket_order_id ? '<span class="badge bg-success">Connected</span>' : '<span class="badge bg-secondary">Unconnected</span>'}
+                    </div>
+                    <div class="card-body p-3">
+            `;
+
+            if (!order.shiprocket_order_id) {
+                shiprocketHtml += `
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div>
+                                <p class="mb-0 text-muted small">This shipment has not been registered in Shiprocket yet.</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="btn-sr-create" onclick="shiprocketCreateShipment(${order.id})">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Register Order with Shiprocket
+                            </button>
+                        </div>
+                `;
+            } else if (!order.shiprocket_awb_code) {
+                shiprocketHtml += `
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end">
+                                <p class="mb-1 small"><strong>Shiprocket Order ID:</strong> ${order.shiprocket_order_id}</p>
+                                <p class="mb-2 small"><strong>Shiprocket Shipment ID:</strong> ${order.shiprocket_shipment_id || 'N/A'}</p>
+                                <button class="btn btn-outline-danger btn-xs py-1" onclick="shiprocketCancelShipment(${order.id})">
+                                    <i class="fa-solid fa-ban me-1"></i> Cancel & Reset Order
+                                </button>
+                            </div>
+                            <div class="col-md-6 ps-md-4">
+                                <h6 class="fw-bold mb-2 small text-uppercase text-muted">Select Courier Partner:</h6>
+                                <div id="couriers-loading-section">
+                                    <button class="btn btn-sm btn-secondary w-100" onclick="shiprocketLoadCouriers(${order.id})">
+                                        <i class="fa-solid fa-search me-1"></i> Search Available Couriers
+                                    </button>
+                                </div>
+                                <div id="couriers-selection-section" style="display:none;">
+                                    <div class="mb-2">
+                                        <select class="form-select form-select-sm" id="sr-courier-select">
+                                            <!-- couriers loaded dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success btn-sm w-100" onclick="shiprocketAssignAwb(${order.id})">
+                                            <i class="fa-solid fa-truck-fast me-1"></i> Book Courier
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="shiprocketLoadCouriers(${order.id})">
+                                            <i class="fa-solid fa-rotate-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                `;
+            } else {
+                shiprocketHtml += `
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end">
+                                <p class="mb-1 small"><strong>Shiprocket Order ID:</strong> ${order.shiprocket_order_id}</p>
+                                <p class="mb-1 small"><strong>Shiprocket Shipment ID:</strong> ${order.shiprocket_shipment_id || 'N/A'}</p>
+                                <p class="mb-1 small"><strong>Courier:</strong> ${order.shiprocket_courier_name}</p>
+                                <p class="mb-0 small"><strong>AWB (Tracking):</strong> <code class="bg-dark text-white px-2 py-0.5 rounded">${order.shiprocket_awb_code}</code></p>
+                            </div>
+                            <div class="col-md-6 ps-md-4 d-flex flex-column gap-2 justify-content-center">
+                                <button class="btn btn-outline-primary btn-sm text-start" onclick="shiprocketGenerateLabel(${order.id})">
+                                    <i class="fa-solid fa-file-pdf me-2"></i> Download Shipping Label
+                                </button>
+                                <button class="btn btn-outline-info btn-sm text-start" onclick="shiprocketGenerateManifest(${order.id})">
+                                    <i class="fa-solid fa-file-invoice me-2"></i> Download Shipment Manifest
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm text-start" onclick="shiprocketCancelShipment(${order.id})">
+                                    <i class="fa-solid fa-circle-xmark me-2"></i> Cancel Shipment & Release AWB
+                                </button>
+                            </div>
+                        </div>
+                `;
+            }
+
+            shiprocketHtml += `
+                    </div>
+                </div>
+                <hr>
+            `;
+        }
         
         let html = `
             <div class="row mb-3">
@@ -270,6 +359,8 @@
             
             <hr>
             
+            ${shiprocketHtml}
+            
             <h6 class="fw-bold mb-3">Order Items</h6>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
@@ -290,17 +381,17 @@
                     <tfoot>
                         <tr>
                             <td colspan="6" class="text-end"><strong>Subtotal:</strong></td>
-                            <td><strong>$${parseFloat(order.subtotal).toFixed(2)}</strong></td>
+                            <td><strong>₹${parseFloat(order.subtotal).toFixed(2)}</strong></td>
                         </tr>
                         ${order.discount > 0 ? `
                         <tr>
                             <td colspan="6" class="text-end"><strong>Discount:</strong></td>
-                            <td><strong>-$${parseFloat(order.discount).toFixed(2)}</strong></td>
+                            <td><strong>-₹${parseFloat(order.discount).toFixed(2)}</strong></td>
                         </tr>
                         ` : ''}
                         <tr class="table-primary">
                             <td colspan="6" class="text-end"><strong>Total:</strong></td>
-                            <td><strong>$${parseFloat(order.total).toFixed(2)}</strong></td>
+                            <td><strong>₹${parseFloat(order.total).toFixed(2)}</strong></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -308,6 +399,219 @@
         `;
         
         $('#orderDetailsBody').html(html);
+    }
+
+    // ─── Shiprocket Action Implementations ───
+
+    function shiprocketCreateShipment(orderId) {
+        let btn = $('#btn-sr-create');
+        btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Registering...');
+
+        $.ajax({
+            url: "{{ route('admin.shiprocket.create-shipment') }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                order_id: orderId
+            },
+            success: function(res) {
+                if(res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: res.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    refreshOrderModal(orderId);
+                } else {
+                    Swal.fire('Error', res.message || 'Failed to create shipment', 'error');
+                    btn.prop('disabled', false).html('<i class="fa-solid fa-cloud-arrow-up me-1"></i> Register Order');
+                }
+            },
+            error: function(xhr) {
+                Swal.fire('Error', 'API server error, please check connection.', 'error');
+                btn.prop('disabled', false).html('<i class="fa-solid fa-cloud-arrow-up me-1"></i> Register Order');
+            }
+        });
+    }
+
+    function shiprocketLoadCouriers(orderId) {
+        let section = $('#couriers-loading-section');
+        section.html('<div class="text-center py-2"><i class="fa-solid fa-spinner fa-spin fa-lg text-secondary"></i><span class="ms-2 small text-muted">Finding delivery options...</span></div>');
+
+        $.ajax({
+            url: '/admin/shiprocket/get-couriers/' + orderId,
+            type: 'GET',
+            success: function(res) {
+                if(res.success && res.couriers && res.couriers.length > 0) {
+                    let select = $('#sr-courier-select');
+                    select.empty();
+                    res.couriers.forEach(function(c) {
+                        let rate = parseFloat(c.freight_charge).toFixed(2);
+                        select.append(`<option value="${c.courier_company_id}">${c.courier_name} (Rate: ₹${rate} | Delivery: ${c.etd || 'N/A'} days)</option>`);
+                    });
+                    section.hide();
+                    $('#couriers-selection-section').show();
+                } else {
+                    Swal.fire('No Delivery Options', res.message || 'Shiprocket returned no serviceable courier options.', 'warning');
+                    section.html(`
+                        <button class="btn btn-sm btn-secondary w-100" onclick="shiprocketLoadCouriers(${orderId})">
+                            <i class="fa-solid fa-rotate-right me-1"></i> Retry Courier Search
+                        </button>
+                    `);
+                }
+            },
+            error: function(xhr) {
+                Swal.fire('Error', 'Unable to fetch serviceable couriers.', 'error');
+                section.html(`
+                    <button class="btn btn-sm btn-secondary w-100" onclick="shiprocketLoadCouriers(${orderId})">
+                        <i class="fa-solid fa-rotate-right me-1"></i> Retry Courier Search
+                    </button>
+                `);
+            }
+        });
+    }
+
+    function shiprocketAssignAwb(orderId) {
+        let courierId = $('#sr-courier-select').val();
+        if(!courierId) {
+            Swal.fire('Warning', 'Please select a courier company.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Confirm Courier Booking',
+            text: 'Are you sure you want to book this delivery and generate the shipping request?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, book it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                $.ajax({
+                    url: "{{ route('admin.shiprocket.assign-awb') }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        order_id: orderId,
+                        courier_id: courierId
+                    },
+                    success: function(res) {
+                        if(res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Courier Booked!',
+                                text: res.message,
+                                timer: 3000,
+                                showConfirmButton: true
+                            });
+                            refreshOrderModal(orderId);
+                            recordList();
+                        } else {
+                            Swal.fire('Booking Failed', res.message || 'Failed to book courier', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', 'Server error booking courier.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    function shiprocketGenerateLabel(orderId) {
+        Swal.showLoading();
+        $.ajax({
+            url: '/admin/shiprocket/label/' + orderId,
+            type: 'GET',
+            success: function(res) {
+                Swal.close();
+                if(res.success && res.label_url) {
+                    window.open(res.label_url, '_blank');
+                } else {
+                    Swal.fire('Error', res.message || 'Failed to retrieve label url.', 'error');
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                Swal.fire('Error', 'Server error generating label pdf.', 'error');
+            }
+        });
+    }
+
+    function shiprocketGenerateManifest(orderId) {
+        Swal.showLoading();
+        $.ajax({
+            url: '/admin/shiprocket/manifest/' + orderId,
+            type: 'GET',
+            success: function(res) {
+                Swal.close();
+                if(res.success) {
+                    if (res.manifest_url) {
+                        window.open(res.manifest_url, '_blank');
+                    } else {
+                        Swal.fire('Manifest Details', JSON.stringify(res.data || res), 'info');
+                    }
+                } else {
+                    Swal.fire('Error', res.message || 'Failed to retrieve manifest details.', 'error');
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                Swal.fire('Error', 'Server error generating manifest.', 'error');
+            }
+        });
+    }
+
+    function shiprocketCancelShipment(orderId) {
+        Swal.fire({
+            title: 'Cancel Shipment?',
+            text: 'Are you sure you want to cancel the active shipment and clear all tracking data? This resets the order status to Pending.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                $.ajax({
+                    url: "{{ route('admin.shiprocket.cancel') }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        order_id: orderId
+                    },
+                    success: function(res) {
+                        if(res.success) {
+                            Swal.fire('Cancelled', res.message, 'success');
+                            refreshOrderModal(orderId);
+                            recordList();
+                        } else {
+                            Swal.fire('Error', res.message || 'Failed to cancel shipment.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error', 'Server error cancelling shipment.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    function refreshOrderModal(orderId) {
+        $.ajax({
+            url: '/admin/orders-details/' + orderId,
+            type: 'GET',
+            success: function(response) {
+                if(response.success) {
+                    displayOrderDetails(response.data);
+                }
+            }
+        });
     }
 </script>
 

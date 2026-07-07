@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\RazorpayController;
+use App\Http\Controllers\Api\ShiprocketController;
+use App\Http\Controllers\Api\ShiprocketWebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ContactController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReturnController;
 use App\Http\Controllers\Api\ExchangeController;
+
 
 
 
@@ -148,3 +151,42 @@ Route::group(['prefix' => 'wallet', 'middleware' => 'auth:sanctum'], function ()
 
 // Reward settings (public - for frontend display)
 Route::get('reward-settings', [App\Http\Controllers\Api\WalletController::class, 'getSettings']);
+
+
+// ─────────────────────────────────────────────────────────────────
+// Shiprocket Routes
+// ─────────────────────────────────────────────────────────────────
+
+// Public: Shiprocket calls this webhook to update order status (no auth — verified by IP/secret)
+Route::post('/shiprocket/webhook', [ShiprocketWebhookController::class, 'handleWebhook']);
+
+// Public: Serviceability & shipping rate check (used on checkout page)
+Route::get('/shiprocket/serviceability', [ShiprocketController::class, 'checkServiceability']);
+
+// Authenticated: User-facing track order
+Route::get('/shiprocket/track/{orderId}', [ShiprocketController::class, 'trackShipment'])
+    ->middleware('auth:sanctum');
+
+// Admin/Protected: Shipment management routes
+Route::middleware('auth:sanctum')->prefix('shiprocket')->group(function () {
+    // Test connection & credentials
+    Route::get('/test', [ShiprocketController::class, 'testConnection']);
+
+    // Create shipment in Shiprocket (admin triggers manually after payment)
+    Route::post('/create-shipment', [ShiprocketController::class, 'createShipment']);
+
+    // Assign AWB code and generate pickup
+    Route::post('/assign-awb-pickup', [ShiprocketController::class, 'assignAwbAndPickup']);
+
+    // Generate shipping label PDF
+    Route::post('/generate-label', [ShiprocketController::class, 'generateLabel']);
+
+    // Generate manifest PDF
+    Route::post('/generate-manifest', [ShiprocketController::class, 'generateManifest']);
+
+    // Cancel a shipment
+    Route::post('/cancel', [ShiprocketController::class, 'cancelShipment']);
+
+    // Manual tracking sync (re-fetch from Shiprocket)
+    Route::post('/sync-tracking/{orderId}', [ShiprocketWebhookController::class, 'syncTracking']);
+});

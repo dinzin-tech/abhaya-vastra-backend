@@ -241,7 +241,7 @@
 
                     <ul class="sidebar-menu child1">
                         <li class="slide">
-                            <a class="sidebar__menu-item {{ !request()->has('status') ? 'active' : '' }}"
+                            <a class="sidebar__menu-item {{ (!request()->has('status') && !request()->has('shiprocket')) ? 'active' : '' }}"
                                 href="{{ route('orders.index') }}">All Orders</a>
                         </li>
                         <li class="slide">
@@ -263,6 +263,10 @@
                         <li class="slide">
                             <a class="sidebar__menu-item {{ $orderStatus == 'cancelled' ? 'active' : '' }}"
                                 href="{{ route('orders.index', ['status' => 'cancelled']) }}">Cancelled Orders</a>
+                        </li>
+                        <li class="slide">
+                            <a class="sidebar__menu-item {{ request()->get('shiprocket') == '1' ? 'active' : '' }}"
+                                href="{{ route('orders.index', ['shiprocket' => '1']) }}">Delivery Management</a>
                         </li>
                     </ul>
                 </li>

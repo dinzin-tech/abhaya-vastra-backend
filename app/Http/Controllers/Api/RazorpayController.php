@@ -737,134 +737,89 @@ class RazorpayController extends Controller
     private function createShiprocketShipment($order)
     {
         try {
-            // Check if shipment already created
+            // Skip if shipment already created
             if ($order->shiprocket_order_id) {
+                Log::info('Shiprocket: shipment already exists, skipping', ['order_id' => $order->id]);
                 return;
             }
-    
-            $shiprocketService = new ShiprocketService();
-    
-            // Prepare order items for Shiprocket
-            $orderItems = [];
-            $totalWeight = 0;
-    
-            foreach ($order->items as $item) {
-                // Default weight if variant not found
-                $itemWeight = 0.5;
-    
-                // Fetch variant weight based only on product_id and size
-                if (!empty($item['product_id']) && !empty($item['size'])) {
-                    $variant = ProductVariant::where('product_id', $item['product_id'])
-                        ->where('size', $item['size'])
-                        ->first();
-    
-                    if ($variant && !empty($variant->weight)) {
-                        $itemWeight = (float) $variant->weight;
-                    }
-    
-                    // Log variant check info for debugging
-                    Log::info('Variant weight check (product_id + size)', [
-                        'product_id' => $item['product_id'],
-                        'size' => $item['size'],
-                        'variant_found' => $variant ? true : false,
-                        'variant_weight' => $variant->weight ?? 'N/A',
-                        'used_weight' => $itemWeight,
-                    ]);
-                }
-    
-                $orderItems[] = [
-                    'name' => $item['name'],
-                    'sku' => $item['id'] ?? 'SKU-' . $item['id'],
-                    'units' => $item['quantity'],
-                    'selling_price' => $item['price'],
-                    'discount' => 0,
-                    'tax' => 0,
-                    'hsn' => '',
-                ];
-    
-                // Calculate total weight using actual variant weight
-                $totalWeight += ($item['quantity'] * $itemWeight);
-            }
-    
-            // Prepare Shiprocket order data
+
+            $shiprocketService = app(ShiprocketService::class);
+
+            // Use the service helper to build items + calculate weight
+            $prepared = $shiprocketService->prepareOrderItems($order->items);
+
             $shiprocketOrderData = [
-                'order_id' => $order->order_number,
-                'order_date' => $order->created_at->format('Y-m-d H:i'),
-                'pickup_location' => config('services.shiprocket.pickup_location', 'Primary'),
-                'channel_id' => '',
-                'comment' => 'Order from ' . config('app.name'),
-                'billing_customer_name' => $order->name,
-                'billing_last_name' => '',
-                'billing_address' => $order->address,
-                'billing_address_2' => '',
-                'billing_city' => $order->city,
-                'billing_pincode' => $order->zip,
-                'billing_state' => $order->state ?? '',
-                'billing_country' => 'India',
-                'billing_email' => $order->email,
-                'billing_phone' => $order->phone,
-                'shipping_is_billing' => true,
+                'order_id'               => $order->order_number,
+                'order_date'             => $order->created_at->format('Y-m-d H:i'),
+                'pickup_location'        => config('services.shiprocket.pickup_location', 'Home'),
+                'channel_id'             => '',
+                'comment'                => 'Order from ' . config('app.name'),
+                'billing_customer_name'  => $order->name,
+                'billing_last_name'      => '',
+                'billing_address'        => $order->address,
+                'billing_address_2'      => '',
+                'billing_city'           => $order->city,
+                'billing_pincode'        => $order->zip,
+                'billing_state'          => $order->state ?: 'Karnataka',
+                'billing_country'        => 'India',
+                'billing_email'          => $order->email,
+                'billing_phone'          => $order->phone,
+                'shipping_is_billing'    => true,
                 'shipping_customer_name' => '',
-                'shipping_last_name' => '',
-                'shipping_address' => '',
-                'shipping_address_2' => '',
-                'shipping_city' => '',
-                'shipping_pincode' => '',
-                'shipping_country' => '',
-                'shipping_state' => '',
-                'shipping_email' => '',
-                'shipping_phone' => '',
-                'order_items' => $orderItems,
-                'payment_method' => 'Prepaid',
-                'shipping_charges' => $order->shipping_charge ?? 0,
-                'giftwrap_charges' => 0,
-                'transaction_charges' => 0,
-                'total_discount' => $order->discount ?? 0,
-                'sub_total' => $order->subtotal,
-                'length' => 10,
-                'breadth' => 10,
-                'height' => 10,
-                'weight' => $totalWeight,
+                'shipping_last_name'     => '',
+                'shipping_address'       => '',
+                'shipping_address_2'     => '',
+                'shipping_city'          => '',
+                'shipping_pincode'       => '',
+                'shipping_country'       => '',
+                'shipping_state'         => '',
+                'shipping_email'         => '',
+                'shipping_phone'         => '',
+                'order_items'            => $prepared['items'],
+                'payment_method'         => 'Prepaid',
+                'shipping_charges'       => (float) ($order->shipping_charge ?? 0),
+                'giftwrap_charges'       => 0,
+                'transaction_charges'    => 0,
+                'total_discount'         => (float) ($order->discount ?? 0),
+                'sub_total'              => (float) $order->subtotal,
+                'length'                 => 30,
+                'breadth'                => 20,
+                'height'                 => 10,
+                'weight'                 => $prepared['total_weight'],
             ];
-    
-            // Log weight being sent to Shiprocket
-            Log::info('📦 Shiprocket Weight Submission', [
+
+            Log::info('📦 Shiprocket: sending order to API', [
                 'order_number' => $order->order_number,
-                'total_weight_kg' => $totalWeight,
-                'items_count' => count($order->items)
+                'total_weight' => $prepared['total_weight'],
+                'items_count'  => count($prepared['items']),
             ]);
-    
-            // Write to debug file for easy viewing
-            $debugInfo = "\n" . str_repeat('=', 50) . "\n";
-            $debugInfo .= date('Y-m-d H:i:s') . "\n";
-            $debugInfo .= "Order: {$order->order_number}\n";
-            $debugInfo .= "Weight sent to Shiprocket: {$totalWeight} kg\n";
-            $debugInfo .= "Items: " . count($order->items) . "\n";
-            $debugInfo .= str_repeat('=', 50) . "\n";
-            file_put_contents(storage_path('logs/shiprocket-weight.log'), $debugInfo, FILE_APPEND);
-    
-            // Create order in Shiprocket
+
             $result = $shiprocketService->createOrder($shiprocketOrderData);
-    
-            if ($result && isset($result['order_id'])) {
-                // Update order with Shiprocket details
+
+            if (!empty($result['order_id'])) {
                 $order->update([
-                    'shiprocket_order_id' => $result['order_id'],
-                    'shiprocket_shipment_id' => $result['shipment_id'],
-                    'status' => 'processing',
+                    'shiprocket_order_id'  => $result['order_id'],
+                    'shiprocket_shipment_id' => $result['shipment_id'] ?? null,
+                    'status'               => 'processing',
                 ]);
-    
-                Log::info('Shiprocket shipment created successfully', [
+
+                Log::info('✅ Shiprocket: shipment created', [
+                    'order_id'             => $order->id,
+                    'shiprocket_order_id'  => $result['order_id'],
+                    'shiprocket_shipment_id' => $result['shipment_id'] ?? null,
+                ]);
+            } else {
+                Log::warning('⚠️ Shiprocket: order created but no order_id in response', [
                     'order_id' => $order->id,
-                    'shiprocket_order_id' => $result['order_id'],
-                    'shiprocket_shipment_id' => $result['shipment_id']
+                    'response' => $result,
                 ]);
             }
-    
+
         } catch (\Exception $e) {
             // Log error but don't fail the payment verification
-            Log::error('Failed to create Shiprocket shipment: ' . $e->getMessage(), [
-                'order_id' => $order->id
+            Log::error('❌ Shiprocket: failed to create shipment: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'trace'    => $e->getTraceAsString(),
             ]);
         }
     }

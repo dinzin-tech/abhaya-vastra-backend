@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\ShiprocketService;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -46,6 +48,11 @@ class OrderController extends Controller
         // Filter by status
         if ($request->status && $request->status != 'all') {
             $query->where('status', $request->status);
+        }
+
+        // Filter by Shiprocket Deliveries
+        if ($request->shiprocket == '1') {
+            $query->whereNotNull('shiprocket_order_id');
         }
 
         $items = $query->orderBy('id', 'desc')->paginate($offset);
@@ -217,6 +224,335 @@ class OrderController extends Controller
             \Log::error('Failed to restore stock on cancel: ' . $e->getMessage(), [
                 'order_id' => $order->id
             ]);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Shiprocket Administration Methods
+    // ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Create a shipment in Shiprocket for an order.
+     */
+    public function shiprocketCreateShipment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->shiprocket_order_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shipment already exists for this order in Shiprocket.'
+            ]);
+        }
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            $prepared = $shiprocketService->prepareOrderItems($order->items);
+
+            $shiprocketOrderData = [
+                'order_id'               => $order->order_number,
+                'order_date'             => $order->created_at->format('Y-m-d H:i'),
+                'pickup_location'        => config('services.shiprocket.pickup_location', 'Home'),
+                'channel_id'             => '',
+                'comment'                => 'Order from Admin Panel ' . config('app.name'),
+                'billing_customer_name'  => $order->name,
+                'billing_last_name'      => '',
+                'billing_address'        => $order->address,
+                'billing_address_2'      => '',
+                'billing_city'           => $order->city,
+                'billing_pincode'        => $order->zip,
+                'billing_state'          => $order->state ?: 'Karnataka',
+                'billing_country'        => 'India',
+                'billing_email'          => $order->email,
+                'billing_phone'          => $order->phone,
+                'shipping_is_billing'    => true,
+                'shipping_customer_name' => '',
+                'shipping_last_name'     => '',
+                'shipping_address'       => '',
+                'shipping_address_2'     => '',
+                'shipping_city'          => '',
+                'shipping_pincode'       => '',
+                'shipping_country'       => '',
+                'shipping_state'         => '',
+                'shipping_email'         => '',
+                'shipping_phone'         => '',
+                'order_items'            => $prepared['items'],
+                'payment_method'         => $order->payment_method === 'cod' ? 'COD' : 'Prepaid',
+                'shipping_charges'       => (float) ($order->shipping_charge ?? 0),
+                'giftwrap_charges'       => 0,
+                'transaction_charges'    => 0,
+                'total_discount'         => (float) ($order->discount ?? 0),
+                'sub_total'              => (float) $order->subtotal,
+                'length'                 => 30,
+                'breadth'                => 20,
+                'height'                 => 10,
+                'weight'                 => $prepared['total_weight'],
+            ];
+
+            Log::info('📦 Admin: Creating Shiprocket order adhoc', ['order_id' => $order->order_number]);
+            $result = $shiprocketService->createOrder($shiprocketOrderData);
+
+            if (!empty($result['order_id'])) {
+                $order->update([
+                    'shiprocket_order_id'    => $result['order_id'],
+                    'shiprocket_shipment_id' => $result['shipment_id'] ?? null,
+                    'status'                 => 'processing',
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Shiprocket shipment created successfully.',
+                    'data'    => $result
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create shipment. Invalid API response.',
+                'response'=> $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Create Shipment failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Shiprocket Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get available couriers and rates for checking serviceability.
+     */
+    public function shiprocketGetCouriers($order_id)
+    {
+        $order = Order::findOrFail($order_id);
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            $pickupPincode = config('services.shiprocket.pickup_pincode', '560064');
+            $deliveryPincode = $order->zip;
+            $prepared = $shiprocketService->prepareOrderItems($order->items);
+            $weight = $prepared['total_weight'];
+            $cod = $order->payment_method === 'cod' ? 1 : 0;
+
+            $result = $shiprocketService->checkServiceability($pickupPincode, $deliveryPincode, $weight, $cod);
+
+            if (!empty($result['data']['available_courier_companies'])) {
+                return response()->json([
+                    'success'  => true,
+                    'couriers' => $result['data']['available_courier_companies']
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No courier companies available for this pincode.',
+                'response'=> $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Get Couriers failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking serviceability: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Assign selected courier AWB and schedule package pickup.
+     */
+    public function shiprocketAssignAwb(Request $request)
+    {
+        $request->validate([
+            'order_id'   => 'required|exists:orders,id',
+            'courier_id' => 'required|integer'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if (!$order->shiprocket_shipment_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shipment not created yet. Please create shipment first.'
+            ]);
+        }
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            
+            // Assign AWB
+            $awbResult = $shiprocketService->assignAwb($order->shiprocket_shipment_id, $request->courier_id);
+
+            if (!empty($awbResult['response']['data']['awb_code'])) {
+                $awbCode = $awbResult['response']['data']['awb_code'];
+                $courierName = $awbResult['response']['data']['courier_name'] ?? 'Shiprocket Courier';
+
+                $order->update([
+                    'shiprocket_awb_code'     => $awbCode,
+                    'shiprocket_courier_name' => $courierName,
+                    'status'                  => 'shipped'
+                ]);
+
+                // Generate Pickup
+                try {
+                    $shiprocketService->generatePickup($order->shiprocket_shipment_id);
+                    $pickupMsg = 'AWB assigned and pickup scheduled successfully.';
+                } catch (\Exception $pe) {
+                    $pickupMsg = 'AWB assigned successfully, but pickup scheduling failed: ' . $pe->getMessage();
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $pickupMsg,
+                    'data'    => [
+                        'awb_code'     => $awbCode,
+                        'courier_name' => $courierName
+                    ]
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign AWB. Shiprocket response invalid.',
+                'response'=> $awbResult
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Assign AWB failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get shipment label URL.
+     */
+    public function shiprocketGenerateLabel($order_id)
+    {
+        $order = Order::findOrFail($order_id);
+
+        if (!$order->shiprocket_shipment_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shipment not created yet.'
+            ]);
+        }
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            $result = $shiprocketService->generateLabel([$order->shiprocket_shipment_id]);
+
+            if (!empty($result['label_url'])) {
+                return response()->json([
+                    'success'   => true,
+                    'label_url' => $result['label_url']
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate label.',
+                'response'=> $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Generate Label failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get manifest details.
+     */
+    public function shiprocketGenerateManifest($order_id)
+    {
+        $order = Order::findOrFail($order_id);
+
+        if (!$order->shiprocket_shipment_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Shipment not created yet.'
+            ]);
+        }
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            $result = $shiprocketService->generateManifest([$order->shiprocket_shipment_id]);
+
+            if (!empty($result['manifest_url'])) {
+                return response()->json([
+                    'success'      => true,
+                    'manifest_url' => $result['manifest_url']
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data'    => $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Generate Manifest failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Cancel shipment.
+     */
+    public function shiprocketCancelShipment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if (!$order->shiprocket_order_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No active Shiprocket order found for cancellation.'
+            ]);
+        }
+
+        try {
+            $shiprocketService = app(ShiprocketService::class);
+            
+            if ($order->shiprocket_awb_code) {
+                $result = $shiprocketService->cancelShipment([$order->shiprocket_awb_code]);
+            } else {
+                $result = $shiprocketService->cancelOrder($order->shiprocket_order_id);
+            }
+
+            $order->update([
+                'shiprocket_order_id'     => null,
+                'shiprocket_shipment_id'  => null,
+                'shiprocket_awb_code'     => null,
+                'shiprocket_courier_name' => null,
+                'shiprocket_tracking_url' => null,
+                'status'                  => 'pending'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Shipment cancelled successfully and order reset to Pending status.',
+                'data'    => $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Shiprocket Cancel Shipment failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error cancelling shipment: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

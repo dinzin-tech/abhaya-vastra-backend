@@ -4,6 +4,8 @@ var getParameters = function () {
         parameters += '&q=' + $('#q').val();
     if (getUrlParameter('status') != null && getUrlParameter('status') != '')
         parameters += '&status=' + getUrlParameter('status');
+    if (getUrlParameter('shiprocket') != null && getUrlParameter('shiprocket') != '')
+        parameters += '&shiprocket=' + getUrlParameter('shiprocket');
     if ($('#phone').val() != null && $('#phone').val() != '')
         parameters += '&phone=' + $('#phone').val();
 
@@ -78,6 +80,8 @@ var getParametersObject = function () {
         parameters['q'] = $('#q').val();
     if (getUrlParameter('status') != null && getUrlParameter('status') != '')
         parameters['status'] = getUrlParameter('status');
+    if (getUrlParameter('shiprocket') != null && getUrlParameter('shiprocket') != '')
+        parameters['shiprocket'] = getUrlParameter('shiprocket');
     if ($('#phone').val() != null && $('#phone').val() != '')
         parameters['phone'] = $('#phone').val();
     if ($('#order_number').val() != null && $('#order_number').val() != '')

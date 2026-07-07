@@ -189,7 +189,7 @@
                         <div class="dropzone-icon">🖼️</div>
                         <div class="dropzone-title">Drag & Drop or Click</div>
                         <div class="dropzone-sub">Upload color-specific pictures</div>
-                        <div class="dropzone-note">JPG, PNG, WEBP — auto-compressed to ≤500KB each</div>
+                        <div class="dropzone-note">JPG, PNG, WEBP — auto-compressed to ≤300KB each</div>
                     </div>
                     <div class="compression-bar" id="progressBar" style="display:none">
                         <div class="compression-bar-fill" id="progressBarFill"></div>
@@ -207,7 +207,7 @@
                         @endif
                     </div>
                     {{-- Hidden file input for actual submission --}}
-                    <input type="file" name="images[]" id="images_hidden" style="display:none" accept="image/*" multiple>
+                    <input type="file" id="images_hidden" style="display:none" accept="image/*" multiple>
                 </div>
             </div>
 
@@ -255,7 +255,7 @@
     }
 
     // Compression Utility
-    function compressImage(file, maxSizeKB = 500, quality = 0.85) {
+    function compressImage(file, maxSizeKB = 300, quality = 0.85) {
         return new Promise((resolve) => {
             const maxBytes = maxSizeKB * 1024;
             if (file.size <= maxBytes) { resolve(file); return; }
@@ -266,7 +266,7 @@
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     let { width, height } = img;
-                    const MAX_DIM = 2000;
+                    const MAX_DIM = 1200;
                     if (width > MAX_DIM || height > MAX_DIM) {
                         const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
                         width = Math.round(width * ratio);
@@ -333,11 +333,11 @@
 
         for(let i=0; i<files.length; i++) {
             const file = files[i];
-            const compressed = await compressImage(file, 500);
+            const compressed = await compressImage(file, 300);
             stagedFiles.push(compressed);
 
             const sizeLabel = formatBytes(compressed.size);
-            const isOk = compressed.size <= 500 * 1024;
+            const isOk = compressed.size <= 300 * 1024;
 
             const card = document.createElement('div');
             card.className = 'img-preview-card';

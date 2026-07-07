@@ -177,6 +177,68 @@
                     </div>
                 </div>
 
+                <!-- Email Templates Section -->
+                <hr class="my-4">
+                <h4 class="mb-4">📧 Email Notification Templates</h4>
+                
+                <div class="row gx-0 g-20 gy-20 mt-3">
+                    <!-- Welcome Email Template -->
+                    <div class="col-lg-6">
+                        <div class="card p-4" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                            <h5 class="mb-3 text-primary">👋 Welcome Email Template</h5>
+                            <p class="text-muted small mb-3">Sent to new customers immediately after registration.</p>
+                            
+                            <div class="from__input-box mb-3">
+                                <div class="form__input-title">
+                                    <label for="welcome_email_subject">Subject Line</label>
+                                </div>
+                                <div class="form__input">
+                                    <input type="text" id="welcome_email_subject" name="welcome_email_subject" class="form-control"
+                                        value="{{ old('welcome_email_subject', $settings['welcome_email_subject'] ?? 'Welcome to Abhaya Vastra!') }}" />
+                                </div>
+                            </div>
+                            
+                            <div class="from__input-box">
+                                <div class="form__input-title">
+                                    <label for="welcome_email_body">Email Body Message</label>
+                                </div>
+                                <div class="form__input">
+                                    <textarea name="welcome_email_body" id="welcome_email_body" class="form-control" rows="8" placeholder="Enter message body...">{{ old('welcome_email_body', $settings['welcome_email_body'] ?? "Hi {name},\n\nThank you for registering at Abhaya Vastra. We are excited to have you onboard!\n\nBest regards,\nAbhaya Vastra Team") }}</textarea>
+                                </div>
+                                <div class="small text-muted mt-1">Available placeholders: <code>{name}</code>, <code>{email}</code></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Status Change Email Template -->
+                    <div class="col-lg-6">
+                        <div class="card p-4" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                            <h5 class="mb-3 text-primary">📦 Order Status Update Template</h5>
+                            <p class="text-muted small mb-3">Sent when the status of an order is changed.</p>
+                            
+                            <div class="from__input-box mb-3">
+                                <div class="form__input-title">
+                                    <label for="order_status_email_subject">Subject Line</label>
+                                </div>
+                                <div class="form__input">
+                                    <input type="text" id="order_status_email_subject" name="order_status_email_subject" class="form-control"
+                                        value="{{ old('order_status_email_subject', $settings['order_status_email_subject'] ?? 'Update: Order #{order_number} status changed') }}" />
+                                </div>
+                            </div>
+                            
+                            <div class="from__input-box">
+                                <div class="form__input-title">
+                                    <label for="order_status_email_body">Email Body Message</label>
+                                </div>
+                                <div class="form__input">
+                                    <textarea name="order_status_email_body" id="order_status_email_body" class="form-control" rows="8" placeholder="Enter message body...">{{ old('order_status_email_body', $settings['order_status_email_body'] ?? "Hi {name},\n\nYour order #{order_number} status has been updated to: {status}.\n\nThank you for shopping with us!\n\nBest regards,\nAbhaya Vastra Team") }}</textarea>
+                                </div>
+                                <div class="small text-muted mt-1">Available placeholders: <code>{name}</code>, <code>{email}</code>, <code>{order_number}</code>, <code>{status}</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Submit -->
                 <div class="mt-4">
                     <button class="btn btn-primary" type="submit">Save Settings</button>

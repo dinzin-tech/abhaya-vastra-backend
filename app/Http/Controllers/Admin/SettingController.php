@@ -35,6 +35,10 @@ class SettingController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'favicon' => 'nullable|image|mimes:ico,png|max:1024',
             'min_order_value' => 'required|numeric|min:0',
+            'welcome_email_subject' => 'nullable|string|max:255',
+            'welcome_email_body' => 'nullable|string',
+            'order_status_email_subject' => 'nullable|string|max:255',
+            'order_status_email_body' => 'nullable|string',
         ]);
 
         // Collect the input fields
@@ -47,6 +51,10 @@ class SettingController extends Controller
             'min_order_value',
             'reward_base_amount',
             'reward_points_per_base',
+            'welcome_email_subject',
+            'welcome_email_body',
+            'order_status_email_subject',
+            'order_status_email_body',
         ]);
 
         // Handle file uploads

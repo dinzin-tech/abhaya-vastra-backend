@@ -389,7 +389,7 @@
             <div class="pf-tab-panel" id="tab-images">
                 <div style="background:#eef2ff;border-radius:10px;padding:14px 18px;margin-bottom:20px;border:1.5px solid #c7d2fe;font-size:.82rem;color:#3730a3;">
                     <i class="fa-solid fa-circle-info me-2"></i>
-                    <strong>Auto Compression Active</strong> — Images are automatically compressed to under 500KB in your browser before upload. Quality is preserved while keeping files small.
+                    <strong>Auto Compression Active</strong> — Images are automatically compressed to under 300KB in your browser before upload. Quality is preserved while keeping files small.
                 </div>
 
                 <div class="pf-row pf-row-2">
@@ -401,7 +401,7 @@
                             <div class="dropzone-icon">🖼️</div>
                             <div class="dropzone-title">Drag & Drop or Click</div>
                             <div class="dropzone-sub">Main product photo</div>
-                            <div class="dropzone-note">JPG, PNG, WEBP — will be compressed to ≤500KB</div>
+                            <div class="dropzone-note">JPG, PNG, WEBP — will be compressed to ≤300KB</div>
                         </div>
                         <div class="compression-bar" id="mainBar" style="display:none">
                             <div class="compression-bar-fill" id="mainBarFill"></div>
@@ -427,7 +427,7 @@
                             <div class="dropzone-icon">🔍</div>
                             <div class="dropzone-title">Drag & Drop or Click</div>
                             <div class="dropzone-sub">High-detail product photo</div>
-                            <div class="dropzone-note">JPG, PNG, WEBP — will be compressed to ≤500KB</div>
+                            <div class="dropzone-note">JPG, PNG, WEBP — will be compressed to ≤300KB</div>
                         </div>
                         <div class="compression-bar" id="zoomedBar" style="display:none">
                             <div class="compression-bar-fill" id="zoomedBarFill"></div>
@@ -481,7 +481,7 @@
                                 <div class="pf-field">
                                     <label>Color Images (multi-select)</label>
                                     <div class="dropzone-area color-dropzone">
-                                        <input type="file" name="colors[{{ $colorIndex }}][images][]"
+                                        <input type="file"
                                             class="color-image-input" accept="image/*" multiple>
                                         <div class="dropzone-icon" style="font-size:1.5rem;">🎨</div>
                                         <div class="dropzone-title" style="font-size:.82rem;">Drop color photos here</div>
@@ -595,7 +595,7 @@ document.getElementById('name').addEventListener('input', function() {
 // =====================================================
 // IMAGE COMPRESSION UTILITY
 // =====================================================
-function compressImage(file, maxSizeKB = 500, quality = 0.85) {
+function compressImage(file, maxSizeKB = 300, quality = 0.85) {
     return new Promise((resolve) => {
         const maxBytes = maxSizeKB * 1024;
         if (file.size <= maxBytes) { resolve(file); return; }
@@ -608,7 +608,7 @@ function compressImage(file, maxSizeKB = 500, quality = 0.85) {
                 let { width, height } = img;
 
                 // Optionally downscale very large images
-                const MAX_DIM = 2000;
+                const MAX_DIM = 1200;
                 if (width > MAX_DIM || height > MAX_DIM) {
                     const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
                     width  = Math.round(width  * ratio);
@@ -704,16 +704,16 @@ function setupDropzone({ zone, fileInput, hiddenInput, previewGrid, bar, barFill
         fillEl.style.width = '30%';
         statEl.textContent = `Compressing ${file.name}…`;
 
-        const compressed = await compressImage(file, 500);
+        const compressed = await compressImage(file, 300);
         fillEl.style.width = '100%';
 
         const ratio = file.size > 0 ? Math.round((1 - compressed.size / file.size) * 100) : 0;
         const sizeLabel = formatBytes(compressed.size);
-        const isOk = compressed.size <= 500 * 1024;
+        const isOk = compressed.size <= 300 * 1024;
 
         statEl.innerHTML = isOk
             ? `✅ <strong>${sizeLabel}</strong> (compressed ${ratio}%)`
-            : `⚠️ <strong>${sizeLabel}</strong> — slightly over 500KB`;
+            : `⚠️ <strong>${sizeLabel}</strong> — slightly over 300KB`;
 
         setTimeout(() => { barEl.style.display = 'none'; fillEl.style.width = '0%'; }, 1500);
 
@@ -781,7 +781,7 @@ function addColorBlock() {
                     <input type="file" id="colorInput_${idx}" class="color-image-input" accept="image/*" multiple>
                     <div class="dropzone-icon" style="font-size:1.5rem;">🎨</div>
                     <div class="dropzone-title" style="font-size:.82rem;">Drop color photos here</div>
-                    <div class="dropzone-note">Multiple images — auto-compressed to ≤500KB each</div>
+                    <div class="dropzone-note">Multiple images — auto-compressed to ≤300KB each</div>
                 </div>
                 <input type="file" name="colors[${idx}][images][]" id="colorHidden_${idx}" class="color-hidden-input" style="display:none" accept="image/*" multiple>
                 <div class="compress-status" id="colorStatus_${idx}"></div>
@@ -841,7 +841,7 @@ function setupColorDropzone(idx) {
         const dt = new DataTransfer();
 
         for (let i = 0; i < files.length; i++) {
-            const compressed = await compressImage(files[i], 500);
+            const compressed = await compressImage(files[i], 300);
             dt.items.add(compressed);
 
             const reader = new FileReader();
@@ -849,7 +849,7 @@ function setupColorDropzone(idx) {
                 const card = document.createElement('div');
                 card.className = 'img-preview-card';
                 const sizeLabel = formatBytes(compressed.size);
-                const isOk = compressed.size <= 500 * 1024;
+                const isOk = compressed.size <= 300 * 1024;
                 card.innerHTML = `
                     <img src="${ev.target.result}" alt="color-img">
                     <span class="img-size-badge ${isOk ? '' : 'warning'}">${sizeLabel}</span>

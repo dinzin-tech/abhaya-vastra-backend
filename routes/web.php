@@ -123,6 +123,14 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/orders-update-status', 'App\Http\Controllers\Admin\OrderController@updateStatus')->name('orders.update-status');
     Route::delete('/delete-order', 'App\Http\Controllers\Admin\OrderController@delete')->name('orders.delete');
 
+    // Shiprocket Management inside Admin Panel
+    Route::post('/shiprocket/create-shipment', 'App\Http\Controllers\Admin\OrderController@shiprocketCreateShipment')->name('admin.shiprocket.create-shipment');
+    Route::get('/shiprocket/get-couriers/{order_id}', 'App\Http\Controllers\Admin\OrderController@shiprocketGetCouriers')->name('admin.shiprocket.get-couriers');
+    Route::post('/shiprocket/assign-awb', 'App\Http\Controllers\Admin\OrderController@shiprocketAssignAwb')->name('admin.shiprocket.assign-awb');
+    Route::get('/shiprocket/label/{order_id}', 'App\Http\Controllers\Admin\OrderController@shiprocketGenerateLabel')->name('admin.shiprocket.generate-label');
+    Route::get('/shiprocket/manifest/{order_id}', 'App\Http\Controllers\Admin\OrderController@shiprocketGenerateManifest')->name('admin.shiprocket.generate-manifest');
+    Route::post('/shiprocket/cancel', 'App\Http\Controllers\Admin\OrderController@shiprocketCancelShipment')->name('admin.shiprocket.cancel');
+
     Route::resource('payments', 'App\Http\Controllers\Admin\PaymentController');
     Route::get('payments-list', 'App\Http\Controllers\Admin\PaymentController@listPayments')->name('payments.list');
     Route::post('/payments-update-status', 'App\Http\Controllers\Admin\PaymentController@updateStatus')->name('payments.update-status');

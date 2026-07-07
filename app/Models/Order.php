@@ -51,6 +51,19 @@ class Order extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderStatusChangedMail($order));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to send order status email for Order #{$order->order_number} to {$order->email}: " . $e->getMessage());
+                }
+            }
+        });
+    }
+
    
 
     /**
