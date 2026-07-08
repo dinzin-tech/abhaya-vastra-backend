@@ -100,9 +100,8 @@
                     </ul>
                 </li>
 
-                <!-- Products Dropdown -->
                 <li
-                    class="slide has-sub {{ areActiveRoutes(['categories.index', 'products.index', 'product-variants.index', 'customized.index'], 'open') }}">
+                    class="slide has-sub {{ areActiveRoutes(['categories.index', 'products.index', 'product-colors.index', 'product-variants.index', 'customized.index', 'admin.print-designs.index'], 'open') }}">
                     <a href="javascript:void(0);" class="sidebar__menu-item">
                         <i class="fa-regular fa-angle-down side-menu__angle"></i>
                         <div class="side-menu__icon"><i class="icon-hrm"></i></div>
@@ -120,6 +119,8 @@
                                 href="{{ route('product-variants.index') }}">Products Verients</a></li>
                         <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['customized.index']) }}"
                                 href="{{ route('customized.index') }}">Customized Products</a></li>
+                        <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['admin.print-designs.index']) }}"
+                                href="{{ route('admin.print-designs.index') }}">Print Designs</a></li>
                     </ul>
                 </li>
 
@@ -309,7 +310,7 @@
 
                 <!-- Settings Dropdown -->
                 <li
-                    class="slide has-sub {{ areActiveRoutes(['settings.index', 'smtp.index', 'contact-us.index', 'social.index', 'payment-gateway.index'], 'open') }}">
+                    class="slide has-sub {{ areActiveRoutes(['settings.index', 'smtp.index', 'contact-us.index', 'social.index', 'payment-gateway.index', 'admin.storage.index'], 'open') }}">
                     <a href="javascript:void(0);" class="sidebar__menu-item">
                         <i class="fa-regular fa-angle-down side-menu__angle"></i>
                         <div class="side-menu__icon"><i class="icon-hrm"></i></div>
@@ -337,6 +338,11 @@
                         <li class="slide">
                             <a class="sidebar__menu-item {{ areActiveRoutes(['payment-gateway.index']) }}"
                                 href="{{ route('payment-gateway.index') }}">Payment Gateway</a>
+                        </li>
+
+                        <li class="slide">
+                            <a class="sidebar__menu-item {{ areActiveRoutes(['admin.storage.index']) }}"
+                                href="{{ route('admin.storage.index') }}">Storage Settings</a>
                         </li>
                     </ul>
                 </li>

@@ -202,10 +202,14 @@
         
         let itemsHtml = '';
         items.forEach(function(item, index) {
+            let designLink = '';
+            if (item.custom_design_url) {
+                designLink = `<br><a href="${item.custom_design_url}" target="_blank" class="badge bg-primary text-white mt-1" style="background-color: #6366f1; text-decoration: none; padding: 4px 8px; font-size: 0.72rem; border-radius: 4px;"><i class="fa-solid fa-paint-brush"></i> View Custom Design</a>`;
+            }
             itemsHtml += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.name}</td>
+                    <td>${item.name}${designLink}</td>
                     <td>₹${parseFloat(item.price).toFixed(2)}</td>
                     <td>${item.quantity || 1}</td>
                     <td>${item.size || item.selectedSize || 'N/A'}</td>

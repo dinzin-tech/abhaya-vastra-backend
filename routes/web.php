@@ -78,6 +78,17 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::resource('customized', 'App\Http\Controllers\Admin\CustomizedController');
     Route::get('customized-list', 'App\Http\Controllers\Admin\CustomizedController@listCustomized')->name('customized.list');
+
+    // GCS Storage Settings
+    Route::get('/storage-settings', 'App\Http\Controllers\Admin\StorageController@index')->name('admin.storage.index');
+    Route::post('/storage-settings', 'App\Http\Controllers\Admin\StorageController@update')->name('admin.storage.update');
+
+    // Design Library (Catalog & Categories)
+    Route::get('/print-designs', 'App\Http\Controllers\Admin\PrintDesignController@index')->name('admin.print-designs.index');
+    Route::post('/print-designs/category', 'App\Http\Controllers\Admin\PrintDesignController@storeCategory')->name('admin.print-designs.store-category');
+    Route::delete('/print-designs/category/{id}', 'App\Http\Controllers\Admin\PrintDesignController@destroyCategory')->name('admin.print-designs.destroy-category');
+    Route::post('/print-designs/upload', 'App\Http\Controllers\Admin\PrintDesignController@storeDesign')->name('admin.print-designs.store-design');
+    Route::delete('/print-designs/{id}', 'App\Http\Controllers\Admin\PrintDesignController@destroyDesign')->name('admin.print-designs.destroy-design');
     Route::delete('/delete-customized', 'App\Http\Controllers\Admin\CustomizedController@delete')->name('customized.delete');
 
     // Banner Routes

@@ -88,7 +88,10 @@ class CartController extends Controller
                         'selectedColor' => $item->selected_color,
                         'quantity' => $item->quantity,
                         'cartKey' => $item->selected_size ? "{$product->id}-{$item->selected_size}" : (string)$product->id,
-                        'added_at' => $item->created_at
+                        'added_at' => $item->created_at,
+                        'custom_design_url' => $item->product_details['custom_design_url'] ?? null,
+                        'custom_preview_url' => $item->product_details['custom_preview_url'] ?? null,
+                        'custom_text' => $item->product_details['custom_text'] ?? null,
                     ];
                 }
                 return null;
@@ -127,19 +130,30 @@ class CartController extends Controller
             $selectedColor = $request->input('selectedColor', '');
             $quantity = $request->input('quantity', 1);
 
-            // Check if item already exists in cart
+            // Check if item already exists in cart with the same parameters (and custom design if applicable)
             $existingItem = null;
+            $customDesignUrl = $request->input('custom_design_url');
+            
+            $existingQuery = Cart::where('product_id', $productId)
+                ->where('selected_size', $selectedSize);
+                
             if ($user) {
-                $existingItem = Cart::where('user_id', $user->id)
-                    ->where('product_id', $productId)
-                    ->where('selected_size', $selectedSize)
-                    ->first();
+                $existingQuery->where('user_id', $user->id);
             } else if ($sessionId) {
-                $existingItem = Cart::where('session_id', $sessionId)
-                    ->where('product_id', $productId)
-                    ->where('selected_size', $selectedSize)
-                    ->whereNull('user_id')
-                    ->first();
+                $existingQuery->where('session_id', $sessionId)->whereNull('user_id');
+            }
+            
+            $existingItems = $existingQuery->get();
+            
+            foreach ($existingItems as $item) {
+                $details = $item->product_details ?? [];
+                $itemDesignUrl = $details['custom_design_url'] ?? null;
+                
+                // Only group if sizes, colors, and custom designs match perfectly
+                if ($itemDesignUrl === $customDesignUrl && $item->selected_color === $selectedColor) {
+                    $existingItem = $item;
+                    break;
+                }
             }
 
             if ($existingItem) {
@@ -157,15 +171,27 @@ class CartController extends Controller
             }
 
             // Create new cart item
+            $productDetails = [
+                'selectedSize' => $selectedSize,
+                'selectedColor' => $selectedColor,
+            ];
+
+            if ($request->has('custom_design_url')) {
+                $productDetails['custom_design_url'] = $request->input('custom_design_url');
+            }
+            if ($request->has('custom_preview_url')) {
+                $productDetails['custom_preview_url'] = $request->input('custom_preview_url');
+            }
+            if ($request->has('custom_text')) {
+                $productDetails['custom_text'] = $request->input('custom_text');
+            }
+
             $cartData = [
                 'product_id' => $productId,
                 'quantity' => $quantity,
                 'selected_size' => $selectedSize,
                 'selected_color' => $selectedColor,
-                'product_details' => [
-                    'selectedSize' => $selectedSize,
-                    'selectedColor' => $selectedColor,
-                ]
+                'product_details' => $productDetails
             ];
 
             if ($user) {

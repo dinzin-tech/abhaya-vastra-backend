@@ -190,3 +190,11 @@ Route::middleware('auth:sanctum')->prefix('shiprocket')->group(function () {
     // Manual tracking sync (re-fetch from Shiprocket)
     Route::post('/sync-tracking/{orderId}', [ShiprocketWebhookController::class, 'syncTracking']);
 });
+
+// Custom T-Shirt Design Studio routes
+Route::post('/custom-design/upload', [App\Http\Controllers\Api\CustomDesignController::class, 'uploadDesign']);
+
+// Design Library API routes (public)
+Route::get('/design-categories', [App\Http\Controllers\Api\DesignCategoryController::class, 'index']);
+Route::get('/print-designs', [App\Http\Controllers\Api\PrintDesignController::class, 'index']);
+Route::get('/media', [App\Http\Controllers\Api\MediaController::class, 'serve']);
