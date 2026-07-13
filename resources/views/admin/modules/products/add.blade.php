@@ -291,6 +291,10 @@
                 <span class="tab-step">3</span>
                 <i class="fa-regular fa-palette tab-icon"></i> Colors & Variants
             </button>
+            <button type="button" class="pf-tab-btn" data-tab="tab-qikink">
+                <span class="tab-step">4</span>
+                <i class="fa-regular fa-shirt tab-icon"></i> Qikink POD Settings
+            </button>
         </div>
 
         <form id="productForm" action="{{ route('products.store') }}" method="post" enctype="multipart/form-data">
@@ -380,49 +384,6 @@
                         <div class="pf-toggle-track"></div>
                         <span class="pf-toggle-label"><i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6"></i> Customizable</span>
                     </label>
-                </div>
-
-                <hr class="section-divider">
-                <p class="section-heading">Print on Demand (Qikink POD)</p>
-
-                <div class="pf-toggles mb-20">
-                    <label class="pf-toggle">
-                        <input type="checkbox" name="is_qikink_product" id="is_qikink_product" value="1"
-                            {{ optional($item)->is_qikink_product ? 'checked' : '' }}
-                            {{ $item ? 'disabled' : '' }}
-                            onchange="toggleQikinkFields(this.checked)">
-                        <div class="pf-toggle-track"></div>
-                        <span class="pf-toggle-label"><i class="fa-solid fa-print" style="color:#4f46e5"></i> Is Qikink Product</span>
-                    </label>
-                    <label class="pf-toggle" id="qikink_search_products_toggle" style="{{ optional($item)->is_qikink_product ? '' : 'display: none;' }}">
-                        <input type="checkbox" name="search_from_my_products" id="search_from_my_products" value="1"
-                            {{ optional($item)->search_from_my_products ? 'checked' : '' }}
-                            {{ $item ? 'disabled' : '' }}>
-                        <div class="pf-toggle-track"></div>
-                        <span class="pf-toggle-label"><i class="fa-solid fa-magnifying-glass" style="color:#2563eb"></i> Search from My Products</span>
-                    </label>
-                </div>
-
-                <div id="qikink_details_section" style="{{ optional($item)->is_qikink_product ? '' : 'display: none;' }} margin-top: 20px;">
-                    <div class="pf-row pf-row-2">
-                        <div class="pf-field">
-                            <label for="qikink_sku">Qikink Blank SKU / Base SKU</label>
-                            <input type="text" name="qikink_sku" id="qikink_sku" class="form-control"
-                                placeholder="e.g. blank-tshirt-white" value="{{ optional($item)->qikink_sku }}"
-                                {{ $item ? 'readonly' : '' }}>
-                            <small class="text-muted" style="font-size: 0.72rem; display: block; margin-top: 4px;">For custom designer products, specify Qikink's base blank SKU. For pre-designed products (Search from My Products = True), specify your exact Qikink Product SKU.</small>
-                        </div>
-                        <div class="pf-field">
-                            <label for="qikink_print_type_id">Print Type Method</label>
-                            <select name="qikink_print_type_id" id="qikink_print_type_id" class="form-control" {{ $item ? 'disabled' : '' }}>
-                                <option value="1" {{ optional($item)->qikink_print_type_id == 1 ? 'selected' : '' }}>DTG (Direct to Garment)</option>
-                                <option value="17" {{ optional($item)->qikink_print_type_id == 17 ? 'selected' : '' }}>DTF (Direct to Film)</option>
-                                <option value="3" {{ optional($item)->qikink_print_type_id == 3 ? 'selected' : '' }}>Embroidery</option>
-                                <option value="2" {{ optional($item)->qikink_print_type_id == 2 ? 'selected' : '' }}>All-over Printed</option>
-                                <option value="5" {{ optional($item)->qikink_print_type_id == 5 ? 'selected' : '' }}>Accessories</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -581,6 +542,58 @@
                 <button type="button" class="btn-add-color" id="btnAddColor" onclick="addColorBlock()" {{ $item ? 'disabled' : '' }}>
                     <i class="fa-regular fa-plus"></i> Add Color Variant
                 </button>
+            </div>
+
+            {{-- ==========================================
+                 TAB 4: QIKINK POD SETTINGS
+            ========================================== --}}
+            <div class="pf-tab-panel" id="tab-qikink">
+                <p class="section-heading">Print on Demand (Qikink POD) Settings</p>
+                
+                <div style="background:#f5f3ff;border-radius:10px;padding:14px 18px;margin-bottom:20px;border:1.5px solid #ddd6fe;font-size:.82rem;color:#5b21b6;display:flex;align-items:center;gap:10px;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span><strong>Qikink Integration</strong> — Set how this product routes to Qikink. Customizable items will print dynamic user canvas uploads. Pre-designed items will map directly to your existing Qikink dashboard catalog.</span>
+                </div>
+
+                <div class="pf-toggles mb-20">
+                    <label class="pf-toggle">
+                        <input type="checkbox" name="is_qikink_product" id="is_qikink_product" value="1"
+                            {{ optional($item)->is_qikink_product ? 'checked' : '' }}
+                            {{ $item ? 'disabled' : '' }}
+                            onchange="toggleQikinkFields(this.checked)">
+                        <div class="pf-toggle-track"></div>
+                        <span class="pf-toggle-label"><i class="fa-solid fa-print" style="color:#4f46e5"></i> Enable Qikink Fulfillment</span>
+                    </label>
+                    <label class="pf-toggle" id="qikink_search_products_toggle" style="{{ optional($item)->is_qikink_product ? '' : 'display: none;' }}">
+                        <input type="checkbox" name="search_from_my_products" id="search_from_my_products" value="1"
+                            {{ optional($item)->search_from_my_products ? 'checked' : '' }}
+                            {{ $item ? 'disabled' : '' }}>
+                        <div class="pf-toggle-track"></div>
+                        <span class="pf-toggle-label"><i class="fa-solid fa-magnifying-glass" style="color:#2563eb"></i> Search from My Products</span>
+                    </label>
+                </div>
+
+                <div id="qikink_details_section" style="{{ optional($item)->is_qikink_product ? '' : 'display: none;' }} margin-top: 20px;">
+                    <div class="pf-row pf-row-2">
+                        <div class="pf-field">
+                            <label for="qikink_sku">Qikink Blank SKU / Base SKU</label>
+                            <input type="text" name="qikink_sku" id="qikink_sku" class="form-control"
+                                placeholder="e.g. blank-tshirt-white" value="{{ optional($item)->qikink_sku }}"
+                                {{ $item ? 'readonly' : '' }}>
+                            <small class="text-muted" style="font-size: 0.72rem; display: block; margin-top: 4px;">For custom designer products, specify Qikink's base blank SKU. For pre-designed products (Search from My Products = True), specify your exact Qikink Product SKU.</small>
+                        </div>
+                        <div class="pf-field">
+                            <label for="qikink_print_type_id">Print Type Method</label>
+                            <select name="qikink_print_type_id" id="qikink_print_type_id" class="form-control" {{ $item ? 'disabled' : '' }}>
+                                <option value="1" {{ optional($item)->qikink_print_type_id == 1 ? 'selected' : '' }}>DTG (Direct to Garment)</option>
+                                <option value="17" {{ optional($item)->qikink_print_type_id == 17 ? 'selected' : '' }}>DTF (Direct to Film)</option>
+                                <option value="3" {{ optional($item)->qikink_print_type_id == 3 ? 'selected' : '' }}>Embroidery</option>
+                                <option value="2" {{ optional($item)->qikink_print_type_id == 2 ? 'selected' : '' }}>All-over Printed</option>
+                                <option value="5" {{ optional($item)->qikink_print_type_id == 5 ? 'selected' : '' }}>Accessories</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- ACTION BAR --}}
