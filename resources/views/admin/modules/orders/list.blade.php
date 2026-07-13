@@ -204,7 +204,10 @@
         items.forEach(function(item, index) {
             let designLink = '';
             if (item.custom_design_url) {
-                designLink = `<br><a href="${item.custom_design_url}" target="_blank" class="badge bg-primary text-white mt-1" style="background-color: #6366f1; text-decoration: none; padding: 4px 8px; font-size: 0.72rem; border-radius: 4px;"><i class="fa-solid fa-paint-brush"></i> View Custom Design</a>`;
+                designLink = `<br><a href="${item.custom_design_url}" target="_blank" class="badge text-white mt-1 me-1" style="background-color: #6366f1; text-decoration: none; padding: 4px 8px; font-size: 0.72rem; border-radius: 4px;"><i class="fa-solid fa-paint-brush"></i> View Design File</a>`;
+            }
+            if (item.custom_preview_url) {
+                designLink += `<a href="${item.custom_preview_url}" target="_blank" class="badge text-white mt-1" style="background-color: #3b82f6; text-decoration: none; padding: 4px 8px; font-size: 0.72rem; border-radius: 4px;"><i class="fa-solid fa-shirt"></i> View Mockup</a>`;
             }
             itemsHtml += `
                 <tr>
@@ -337,6 +340,58 @@
                 <hr>
             `;
         }
+
+        // Qikink POD management block
+        let qikinkHtml = '';
+        if (order.has_qikink_items && order.status !== 'cancelled') {
+            qikinkHtml = `
+                <div class="card border-primary mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2 px-3" style="background-color: #4f46e5 !important;">
+                        <h6 class="mb-0 fw-bold text-white"><i class="fa-solid fa-shirt me-2"></i> Qikink Print on Demand Fulfillments</h6>
+                        ${order.qikink_order_id ? '<span class="badge bg-success">Pushed</span>' : '<span class="badge bg-secondary">Not Pushed</span>'}
+                    </div>
+                    <div class="card-body p-3">
+            `;
+
+            if (!order.qikink_order_id) {
+                qikinkHtml += `
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div>
+                                <p class="mb-0 text-muted small">This order has POD items but has not been pushed to Qikink yet.</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="btn-qikink-create" onclick="qikinkCreateOrder(${order.id})">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Send Order to Qikink
+                            </button>
+                        </div>
+                `;
+            } else {
+                qikinkHtml += `
+                        <div class="row g-3">
+                            <div class="col-md-6 border-end">
+                                <p class="mb-1 small"><strong>Qikink Order ID:</strong> ${order.qikink_order_id}</p>
+                                <p class="mb-1 small"><strong>Qikink Status:</strong> <span class="badge bg-info text-dark font-monospace">${order.qikink_status || 'Queued'}</span></p>
+                                <p class="mb-1 small"><strong>Sent On:</strong> ${order.qikink_sent_at ? new Date(order.qikink_sent_at).toLocaleString() : 'N/A'}</p>
+                                ${order.qikink_awb_code ? `<p class="mb-1 small"><strong>AWB Code:</strong> <code class="bg-dark text-white px-2 py-0.5 rounded">${order.qikink_awb_code}</code></p>` : ''}
+                                ${order.qikink_tracking_url ? `<p class="mb-0 small"><strong>Tracking Link:</strong> <a href="${order.qikink_tracking_url}" target="_blank" class="text-primary">Track Shipment <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a></p>` : ''}
+                            </div>
+                            <div class="col-md-6 ps-md-4 d-flex flex-column gap-2 justify-content-center">
+                                <button class="btn btn-outline-primary btn-sm text-start" id="btn-qikink-sync" onclick="qikinkSyncOrder(${order.id})">
+                                    <i class="fa-solid fa-arrows-rotate me-2"></i> Sync Order & Tracking Status
+                                </button>
+                                <div class="text-muted small mt-2">
+                                    <i class="fa-solid fa-circle-info me-1"></i> Custom POD designs will be printed exactly as uploaded by customer.
+                                </div>
+                            </div>
+                        </div>
+                `;
+            }
+
+            qikinkHtml += `
+                    </div>
+                </div>
+                <hr>
+            `;
+        }
         
         let html = `
             <div class="row mb-3">
@@ -364,6 +419,7 @@
             <hr>
             
             ${shiprocketHtml}
+            ${qikinkHtml}
             
             <h6 class="fw-bold mb-3">Order Items</h6>
             <div class="table-responsive">
@@ -614,6 +670,61 @@
                 if(response.success) {
                     displayOrderDetails(response.data);
                 }
+            }
+        });
+    }
+
+    function qikinkCreateOrder(orderId) {
+        let btn = $('#btn-qikink-create');
+        btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Sending...');
+
+        $.ajax({
+            url: "{{ route('admin.qikink.push-order') }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                order_id: orderId
+            },
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-cloud-arrow-up me-1"></i> Send Order to Qikink');
+                if(res.success) {
+                    Swal.fire('Pushed!', res.message, 'success');
+                    refreshOrderModal(orderId);
+                    recordList();
+                } else {
+                    Swal.fire('Push Failed', res.message || 'Failed to send order to Qikink.', 'error');
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-cloud-arrow-up me-1"></i> Send Order to Qikink');
+                let err = xhr.responseJSON ? xhr.responseJSON.message : 'Server error sending order.';
+                Swal.fire('Error', err, 'error');
+            }
+        });
+    }
+
+    function qikinkSyncOrder(orderId) {
+        let btn = $('#btn-qikink-sync');
+        btn.prop('disabled', true).html('<i class="fa-solid fa-arrows-rotate fa-spin me-1"></i> Syncing...');
+
+        $.ajax({
+            url: '/admin/qikink/sync-order/' + orderId,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(res) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-arrows-rotate me-2"></i> Sync Order & Tracking Status');
+                if(res.success) {
+                    Swal.fire('Synced!', res.message, 'success');
+                    refreshOrderModal(orderId);
+                } else {
+                    Swal.fire('Sync Failed', res.message || 'Failed to sync Qikink status.', 'error');
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html('<i class="fa-solid fa-arrows-rotate me-2"></i> Sync Order & Tracking Status');
+                Swal.fire('Error', 'Server error syncing Qikink status.', 'error');
             }
         });
     }

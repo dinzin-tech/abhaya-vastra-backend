@@ -35,7 +35,13 @@ class Order extends Model
         'shiprocket_shipment_id',
         'shiprocket_awb_code',
         'shiprocket_courier_name',
-        'shiprocket_tracking_url'
+        'shiprocket_tracking_url',
+        'qikink_order_id',
+        'qikink_status',
+        'qikink_shipping',
+        'qikink_sent_at',
+        'qikink_awb_code',
+        'qikink_tracking_url'
     ];
 
     protected $casts = [

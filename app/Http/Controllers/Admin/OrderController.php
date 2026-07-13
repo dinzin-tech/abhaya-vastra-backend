@@ -82,6 +82,28 @@ class OrderController extends Controller
     {
         $order = Order::with(['user', 'payment'])->findOrFail($id);
         
+        // Server-side check if order contains Qikink POD items
+        $hasQikinkItems = false;
+        if (is_array($order->items)) {
+            foreach ($order->items as $item) {
+                if (!empty($item['custom_design_url'])) {
+                    $hasQikinkItems = true;
+                    break;
+                }
+                $productId = $item['product_id'] ?? ($item['id'] ?? null);
+                if ($productId) {
+                    $product = \App\Models\Products::find($productId);
+                    if ($product && $product->is_qikink_product) {
+                        $hasQikinkItems = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Dynamically add has_qikink_items to order object
+        $order->setAttribute('has_qikink_items', $hasQikinkItems);
+        
         return response()->json([
             'success' => true,
             'data' => $order
@@ -552,6 +574,135 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error cancelling shipment: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Manually push an order to Qikink for printing
+     */
+    public function qikinkCreateOrder(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        if ($order->qikink_order_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order has already been pushed to Qikink (ID: ' . $order->qikink_order_id . ')'
+            ]);
+        }
+
+        try {
+            $qikinkService = app(\App\Services\QikinkService::class);
+            $mappedData = $qikinkService->mapOrderData($order);
+
+            Log::info('📦 Admin: Pushing order to Qikink', ['order_id' => $order->id, 'order_number' => $order->order_number]);
+            $result = $qikinkService->createOrder($mappedData);
+
+            if (isset($result['status_code']) && $result['status_code'] == '200' && !empty($result['order_id'])) {
+                $qikinkId = $result['order_id'];
+                
+                $order->update([
+                    'qikink_order_id' => $qikinkId,
+                    'qikink_status'   => 'Queued', // Initial status on Qikink
+                    'qikink_sent_at'  => now(),
+                    'status'          => 'processing' // Move order to processing
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order successfully sent to Qikink! ID assigned: ' . $qikinkId,
+                    'data'    => $result
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to push to Qikink. Qikink response: ' . ($result['message'] ?? json_encode($result)),
+                'response'=> $result
+            ]);
+        } catch (\InvalidArgumentException $iae) {
+            return response()->json([
+                'success' => false,
+                'message' => $iae->getMessage()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Admin Qikink push failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error pushing order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Manually sync order status from Qikink
+     */
+    public function qikinkSyncOrder($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if (!$order->qikink_order_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This order has not been sent to Qikink yet.'
+            ]);
+        }
+
+        try {
+            $qikinkService = app(\App\Services\QikinkService::class);
+            $result = $qikinkService->getOrder($order->qikink_order_id);
+
+            // Qikink order endpoint returns order details (sometimes inside array)
+            $qikOrder = isset($result[0]) ? $result[0] : $result;
+
+            if (!empty($qikOrder) && isset($qikOrder['status'])) {
+                $status = $qikOrder['status'];
+                $awb = $qikOrder['shipping']['awb'] ?? null;
+                $trackingLink = $qikOrder['shipping']['tracking_link'] ?? null;
+
+                $updateData = [
+                    'qikink_status' => $status,
+                ];
+
+                if ($awb) {
+                    $updateData['qikink_awb_code'] = $awb;
+                }
+                if ($trackingLink) {
+                    $updateData['qikink_tracking_url'] = $trackingLink;
+                }
+
+                // If qikink has shipped, update our system status as well
+                if (strtolower($status) === 'shipped' || strtolower($status) === 'dispatched' || strtolower($status) === 'archived') {
+                    // If it is archived or completed, map to appropriate status
+                    if ($awb && !$order->qikink_awb_code) {
+                        $updateData['status'] = 'shipped';
+                    }
+                }
+
+                $order->update($updateData);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order status synced successfully! Current Qikink Status: ' . $status,
+                    'data'    => $qikOrder
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not retrieve status. Qikink returned invalid response.',
+                'response'=> $result
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Admin Qikink status sync failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error syncing status: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -23,7 +23,11 @@ class Products extends Model
         'best_seller',
         'is_featured',
         'customizable',
-        'gender'
+        'gender',
+        'is_qikink_product',
+        'qikink_sku',
+        'qikink_print_type_id',
+        'search_from_my_products'
     ];
 
     public function category()

@@ -83,6 +83,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/storage-settings', 'App\Http\Controllers\Admin\StorageController@index')->name('admin.storage.index');
     Route::post('/storage-settings', 'App\Http\Controllers\Admin\StorageController@update')->name('admin.storage.update');
 
+    // Qikink Integration Settings
+    Route::get('/qikink-settings', 'App\Http\Controllers\Admin\QikinkSettingsController@index')->name('admin.qikink.settings');
+    Route::post('/qikink-settings', 'App\Http\Controllers\Admin\QikinkSettingsController@update')->name('admin.qikink.settings.update');
+
     // Design Library (Catalog & Categories)
     Route::get('/print-designs', 'App\Http\Controllers\Admin\PrintDesignController@index')->name('admin.print-designs.index');
     Route::post('/print-designs/category', 'App\Http\Controllers\Admin\PrintDesignController@storeCategory')->name('admin.print-designs.store-category');
@@ -141,6 +145,10 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('/shiprocket/label/{order_id}', 'App\Http\Controllers\Admin\OrderController@shiprocketGenerateLabel')->name('admin.shiprocket.generate-label');
     Route::get('/shiprocket/manifest/{order_id}', 'App\Http\Controllers\Admin\OrderController@shiprocketGenerateManifest')->name('admin.shiprocket.generate-manifest');
     Route::post('/shiprocket/cancel', 'App\Http\Controllers\Admin\OrderController@shiprocketCancelShipment')->name('admin.shiprocket.cancel');
+
+    // Qikink Print on Demand Management inside Admin Panel
+    Route::post('/qikink/push-order', 'App\Http\Controllers\Admin\OrderController@qikinkCreateOrder')->name('admin.qikink.push-order');
+    Route::post('/qikink/sync-order/{id}', 'App\Http\Controllers\Admin\OrderController@qikinkSyncOrder')->name('admin.qikink.sync-order');
 
     Route::resource('payments', 'App\Http\Controllers\Admin\PaymentController');
     Route::get('payments-list', 'App\Http\Controllers\Admin\PaymentController@listPayments')->name('payments.list');

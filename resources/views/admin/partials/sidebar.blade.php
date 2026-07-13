@@ -310,7 +310,7 @@
 
                 <!-- Settings Dropdown -->
                 <li
-                    class="slide has-sub {{ areActiveRoutes(['settings.index', 'smtp.index', 'contact-us.index', 'social.index', 'payment-gateway.index', 'admin.storage.index'], 'open') }}">
+                    class="slide has-sub {{ areActiveRoutes(['settings.index', 'smtp.index', 'contact-us.index', 'social.index', 'payment-gateway.index', 'admin.storage.index', 'admin.qikink.settings'], 'open') }}">
                     <a href="javascript:void(0);" class="sidebar__menu-item">
                         <i class="fa-regular fa-angle-down side-menu__angle"></i>
                         <div class="side-menu__icon"><i class="icon-hrm"></i></div>
@@ -343,6 +343,11 @@
                         <li class="slide">
                             <a class="sidebar__menu-item {{ areActiveRoutes(['admin.storage.index']) }}"
                                 href="{{ route('admin.storage.index') }}">Storage Settings</a>
+                        </li>
+
+                        <li class="slide">
+                            <a class="sidebar__menu-item {{ areActiveRoutes(['admin.qikink.settings']) }}"
+                                href="{{ route('admin.qikink.settings') }}">Qikink POD Settings</a>
                         </li>
                     </ul>
                 </li>

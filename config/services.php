@@ -48,4 +48,10 @@ return [
         'warehouse_phone' => env('SHIPROCKET_WAREHOUSE_PHONE', ''),
     ],
 
+    'qikink' => [
+        'client_id'     => env('QIKINK_CLIENT_ID', ''),
+        'client_secret' => env('QIKINK_CLIENT_SECRET', ''),
+        'sandbox'       => env('QIKINK_SANDBOX', true),
+    ],
+
 ];

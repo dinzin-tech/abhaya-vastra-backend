@@ -109,7 +109,10 @@ class ProductController extends Controller
         'main_image'  => $request->id ? 'nullable|mimes:jpeg,png,bmp,gif,svg,webp,avif' : 'required|mimes:jpeg,png,bmp,gif,svg,webp,avif',
         'zoomed_image'=> $request->id ? 'nullable|mimes:jpeg,png,bmp,gif,svg,webp,avif' : 'required|mimes:jpeg,png,bmp,gif,svg,webp,avif',
         'colors.*.color' => 'nullable|string|max:50',
-        
+        'is_qikink_product'       => 'nullable',
+        'qikink_sku'              => 'nullable|string|max:255',
+        'qikink_print_type_id'    => 'nullable|integer',
+        'search_from_my_products' => 'nullable',
     ]);
 
     // $price = $request->price;
@@ -127,7 +130,10 @@ class ProductController extends Controller
         // 'total_price' => $totalPrice,
         'best_seller' => $request->has('best_seller') ? 1 : 0,
         'is_featured' => $request->has('is_featured') ? 1 : 0,
-
+        'is_qikink_product'       => $request->has('is_qikink_product') ? 1 : 0,
+        'qikink_sku'              => $request->qikink_sku,
+        'qikink_print_type_id'    => $request->qikink_print_type_id ?? 1,
+        'search_from_my_products' => $request->has('search_from_my_products') ? 1 : 0,
     ];
 
     // Handle main image
