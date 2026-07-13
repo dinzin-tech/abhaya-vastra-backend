@@ -29,6 +29,14 @@
         transition: transform .15s, box-shadow .15s;
     }
     .btn-add-product:hover { color:#fff; transform:translateY(-1px); box-shadow:0 6px 18px rgba(99,102,241,.4); }
+    .btn-qikink-quick {
+        display:inline-flex; align-items:center; gap:7px;
+        background:#e0e7ff; color:#4338ca; border:1.5px solid #a5b4fc;
+        border-radius:9px; padding:9px 18px; font-size:0.85rem; font-weight:700;
+        text-decoration:none; transition: background .2s, color .2s;
+        cursor: pointer;
+    }
+    .btn-qikink-quick:hover { background:#c7d2fe; color:#312e81; }
 
     /* Filter bar */
     .pl-filters {
@@ -119,6 +127,9 @@
     <div class="pl-header">
         <h4><i class="fa-regular fa-boxes-stacked me-2" style="color:#6366f1"></i> Product Catalog</h4>
         <div class="pl-actions">
+            <button type="button" class="btn-qikink-quick" data-bs-toggle="modal" data-bs-target="#qikinkQuickCreateModal">
+                <i class="fa-solid fa-shirt"></i> Quick Qikink Product
+            </button>
             <a href="{{ route('products.bulk-import') }}" class="btn-bulk">
                 <i class="fa-regular fa-file-arrow-up"></i> Bulk Import
             </a>
@@ -209,6 +220,67 @@
         </div>
     </div>
 </div>
+
+<!-- Qikink Quick Create Modal -->
+<div class="modal fade" id="qikinkQuickCreateModal" tabindex="-1" aria-labelledby="qikinkQuickCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:14px;">
+            <div class="modal-header text-white border-0 py-3" style="background: linear-gradient(135deg,#6366f1,#4f46e5) !important;">
+                <h5 class="modal-title fw-bold text-white" id="qikinkQuickCreateModalLabel">
+                    <i class="fa-solid fa-shirt me-2"></i> Quick Qikink Product Creator
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="qikinkQuickForm" action="{{ route('products.qikink-quick-create') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="quick_name" class="form-label fw-bold small text-muted">Product Name</label>
+                        <input type="text" class="form-control" name="name" id="quick_name" placeholder="e.g. Classic Men Crewneck T-Shirt" required style="border-radius: 8px;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick_qikink_sku" class="form-label fw-bold small text-muted">Qikink Product SKU</label>
+                        <input type="text" class="form-control" name="qikink_sku" id="quick_qikink_sku" placeholder="e.g. M-TSHIRT-SUPERMAN-WH" required style="border-radius: 8px;">
+                        <small class="text-muted d-block mt-1" style="font-size:0.75rem;">Must match your pre-created product SKU inside Qikink Dashboard.</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quick_base_price" class="form-label fw-bold small text-muted">Retail Price (₹)</label>
+                            <input type="number" class="form-control" name="base_price" id="quick_base_price" placeholder="599" min="0" required style="border-radius: 8px;">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="quick_gender" class="form-label fw-bold small text-muted">Gender Category</label>
+                            <select class="form-select" name="gender" id="quick_gender" required style="border-radius: 8px; padding: 9px 12px; height: auto;">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                                <option value="unisex">Unisex</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quick_category_id" class="form-label fw-bold small text-muted">Store Category</label>
+                        <select class="form-select" name="category_id" id="quick_category_id" required style="border-radius: 8px; padding: 9px 12px; height: auto;">
+                            <option value="">— Select Category —</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="p-3 bg-light rounded-3 small text-muted mt-2 border">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i> 
+                        This will automatically build the product, configure Qikink settings, and generate size variants (S, M, L, XL, XXL) with 100 stock. You can later add images/colors by editing the product.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 py-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-3" id="btnQuickSubmit" style="background: linear-gradient(135deg,#6366f1,#4f46e5); border: none; border-radius: 8px;">
+                        <i class="fa-solid fa-plus me-1"></i> Auto-Create Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @stop
 
 @push('appendJs')
@@ -277,6 +349,36 @@
         @endif
 
         recordList();
+
+        // Qikink Quick Create Submission Handler
+        $('#qikinkQuickForm').on('submit', function(e) {
+            e.preventDefault();
+            let form = $(this);
+            let btn = $('#btnQuickSubmit');
+            btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-1"></i> Creating...');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function(res) {
+                    btn.prop('disabled', false).html('<i class="fa-solid fa-plus me-1"></i> Auto-Create Product');
+                    if(res.success) {
+                        $('#qikinkQuickCreateModal').modal('hide');
+                        toastr.success(res.message);
+                        form[0].reset();
+                        recordList();
+                    } else {
+                        toastr.error(res.message || 'Failed to auto-create product.');
+                    }
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html('<i class="fa-solid fa-plus me-1"></i> Auto-Create Product');
+                    let err = xhr.responseJSON ? xhr.responseJSON.message : 'Server error creating product.';
+                    toastr.error(err);
+                }
+            });
+        });
     });
 </script>
 <script type="text/javascript" src="{{ asset('assets/js/list-records.js') }}?v=1.5"></script>

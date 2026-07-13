@@ -64,6 +64,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::resource('products', 'App\Http\Controllers\Admin\ProductController');
     Route::get('products-list', 'App\Http\Controllers\Admin\ProductController@listProducts')->name('products.list');
     Route::delete('/delete-product', 'App\Http\Controllers\Admin\ProductController@delete')->name('products.delete');
+    Route::post('products/qikink-quick-create', 'App\Http\Controllers\Admin\ProductController@qikinkQuickCreate')->name('products.qikink-quick-create');
 
     // Product Variants Routes
     Route::resource('product-variants', 'App\Http\Controllers\Admin\ProductVariantController');

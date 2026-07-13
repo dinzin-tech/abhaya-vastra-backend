@@ -22,8 +22,9 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         return view('admin.modules.products.list', [
-            'q'      => $request->q,
-            'offset' => $request->offset
+            'q'          => $request->q,
+            'offset'     => $request->offset,
+            'categories' => \App\Models\Category::all()
         ]);
     }
 
@@ -317,5 +318,79 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Product Deleted Successfully!',
         ], 200);
+    }
+
+    /**
+     * Quick create/import product using Qikink SKU.
+     */
+    public function qikinkQuickCreate(Request $request)
+    {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'qikink_sku'  => 'required|string|max:255',
+            'base_price'  => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'gender'      => 'required|in:male,female,unisex',
+        ]);
+
+        try {
+            // Check if product already exists with this slug
+            $slug = \Illuminate\Support\Str::slug($request->name);
+            $slugCount = Products::where('slug', $slug)->count();
+            if ($slugCount > 0) {
+                $slug = $slug . '-' . time();
+            }
+
+            // Create product
+            $product = Products::create([
+                'name'                    => $request->name,
+                'slug'                    => $slug,
+                'category_id'             => $request->category_id,
+                'gender'                  => $request->gender,
+                'description'             => 'Quick created Qikink product (SKU: ' . $request->qikink_sku . ')',
+                'customizable'            => 1, // Default customizable
+                'is_qikink_product'       => 1,
+                'qikink_sku'              => $request->qikink_sku,
+                'qikink_print_type_id'    => 1, // DTG by default
+                'search_from_my_products' => 1, // Default Search from My Products = True for quick adds
+                'best_seller'             => 0,
+                'is_featured'             => 0,
+            ]);
+
+            // Add a default color block (e.g. "Default")
+            $color = \App\Models\ProductColor::create([
+                'product_id' => $product->id,
+                'color'      => 'Default',
+                'images'     => [] // empty array
+            ]);
+
+            // Add standard size variants: S, M, L, XL, XXL
+            $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+            $price = floatval($request->base_price);
+            
+            foreach ($sizes as $size) {
+                \App\Models\ProductVariant::create([
+                    'color_id'    => $color->id,
+                    'size'        => $size,
+                    'stock'       => 100, // standard high stock
+                    'price'       => $price,
+                    'discount'    => 0,
+                    'total_price' => $price
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product imported and created successfully! (SKU: ' . $request->qikink_sku . ')',
+                'redirect'=> route('products.index')
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Qikink Quick Import failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
