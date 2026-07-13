@@ -370,6 +370,7 @@ class ProductController extends Controller
             
             foreach ($sizes as $size) {
                 \App\Models\ProductVariant::create([
+                    'product_id'  => $product->id,
                     'color_id'    => $color->id,
                     'size'        => $size,
                     'stock'       => 100, // standard high stock
