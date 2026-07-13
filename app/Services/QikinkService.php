@@ -71,7 +71,11 @@ class QikinkService
 
         $url = $this->getBaseUrl() . '/api/token';
         
-        Log::info('Qikink Service: Fetching fresh access token from ' . $url);
+        Log::info('Qikink Service: Fetching fresh access token', [
+            'url'           => $url,
+            'client_id'     => $this->maskString($clientId),
+            'client_secret' => $this->maskString($clientSecret),
+        ]);
         
         $response = Http::asForm()->post($url, [
             'ClientId'      => $clientId,
@@ -84,6 +88,18 @@ class QikinkService
         }
 
         return $response->json('Accesstoken');
+    }
+
+    /**
+     * Helper to mask sensitive credentials for logs
+     */
+    private function maskString(string $str): string
+    {
+        $len = strlen($str);
+        if ($len <= 6) {
+            return str_repeat('*', $len);
+        }
+        return substr($str, 0, 3) . '...' . substr($str, -3);
     }
 
     /**
