@@ -310,8 +310,11 @@ class ProductController extends Controller
         //     $color->delete();
         // }
 
-        // Delete main and zoomed images
-        Storage::disk('public')->delete([$product->main_image, $product->zoomed_image]);
+        // Delete main and zoomed images if they exist
+        $imagesToDelete = array_filter([$product->main_image, $product->zoomed_image]);
+        if (!empty($imagesToDelete)) {
+            Storage::disk('public')->delete($imagesToDelete);
+        }
 
         $product->delete();
 
