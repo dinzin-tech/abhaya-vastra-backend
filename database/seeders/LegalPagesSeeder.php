@@ -18,7 +18,7 @@ class LegalPagesSeeder extends Seeder
             [
                 'title' => 'Terms and Conditions',
                 'description' => '<p><em>Last Updated: July 14, 2026</em></p>
-<p>Welcome to <strong>Abhaya Vastra</strong> ("Company", "we", "our", "us"). These Terms and Conditions ("Terms") govern your access to and use of our website located at <strong>http://localhost:3000</strong> (the "Site") and any purchases made through the Site.</p>
+<p>Welcome to <strong>Abhaya Vastra</strong> ("Company", "we", "our", "us"). These Terms and Conditions ("Terms") govern your access to and use of our website located at <strong>http://abhayavastra.store</strong> (the "Site") and any purchases made through the Site.</p>
 <p>By accessing the Site or purchasing products from us, you agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, please do not use the Site.</p>
 
 <hr/>
@@ -72,7 +72,7 @@ Address: #52/A, 6th Cross, Attur Layout, Yelahanka New Town, Bengaluru, Karnatak
             [
                 'title' => 'Privacy Policy',
                 'description' => '<p><em>Last Updated: July 14, 2026</em></p>
-<p>At <strong>Abhaya Vastra</strong>, accessible from <strong>http://localhost:3000</strong>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Abhaya Vastra and how we use it.</p>
+<p>At <strong>Abhaya Vastra</strong>, accessible from <strong>http://abhayavastra.store</strong>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Abhaya Vastra and how we use it.</p>
 <p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us at <strong>info@abhayavastra.store</strong>.</p>
 
 <hr/>
