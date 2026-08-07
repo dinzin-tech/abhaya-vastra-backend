@@ -20,10 +20,25 @@ class AddJsonHeader
         // Add JSON headers
         $response->headers->set('Content-Type', 'application/json');
         $response->headers->set('Accept', 'application/json');
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
-        $response->headers->set('Access-Control-Allow-Origin', $frontendUrl);
+        $origin = $request->header('Origin');
+        $allowedOrigins = [
+            'https://abhayavastra.store',
+            'https://www.abhayavastra.store',
+            'http://abhayavastra.store',
+            'http://www.abhayavastra.store',
+            'https://api.dinzin.in',
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'http://127.0.0.1:8000',
+        ];
+
+        if ($origin && in_array($origin, $allowedOrigins)) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+        } else {
+            $response->headers->set('Access-Control-Allow-Origin', env('FRONTEND_URL', 'https://abhayavastra.store'));
+        }
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
         
         return $response;

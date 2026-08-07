@@ -26,7 +26,16 @@ return [
         'DELETE',
     ],
 
-    'allowed_origins' => ['http://localhost:3000'],
+    'allowed_origins' => [
+        'https://abhayavastra.store',
+        'https://www.abhayavastra.store',
+        'http://abhayavastra.store',
+        'http://www.abhayavastra.store',
+        'https://api.dinzin.in',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:8000',
+    ],
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => [
