@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ProductColorSeeder::class,
             ProductVariantSeeder::class,
             BannerSeeder::class,
+            LookbookSeeder::class,
             SettingSeeder::class,
             LegalPagesSeeder::class,
         ]);

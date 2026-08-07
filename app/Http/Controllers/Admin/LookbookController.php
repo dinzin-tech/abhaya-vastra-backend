@@ -77,7 +77,7 @@ class LookbookController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $path          = $request->file('image')->store('lookbooks', 'public');
+            $path          = \App\Helpers\ImageHelper::convertAndStoreToWebp($request->file('image'), 'lookbooks');
             $data['image'] = $path;
         }
 

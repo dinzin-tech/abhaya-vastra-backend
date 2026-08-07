@@ -91,196 +91,198 @@ class ProductController extends Controller
     /**
      * Store or update a Product along with Colors.
      */
- public function store(Request $request)
-{
-    // 1. Validation for main product fields
-    $request->validate([
-        'name'        => 'required|string|max:255',
-        'slug'        => [
-                                'required',
-                                'string',
-                                'max:255',
-                                Rule::unique('products')->ignore($request->id),
-                            ],
+    public function store(Request $request)
+    {
+        // 1. Validation for main product fields
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'gender'      => 'required|in:male,female,unisex',
+            'main_image'  => $request->id ? 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480' : 'required|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
+            'zoomed_image'=> 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
+            'colors.*.color' => 'nullable|string|max:50',
+            'is_qikink_product'       => 'nullable',
+            'qikink_sku'              => 'nullable|string|max:255',
+            'qikink_print_type_id'    => 'nullable|integer',
+            'search_from_my_products' => 'nullable',
+        ]);
 
-        'category_id' => 'required|exists:categories,id',
-        'gender'      => 'required|in:male,female,unisex', // ✅ Validate gender
-        // 'price'       => 'required|numeric',
-        // 'discount'    => 'nullable|numeric',
-        'main_image'  => $request->id ? 'nullable|mimes:jpeg,png,bmp,gif,svg,webp,avif' : 'required|mimes:jpeg,png,bmp,gif,svg,webp,avif',
-        'zoomed_image'=> $request->id ? 'nullable|mimes:jpeg,png,bmp,gif,svg,webp,avif' : 'required|mimes:jpeg,png,bmp,gif,svg,webp,avif',
-        'colors.*.color' => 'nullable|string|max:50',
-        'is_qikink_product'       => 'nullable',
-        'qikink_sku'              => 'nullable|string|max:255',
-        'qikink_print_type_id'    => 'nullable|integer',
-        'search_from_my_products' => 'nullable',
-    ]);
+        try {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+                // Generate a unique slug automatically to avoid duplicate slug failures
+                $userSlug = $request->slug ? \Illuminate\Support\Str::slug($request->slug) : \Illuminate\Support\Str::slug($request->name);
+                $baseSlug = $userSlug ?: 'product-' . time();
+                $slug = $baseSlug;
+                $count = 1;
 
-    // $price = $request->price;
-    // $discount = $request->discount ?? 0;
-    // $totalPrice = $discount > 0 ? $price - ($price * ($discount / 100)) : $price;
-
-    $data = [
-        'name'        => $request->name,
-        'slug'        => \Illuminate\Support\Str::slug($request->name),
-        'category_id' => $request->category_id,
-        'gender'      => $request->gender, // ✅ Take from form
-        'description' => $request->description,
-        // 'price'       => $price,
-        // 'discount'    => $discount,
-        // 'total_price' => $totalPrice,
-        'best_seller' => $request->has('best_seller') ? 1 : 0,
-        'is_featured' => $request->has('is_featured') ? 1 : 0,
-        'is_qikink_product'       => $request->has('is_qikink_product') ? 1 : 0,
-        'qikink_sku'              => $request->qikink_sku,
-        'qikink_print_type_id'    => $request->qikink_print_type_id ?? 1,
-        'search_from_my_products' => $request->has('search_from_my_products') ? 1 : 0,
-    ];
-
-    // Handle main image
-    if ($request->hasFile('main_image')) {
-        if ($request->id && $product = \App\Models\Products::find($request->id)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->main_image);
-        }
-        $data['main_image'] = $request->file('main_image')->store('products', 'public');
-    }
-
-    // Handle zoomed image
-    if ($request->hasFile('zoomed_image')) {
-        if ($request->id && $product = \App\Models\Products::find($request->id)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->zoomed_image);
-        }
-        $data['zoomed_image'] = $request->file('zoomed_image')->store('products', 'public');
-    }
-
-    // Create or update product
-    if ($request->id) {
-        $product = \App\Models\Products::findOrFail($request->id);
-        $product->update($data);
-        $message = 'Product Updated';
-    } else {
-        $product = \App\Models\Products::create($data);
-        $message = 'Product Added';
-    }
-
-    // Handle colors & variants
-    if ($request->has('colors')) {
-        foreach ($request->colors as $colorInput) {
-            if (empty($colorInput['color'])) continue;
-
-            $colorId   = $colorInput['id'] ?? null;
-            $newImages = [];
-
-            // Collect newly uploaded images
-            if (isset($colorInput['images']) && is_array($colorInput['images'])) {
-                foreach ($colorInput['images'] as $img) {
-                    if ($img instanceof \Illuminate\Http\UploadedFile && $img->isValid()) {
-                        $newImages[] = $img->store('product-colors', 'public');
-                    }
-                }
-            }
-
-            if ($colorId) {
-                // ── UPDATE existing color ──────────────────────────────────
-                $productColor = \App\Models\ProductColor::find($colorId);
-                if (!$productColor) continue;
-
-                $updateData = ['color' => $colorInput['color']];
-
-                if (!empty($newImages)) {
-                    // Delete old images from storage (model casts to array already)
-                    $oldImages = is_array($productColor->images) ? $productColor->images : [];
-                    foreach ($oldImages as $img) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->delete($img);
-                    }
-                    // Pass plain array — model will json_encode via cast
-                    $updateData['images'] = $newImages;
+                while (Products::where('slug', $slug)->where('id', '!=', $request->id)->exists()) {
+                    $slug = "{$baseSlug}-{$count}";
+                    $count++;
                 }
 
-                $productColor->update($updateData);
+                $data = [
+                    'name'        => $request->name,
+                    'slug'        => $slug,
+                    'category_id' => $request->category_id,
+                    'gender'      => $request->gender,
+                    'description' => $request->description,
+                    'best_seller' => $request->has('best_seller') ? 1 : 0,
+                    'is_featured' => $request->has('is_featured') ? 1 : 0,
+                    'is_qikink_product'       => $request->has('is_qikink_product') ? 1 : 0,
+                    'qikink_sku'              => $request->qikink_sku,
+                    'qikink_print_type_id'    => $request->qikink_print_type_id ?? 1,
+                    'search_from_my_products' => $request->has('search_from_my_products') ? 1 : 0,
+                ];
 
-                // ── UPDATE / CREATE / DELETE variants for existing color ───
-                if (isset($colorInput['variants']) && is_array($colorInput['variants'])) {
-                    $submittedVariantIds = [];
-
-                    foreach ($colorInput['variants'] as $variantData) {
-                        if (empty($variantData['size']) && empty($variantData['price'])) continue;
-
-                        $price    = floatval($variantData['price']    ?? 0);
-                        $discount = floatval($variantData['discount'] ?? 0);
-                        $total    = $discount > 0 ? $price - ($price * $discount / 100) : $price;
-
-                        $variantId = $variantData['id'] ?? null;
-
-                        if ($variantId) {
-                            // Update existing variant row
-                            $existingVariant = \App\Models\ProductVariant::find($variantId);
-                            if ($existingVariant && $existingVariant->color_id == $colorId) {
-                                $existingVariant->update([
-                                    'size'        => $variantData['size']  ?? '',
-                                    'stock'       => intval($variantData['stock'] ?? 0),
-                                    'price'       => $price,
-                                    'discount'    => $discount,
-                                    'total_price' => round($total, 2),
-                                ]);
-                                $submittedVariantIds[] = $existingVariant->id;
-                            }
-                        } else {
-                            // Create new variant row
-                            $newVariant = $productColor->variants()->create([
-                                'product_id'  => $product->id,
-                                'size'        => $variantData['size']  ?? '',
-                                'stock'       => intval($variantData['stock'] ?? 0),
-                                'price'       => $price,
-                                'discount'    => $discount,
-                                'total_price' => round($total, 2),
-                            ]);
-                            $submittedVariantIds[] = $newVariant->id;
+                // Handle main image
+                if ($request->hasFile('main_image')) {
+                    if ($request->id && $product = Products::find($request->id)) {
+                        if ($product->main_image) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->main_image);
                         }
                     }
-
-                    // Delete variants that were removed from the form
-                    $productColor->variants()
-                        ->whereNotIn('id', $submittedVariantIds)
-                        ->delete();
+                    $data['main_image'] = \App\Helpers\ImageHelper::convertAndStoreToWebp($request->file('main_image'), 'products');
                 }
 
-            } else {
-                // ── CREATE new color ───────────────────────────────────────
-                // Pass plain array — model cast handles encoding
-                $productColor = $product->colors()->create([
-                    'color'  => $colorInput['color'],
-                    'images' => $newImages,   // array, not json_encode()
-                ]);
+                // Handle zoomed image with fallback to main_image
+                if ($request->hasFile('zoomed_image')) {
+                    if ($request->id && $product = Products::find($request->id)) {
+                        if ($product->zoomed_image) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->zoomed_image);
+                        }
+                    }
+                    $data['zoomed_image'] = \App\Helpers\ImageHelper::convertAndStoreToWebp($request->file('zoomed_image'), 'products');
+                } elseif (!empty($data['main_image']) && empty($data['zoomed_image']) && !$request->id) {
+                    $data['zoomed_image'] = $data['main_image'];
+                }
 
-                // Create variants for this new color
-                if (!empty($colorInput['variants']) && is_array($colorInput['variants'])) {
-                    foreach ($colorInput['variants'] as $variantData) {
-                        if (empty($variantData['size']) && empty($variantData['price'])) continue;
-                        $price    = floatval($variantData['price']    ?? 0);
-                        $discount = floatval($variantData['discount'] ?? 0);
-                        $total    = $discount > 0 ? $price - ($price * $discount / 100) : $price;
-                        $productColor->variants()->create([
-                            'product_id'  => $product->id,
-                            'size'        => $variantData['size']  ?? '',
-                            'stock'       => intval($variantData['stock'] ?? 0),
-                            'price'       => $price,
-                            'discount'    => $discount,
-                            'total_price' => round($total, 2),
-                        ]);
+                // Create or update product
+                if ($request->id) {
+                    $product = Products::findOrFail($request->id);
+                    $product->update($data);
+                    $message = 'Product Updated Successfully';
+                } else {
+                    $product = Products::create($data);
+                    $message = 'Product Added Successfully';
+                }
+
+                // Handle colors & variants
+                if ($request->has('colors')) {
+                    foreach ($request->colors as $colorInput) {
+                        if (empty($colorInput['color'])) continue;
+
+                        $colorId   = $colorInput['id'] ?? null;
+                        $newImages = [];
+
+                        // Collect newly uploaded images
+                        if (isset($colorInput['images']) && is_array($colorInput['images'])) {
+                            foreach ($colorInput['images'] as $img) {
+                                if ($img instanceof \Illuminate\Http\UploadedFile && $img->isValid()) {
+                                    $newImages[] = \App\Helpers\ImageHelper::convertAndStoreToWebp($img, 'product-colors');
+                                }
+                            }
+                        }
+
+                        if ($colorId) {
+                            // UPDATE existing color
+                            $productColor = \App\Models\ProductColor::find($colorId);
+                            if (!$productColor) continue;
+
+                            $updateData = ['color' => $colorInput['color']];
+
+                            if (!empty($newImages)) {
+                                $oldImages = is_array($productColor->images) ? $productColor->images : [];
+                                foreach ($oldImages as $img) {
+                                    \Illuminate\Support\Facades\Storage::disk('public')->delete($img);
+                                }
+                                $updateData['images'] = $newImages;
+                            }
+
+                            $productColor->update($updateData);
+
+                            // UPDATE / CREATE / DELETE variants for existing color
+                            if (isset($colorInput['variants']) && is_array($colorInput['variants'])) {
+                                $submittedVariantIds = [];
+
+                                foreach ($colorInput['variants'] as $variantData) {
+                                    if (empty($variantData['size']) && empty($variantData['price'])) continue;
+
+                                    $price    = floatval($variantData['price']    ?? 0);
+                                    $discount = floatval($variantData['discount'] ?? 0);
+                                    $total    = $discount > 0 ? $price - ($price * $discount / 100) : $price;
+                                    $variantId = $variantData['id'] ?? null;
+
+                                    if ($variantId) {
+                                        $existingVariant = \App\Models\ProductVariant::find($variantId);
+                                        if ($existingVariant && $existingVariant->color_id == $colorId) {
+                                            $existingVariant->update([
+                                                'size'        => $variantData['size']  ?? '',
+                                                'stock'       => intval($variantData['stock'] ?? 0),
+                                                'price'       => $price,
+                                                'discount'    => $discount,
+                                                'total_price' => round($total, 2),
+                                            ]);
+                                            $submittedVariantIds[] = $existingVariant->id;
+                                        }
+                                    } else {
+                                        $newVariant = $productColor->variants()->create([
+                                            'product_id'  => $product->id,
+                                            'size'        => $variantData['size']  ?? '',
+                                            'stock'       => intval($variantData['stock'] ?? 0),
+                                            'price'       => $price,
+                                            'discount'    => $discount,
+                                            'total_price' => round($total, 2),
+                                        ]);
+                                        $submittedVariantIds[] = $newVariant->id;
+                                    }
+                                }
+
+                                $productColor->variants()
+                                    ->whereNotIn('id', $submittedVariantIds)
+                                    ->delete();
+                            }
+
+                        } else {
+                            // CREATE new color
+                            $productColor = $product->colors()->create([
+                                'color'  => $colorInput['color'],
+                                'images' => $newImages,
+                            ]);
+
+                            if (!empty($colorInput['variants']) && is_array($colorInput['variants'])) {
+                                foreach ($colorInput['variants'] as $variantData) {
+                                    if (empty($variantData['size']) && empty($variantData['price'])) continue;
+                                    $price    = floatval($variantData['price']    ?? 0);
+                                    $discount = floatval($variantData['discount'] ?? 0);
+                                    $total    = $discount > 0 ? $price - ($price * $discount / 100) : $price;
+                                    $productColor->variants()->create([
+                                        'product_id'  => $product->id,
+                                        'size'        => $variantData['size']  ?? '',
+                                        'stock'       => intval($variantData['stock'] ?? 0),
+                                        'price'       => $price,
+                                        'discount'    => $discount,
+                                        'total_price' => round($total, 2),
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
-            }
+
+                return response()->json([
+                    'success'  => true,
+                    'message'  => $message,
+                    'redirect' => route('products.index')
+                ]);
+            });
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to save product: ' . $e->getMessage()
+            ], 422);
         }
     }
-
-
-    return response()->json([
-        'success'  => true,
-        'message'  => $message,
-        'redirect' => route('products.index')
-    ]);
-}
 
     /**
      * Show the form for editing a Product.

@@ -42,8 +42,12 @@ class PagesController extends Controller
 
     public function banner()
     {
-        $banner = Banner::all();
-        return response()->json($banner);
+        $banners = Banner::all()->map(function ($item) {
+            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
+            $item->mobile_image_url = $item->mobile_image ? asset('storage/' . $item->mobile_image) : $item->image_url;
+            return $item;
+        });
+        return response()->json($banners);
     }
 
     public function review()
@@ -114,12 +118,16 @@ class PagesController extends Controller
            ->orderBy('sort_order', 'asc')
            ->orderBy('id', 'asc')
            ->get()
-           ->map(function ($item) {
-               $item->image_url = $item->image
-                   ? asset('storage/' . $item->image)
-                   : null;
-               return $item;
-           });
+            ->map(function ($item) {
+                if ($item->image) {
+                    $item->image_url = \Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://'])
+                        ? $item->image
+                        : asset('storage/' . $item->image);
+                } else {
+                    $item->image_url = null;
+                }
+                return $item;
+            });
 
        return response()->json($lookbooks);
    }

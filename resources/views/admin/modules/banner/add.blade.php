@@ -22,10 +22,6 @@
     <div class="row">
         <div class="col-xxl-12 col-xl-12 col-lg-12">
             <form class="card__wrapper" action="{{ route('banner.store') }}" method="post" enctype="multipart/form-data" onsubmit="return updateProfileimgs(this)">
-
-
-
-            
                 @csrf
                 <input type="hidden" name="id" value="{{ $item ? $item->id : '' }}">
 
@@ -41,29 +37,52 @@
                     </div>
                 </div>
 
-                <!-- Banner Image Upload -->
-                <div class="row gx-0 g-20 gy-20 align-items-center justify-content-center mt-3">
-                    <div class="col-lg-12">
-                        <div class="from__input-box">
-                            <div class="form__input-title">
-                                <label for="image">Banner Image<span>*</span></label>
+                <div class="row g-4 mt-2">
+                    <!-- Desktop Banner Image Upload -->
+                    <div class="col-md-6">
+                        <div class="from__input-box border p-3 rounded bg-light">
+                            <div class="form__input-title mb-2">
+                                <label for="image" class="fw-bold">🖥️ Desktop Banner Image <span>*</span></label>
+                                <small class="text-muted d-block">Recommended size: <strong>1920 × 800 px</strong> (Landscape 16:9)</small>
                             </div>
                             <div class="form__input">
-                                <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewBanner(this)" {{ $item ? 'disabled' : '' }} />
+                                <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewBanner(this, 'bannerPreview')" {{ $item ? 'disabled' : '' }} />
 
                                 <!-- Existing Image -->
-                                <div class="mt-2">
-                                    <img id="bannerPreview" src="{{ isset($item->image) ? asset('storage/' . $item->image) : '' }}" alt="Banner Preview" style="height:100px; {{ isset($item->image) ? '' : 'display:none;' }}">
+                                @php
+                                    $desktopSrc = isset($item->image) ? (\Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://']) ? $item->image : asset('storage/' . $item->image)) : '';
+                                @endphp
+                                <div class="mt-3">
+                                    <img id="bannerPreview" src="{{ $desktopSrc }}" alt="Desktop Banner Preview" style="max-height:160px; width:auto; border-radius:6px; {{ isset($item->image) ? '' : 'display:none;' }}">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="help-block"></div>
+                    <!-- Mobile Banner Image Upload -->
+                    <div class="col-md-6">
+                        <div class="from__input-box border p-3 rounded bg-light">
+                            <div class="form__input-title mb-2">
+                                <label for="mobile_image" class="fw-bold">📱 Mobile Banner Image <span class="text-muted">(Optional)</span></label>
+                                <small class="text-muted d-block">Recommended size: <strong>800 × 1200 px</strong> (Portrait 4:5 or 9:16)</small>
+                            </div>
+                            <div class="form__input">
+                                <input type="file" id="mobile_image" name="mobile_image" class="form-control" accept="image/*" onchange="previewBanner(this, 'mobileBannerPreview')" {{ $item ? 'disabled' : '' }} />
+
+                                <!-- Existing Image -->
+                                @php
+                                    $mobileSrc = isset($item->mobile_image) ? (\Illuminate\Support\Str::startsWith($item->mobile_image, ['http://', 'https://']) ? $item->mobile_image : asset('storage/' . $item->mobile_image)) : $desktopSrc;
+                                @endphp
+                                <div class="mt-3">
+                                    <img id="mobileBannerPreview" src="{{ $mobileSrc }}" alt="Mobile Banner Preview" style="max-height:160px; width:auto; border-radius:6px; {{ isset($item->mobile_image) || isset($item->image) ? '' : 'display:none;' }}">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary w-auto saveBtn mt-5" style="{{ $item ? 'display:none;' : '' }}" type="submit">
-                    {{ $item ? 'Update' : 'Add' }}
+                <button class="btn btn-primary w-auto saveBtn mt-4" style="{{ $item ? 'display:none;' : '' }}" type="submit">
+                    {{ $item ? 'Update' : 'Add' }} Banner
                 </button>
             </form>
         </div>
@@ -72,20 +91,17 @@
 @stop
 
 @push('appendJs')
-
 <script src="{{asset('assets/js/plugins/flatpickr.js')}}"></script>
 <script src="{{asset('assets/js/plugins/select2.full.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js"></script>
 <script src="{{asset('assets/js/post-jobs.js')}}"></script>
 <script src="{{asset('assets/js/save-file.js') }}" type="text/javascript" charset="utf-8"></script>
 <script>
-  
-
-     function previewBanner(input) {
+    function previewBanner(input, targetId) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                var preview = document.getElementById('bannerPreview');
+                var preview = document.getElementById(targetId);
                 preview.src = e.target.result;
                 preview.style.display = 'block';
             }
@@ -93,9 +109,8 @@
         }
     }
 
-    // Automatically enable edit if adding a new item
-   var enableEdit = function(ele) {
-        $('#image').prop('disabled', false);
+    var enableEdit = function(ele) {
+        $('#image, #mobile_image').prop('disabled', false);
         $('.saveBtn').show();
         $(ele).hide();
     }
@@ -103,5 +118,5 @@
     @if(!$item)
         enableEdit();
     @endif
-    </script>
+</script>
 @endpush

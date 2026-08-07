@@ -6,7 +6,10 @@
     <!-- Banner Image -->
     <td>
         @if($item->image)
-            <img src="{{ asset('storage/' . $item->image) }}" alt="Banner" style="height:60px;">
+            @php
+                $imgUrl = \Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://']) ? $item->image : asset('storage/' . $item->image);
+            @endphp
+            <img src="{{ $imgUrl }}" alt="Banner" style="height:60px;object-fit:cover;border-radius:4px;">
         @else
             <span>No Image</span>
         @endif

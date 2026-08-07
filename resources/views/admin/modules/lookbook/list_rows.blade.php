@@ -3,7 +3,10 @@
     <td>{{ $index + 1 }}</td>
     <td>
         @if($item->image)
-            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}"
+            @php
+                $imgUrl = \Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://']) ? $item->image : asset('storage/' . $item->image);
+            @endphp
+            <img src="{{ $imgUrl }}" alt="{{ $item->title }}"
                  style="width:80px;height:60px;object-fit:cover;border-radius:4px;" />
         @else
             <span class="text-muted">No image</span>

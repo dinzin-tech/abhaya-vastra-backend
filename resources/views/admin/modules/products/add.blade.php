@@ -246,6 +246,109 @@
 
     /* Compress status */
     .compress-status { font-size:0.75rem; color:#6366f1; margin-top:6px; font-weight:600; }
+
+    /* Horizontal scroll container for variant table on mobile */
+    .variant-table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 10px;
+    }
+
+    /* 📱 MOBILE UI OPTIMIZATIONS (Max-width 768px) */
+    @media(max-width: 768px) {
+        .pf-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .pf-header h4 {
+            font-size: 1.15rem;
+        }
+        .pf-header .btn-back {
+            width: 100%;
+            justify-content: center;
+            padding: 10px 14px;
+        }
+        .card__wrapper {
+            padding: 16px 12px !important;
+            border-radius: 12px !important;
+        }
+        .pf-tabs {
+            gap: 6px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 6px;
+        }
+        .pf-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .pf-tab-btn {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .pf-row {
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .pf-field label {
+            font-size: 0.78rem;
+        }
+        .pf-field .form-control, .pf-field select, .pf-field textarea {
+            padding: 12px 14px;
+            font-size: 0.95rem; /* Prevents auto-zoom on mobile safari */
+        }
+        .color-block {
+            padding: 14px 10px;
+            border-radius: 10px;
+        }
+        .color-block-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .variant-table {
+            min-width: 520px;
+        }
+        .img-preview-grid {
+            justify-content: flex-start;
+            gap: 8px;
+        }
+        .img-preview-card {
+            width: 100px;
+            height: 100px;
+        }
+        .dropzone-area {
+            padding: 18px 12px;
+        }
+        .dropzone-icon {
+            font-size: 1.8rem;
+        }
+        .pf-action-bar {
+            position: sticky;
+            bottom: 0;
+            background: #ffffff;
+            padding: 12px 14px;
+            margin: 20px -12px -16px;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            z-index: 99;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .btn-pf-save, .btn-pf-edit {
+            width: 100%;
+            justify-content: center;
+            padding: 14px;
+            font-size: 0.92rem;
+        }
+    }
 </style>
 @endpush
 
@@ -508,31 +611,33 @@
                             {{-- Variants for this color --}}
                             <hr class="section-divider" style="margin:16px 0;">
                             <p class="section-heading">Size & Stock Variants</p>
-                            <table class="variant-table">
-                                <thead>
-                                    <tr>
-                                        <th>Size</th>
-                                        <th>Stock (Qty)</th>
-                                        <th>Price (₹)</th>
-                                        <th>Discount (%)</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="variant-body">
-                                    @foreach($color->variants as $vIdx => $variant)
-                                    <tr>
-                                        <td>
-                                            <input type="hidden" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][id]" value="{{ $variant->id }}">
-                                            <input type="text" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][size]" value="{{ $variant->size }}" placeholder="S / M / Free" {{ $item ? 'readonly' : '' }}>
-                                        </td>
-                                        <td><input type="number" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][stock]" value="{{ $variant->stock }}" min="0" {{ $item ? 'readonly' : '' }}></td>
-                                        <td><input type="number" step="0.01" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][price]" value="{{ $variant->price }}" min="0" {{ $item ? 'readonly' : '' }}></td>
-                                        <td><input type="number" step="0.01" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][discount]" value="{{ $variant->discount }}" min="0" max="100" {{ $item ? 'readonly' : '' }}></td>
-                                        <td><button type="button" class="btn-remove-variant" onclick="this.closest('tr').remove()" {{ $item ? 'disabled' : '' }}>✕</button></td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <div class="variant-table-container">
+                                <table class="variant-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Size</th>
+                                            <th>Stock (Qty)</th>
+                                            <th>Price (₹)</th>
+                                            <th>Discount (%)</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="variant-body">
+                                        @foreach($color->variants as $vIdx => $variant)
+                                        <tr>
+                                            <td>
+                                                <input type="hidden" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][id]" value="{{ $variant->id }}">
+                                                <input type="text" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][size]" value="{{ $variant->size }}" placeholder="S / M / Free" {{ $item ? 'readonly' : '' }}>
+                                            </td>
+                                            <td><input type="number" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][stock]" value="{{ $variant->stock }}" min="0" {{ $item ? 'readonly' : '' }}></td>
+                                            <td><input type="number" step="0.01" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][price]" value="{{ $variant->price }}" min="0" {{ $item ? 'readonly' : '' }}></td>
+                                            <td><input type="number" step="0.01" name="colors[{{ $colorIndex }}][variants][{{ $vIdx }}][discount]" value="{{ $variant->discount }}" min="0" max="100" {{ $item ? 'readonly' : '' }}></td>
+                                            <td><button type="button" class="btn-remove-variant" onclick="this.closest('tr').remove()" {{ $item ? 'disabled' : '' }}>✕</button></td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                             <button type="button" class="btn-add-variant" onclick="addVariantRow(this)" {{ $item ? 'disabled' : '' }}>+ Add Size</button>
                         </div>
                         @endforeach

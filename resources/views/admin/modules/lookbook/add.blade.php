@@ -92,8 +92,11 @@
                                         accept="image/*" {{ $item ? '' : 'required' }} />
                                     <small class="text-muted">Recommended: 1200×800px or larger. Max 4MB.</small>
                                     @if($item && $item->image)
+                                        @php
+                                            $imgUrl = \Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://']) ? $item->image : asset('storage/' . $item->image);
+                                        @endphp
                                         <div class="mt-2">
-                                            <img src="{{ asset('storage/' . $item->image) }}" alt="Current"
+                                            <img src="{{ $imgUrl }}" alt="Current"
                                                  style="width:200px;height:120px;object-fit:cover;border:1px solid #ddd;border-radius:4px;" />
                                             <p class="text-muted small mt-1">Current image</p>
                                         </div>

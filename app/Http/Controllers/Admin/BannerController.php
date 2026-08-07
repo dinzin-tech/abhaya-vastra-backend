@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 
+use App\Helpers\ImageHelper;
+
 class BannerController extends Controller
 {
     /**
@@ -59,17 +61,22 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'image' => $request->id
-    ? 'nullable|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:2048'
-    : 'required|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:2048',
-
+            'image' => $request->id
+                ? 'nullable|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240'
+                : 'required|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240',
+            'mobile_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240',
         ]);
 
         $data = [];
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('banners', 'public');
+            $path = ImageHelper::convertAndStoreToWebp($request->file('image'), 'banners');
             $data['image'] = $path;
+        }
+
+        if ($request->hasFile('mobile_image')) {
+            $mobilePath = ImageHelper::convertAndStoreToWebp($request->file('mobile_image'), 'banners');
+            $data['mobile_image'] = $mobilePath;
         }
 
         if ($request->id) {
@@ -77,6 +84,9 @@ class BannerController extends Controller
             $banner->update($data);
             $message = 'Banner Updated';
         } else {
+            if (empty($data['mobile_image']) && !empty($data['image'])) {
+                $data['mobile_image'] = $data['image'];
+            }
             Banner::create($data);
             $message = 'Banner Added';
         }
