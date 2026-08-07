@@ -15,6 +15,7 @@ use App\Models\ContactUs;
 use App\Models\Video;
 use App\Models\Review;
 use App\Models\Gallery;
+use App\Models\Lookbook;
 
 
 
@@ -107,6 +108,20 @@ class PagesController extends Controller
        return response()->json($socialLinks);
    }
 
-    
+   public function lookbooks()
+   {
+       $lookbooks = Lookbook::where('is_active', true)
+           ->orderBy('sort_order', 'asc')
+           ->orderBy('id', 'asc')
+           ->get()
+           ->map(function ($item) {
+               $item->image_url = $item->image
+                   ? asset('storage/' . $item->image)
+                   : null;
+               return $item;
+           });
+
+       return response()->json($lookbooks);
+   }
 
 }

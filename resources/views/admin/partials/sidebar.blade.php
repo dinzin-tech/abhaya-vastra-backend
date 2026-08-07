@@ -67,7 +67,7 @@
 
                 <!-- Pages Dropdown -->
                 <li
-                    class="slide has-sub {{ areActiveRoutes(['banner.index', 'about-us.index', 'terms.index', 'privacy.index', 'faq.index', 'video.index', 'reviews.index', 'gallery.index'], 'open') }}">
+                    class="slide has-sub {{ areActiveRoutes(['banner.index', 'lookbook.index', 'about-us.index', 'terms.index', 'privacy.index', 'faq.index', 'video.index', 'reviews.index', 'gallery.index'], 'open') }}">
                     <a href="javascript:void(0);" class="sidebar__menu-item">
                         <i class="fa-regular fa-angle-down side-menu__angle"></i>
                         <div class="side-menu__icon"><i class="icon-hrm"></i></div>
@@ -76,6 +76,8 @@
                     <ul class="sidebar-menu child1">
                         <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['banner.index']) }}"
                                 href="{{ route('banner.index') }}">Banners</a></li>
+                        <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['lookbook.index']) }}"
+                                href="{{ route('lookbook.index') }}">Lookbook</a></li>
                         <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['about-us.index']) }}"
                                 href="{{ route('about-us.index') }}">About Us</a></li>
                         <li class="slide"><a class="sidebar__menu-item {{ areActiveRoutes(['terms.index']) }}"

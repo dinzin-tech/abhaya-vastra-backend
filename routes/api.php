@@ -107,6 +107,7 @@ Route::post('/razorpay/payment-failed', [RazorpayController::class, 'paymentFail
 Route::get('/about-us', [PagesController::class, 'aboutUs']);
 Route::get('/categories', [PagesController::class, 'categories']);
 Route::get('/banner', [PagesController::class, 'banner']);
+Route::get('/lookbooks', [PagesController::class, 'lookbooks']);
 Route::get('/faq', [PagesController::class, 'faq']);
 Route::get('/privacy', [PagesController::class, 'privacy']);
 Route::get('/terms', [PagesController::class, 'terms']);
