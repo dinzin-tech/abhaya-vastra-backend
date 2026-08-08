@@ -82,14 +82,6 @@ class BannerController extends Controller
                 $data['mobile_image'] = $mobilePath;
             }
 
-            if (empty($data['image']) && !empty($data['mobile_image'])) {
-                $data['image'] = $data['mobile_image'];
-            }
-
-            if (empty($data['mobile_image']) && !empty($data['image'])) {
-                $data['mobile_image'] = $data['image'];
-            }
-
             if ($isUpdate) {
                 $banner = Banner::findOrFail($request->id);
                 if (!empty($data)) {

@@ -43,8 +43,14 @@ class PagesController extends Controller
     public function banner()
     {
         $banners = Banner::all()->map(function ($item) {
-            $item->image_url = $item->image ? asset('storage/' . $item->image) : null;
-            $item->mobile_image_url = $item->mobile_image ? asset('storage/' . $item->mobile_image) : $item->image_url;
+            $item->image_url = $item->image 
+                ? (\Illuminate\Support\Str::startsWith($item->image, ['http://', 'https://']) ? $item->image : asset('storage/' . $item->image)) 
+                : null;
+
+            $item->mobile_image_url = $item->mobile_image 
+                ? (\Illuminate\Support\Str::startsWith($item->mobile_image, ['http://', 'https://']) ? $item->mobile_image : asset('storage/' . $item->mobile_image)) 
+                : null;
+
             return $item;
         });
         return response()->json($banners);
