@@ -60,42 +60,58 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'image' => $request->id
-                ? 'nullable|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240'
-                : 'required|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240',
-            'mobile_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,avif,heic,heif|max:10240',
-        ]);
+        try {
+            $request->validate([
+                'image' => $request->id
+                    ? 'nullable|file|max:10240'
+                    : 'required|file|max:10240',
+                'mobile_image' => 'nullable|file|max:10240',
+            ]);
 
-        $data = [];
+            $data = [];
 
-        if ($request->hasFile('image')) {
-            $path = ImageHelper::convertAndStoreToWebp($request->file('image'), 'banners');
-            $data['image'] = $path;
-        }
-
-        if ($request->hasFile('mobile_image')) {
-            $mobilePath = ImageHelper::convertAndStoreToWebp($request->file('mobile_image'), 'banners');
-            $data['mobile_image'] = $mobilePath;
-        }
-
-        if ($request->id) {
-            $banner = Banner::findOrFail($request->id);
-            $banner->update($data);
-            $message = 'Banner Updated';
-        } else {
-            if (empty($data['mobile_image']) && !empty($data['image'])) {
-                $data['mobile_image'] = $data['image'];
+            if ($request->hasFile('image')) {
+                $path = ImageHelper::convertAndStoreToWebp($request->file('image'), 'banners');
+                $data['image'] = $path;
             }
-            Banner::create($data);
-            $message = 'Banner Added';
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => $message,
-            'redirect' => route('banner.index')
-        ]);
+            if ($request->hasFile('mobile_image')) {
+                $mobilePath = ImageHelper::convertAndStoreToWebp($request->file('mobile_image'), 'banners');
+                $data['mobile_image'] = $mobilePath;
+            }
+
+            if ($request->id) {
+                $banner = Banner::findOrFail($request->id);
+                if (!empty($data)) {
+                    $banner->update($data);
+                }
+                $message = 'Banner Updated Successfully';
+            } else {
+                if (empty($data['mobile_image']) && !empty($data['image'])) {
+                    $data['mobile_image'] = $data['image'];
+                }
+                Banner::create($data);
+                $message = 'Banner Added Successfully';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'redirect' => route('banner.index')
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first() ?? 'Validation error.',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Banner store error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save banner: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

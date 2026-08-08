@@ -257,9 +257,6 @@ var updateProfileimgs = function (_form) {
         method: 'post',
         url: frm.attr('action'),
         data: formData,
-        headers: {
-            'Content-Type': 'multipart/form-data' // Important for file upload
-        },
         onUploadProgress: function (progressEvent) {
             startLoader(btn);
         }
