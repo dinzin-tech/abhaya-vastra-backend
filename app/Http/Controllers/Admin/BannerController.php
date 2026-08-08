@@ -61,8 +61,10 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         try {
+            $isUpdate = !empty($request->id);
+
             $request->validate([
-                'image' => $request->id
+                'image' => ($isUpdate || $request->hasFile('mobile_image'))
                     ? 'nullable|file|max:10240'
                     : 'required|file|max:10240',
                 'mobile_image' => 'nullable|file|max:10240',
@@ -80,16 +82,21 @@ class BannerController extends Controller
                 $data['mobile_image'] = $mobilePath;
             }
 
-            if ($request->id) {
+            if (empty($data['image']) && !empty($data['mobile_image'])) {
+                $data['image'] = $data['mobile_image'];
+            }
+
+            if (empty($data['mobile_image']) && !empty($data['image'])) {
+                $data['mobile_image'] = $data['image'];
+            }
+
+            if ($isUpdate) {
                 $banner = Banner::findOrFail($request->id);
                 if (!empty($data)) {
                     $banner->update($data);
                 }
                 $message = 'Banner Updated Successfully';
             } else {
-                if (empty($data['mobile_image']) && !empty($data['image'])) {
-                    $data['mobile_image'] = $data['image'];
-                }
                 Banner::create($data);
                 $message = 'Banner Added Successfully';
             }

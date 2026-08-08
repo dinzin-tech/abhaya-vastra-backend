@@ -46,7 +46,7 @@
                                 <small class="text-muted d-block">Recommended size: <strong>1920 × 800 px</strong> (Landscape 16:9)</small>
                             </div>
                             <div class="form__input">
-                                <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewBanner(this, 'bannerPreview')" {{ $item ? 'disabled' : '' }} />
+                                <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewBanner(this, 'bannerPreview')" />
 
                                 <!-- Existing Image -->
                                 @php
@@ -67,7 +67,7 @@
                                 <small class="text-muted d-block">Recommended size: <strong>800 × 1200 px</strong> (Portrait 4:5 or 9:16)</small>
                             </div>
                             <div class="form__input">
-                                <input type="file" id="mobile_image" name="mobile_image" class="form-control" accept="image/*" onchange="previewBanner(this, 'mobileBannerPreview')" {{ $item ? 'disabled' : '' }} />
+                                <input type="file" id="mobile_image" name="mobile_image" class="form-control" accept="image/*" onchange="previewBanner(this, 'mobileBannerPreview')" />
 
                                 <!-- Existing Image -->
                                 @php
@@ -81,7 +81,7 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary w-auto saveBtn mt-4" style="{{ $item ? 'display:none;' : '' }}" type="submit">
+                <button class="btn btn-primary w-auto saveBtn mt-4" type="submit">
                     {{ $item ? 'Update' : 'Add' }} Banner
                 </button>
             </form>
