@@ -85,7 +85,7 @@ class ProductColorController extends Controller
                 })->ignore($request->id), // Ignore the current color record when updating
             ],
             
-            'images.*'   => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp,avif,heic,heif|max:20480' 
+            'images.*'   => ['nullable', new \App\Rules\ValidImageFile] 
         ]);
 
         $data = [

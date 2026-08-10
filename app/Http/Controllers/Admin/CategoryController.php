@@ -93,8 +93,8 @@ public function store(Request $request)
         // 'main_image'  => $request->id ? 'nullable|image' : 'required|image',
         // 'zoomed_image'=> $request->id ? 'nullable|image' : 'required|image',
 
-        'main_image'  => $request->id ? 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480' : 'required|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
-        'zoomed_image'=> 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
+        'main_image'  => $request->id ? ['nullable', new \App\Rules\ValidImageFile] : ['required', new \App\Rules\ValidImageFile],
+        'zoomed_image'=> ['nullable', new \App\Rules\ValidImageFile],
     ]);
 
     $data = [

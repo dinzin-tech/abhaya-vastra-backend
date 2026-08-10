@@ -21,7 +21,7 @@ class ImageHelper
     public static function convertAndStoreToWebp(UploadedFile $file, string $folder = 'products', string $disk = 'public', int $quality = 82): string
     {
         try {
-            $extension = strtolower($file->getClientOriginalExtension());
+            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension());
             $mimeType  = strtolower($file->getMimeType() ?: '');
             $realPath  = $file->getRealPath();
 
@@ -38,7 +38,16 @@ class ImageHelper
 
             $targetFile = $destinationPath . '/' . $filename;
 
-            // ── Method 1: Imagick (Supports HEIC, PNG, JPEG, WEBP, AVIF out-of-the-box) ──
+            // ── Method 1: FFmpeg (Full native support for HEIC, HEIF, AVIF, WEBP, PNG, JPG) ──
+            if (function_exists('exec')) {
+                $cmd = "ffmpeg -y -i " . escapeshellarg($realPath) . " -q:v " . intval($quality) . " " . escapeshellarg($targetFile) . " 2>&1";
+                @exec($cmd, $ffmpegOut, $ffmpegCode);
+                if ($ffmpegCode === 0 && file_exists($targetFile) && filesize($targetFile) > 0) {
+                    return trim($folder, '/') . '/' . $filename;
+                }
+            }
+
+            // ── Method 2: Imagick (Supports HEIC, PNG, JPEG, WEBP, AVIF) ──
             if (class_exists('\Imagick')) {
                 try {
                     $imagick = new \Imagick($realPath);
@@ -60,7 +69,7 @@ class ImageHelper
                 }
             }
 
-            // ── Method 2: HEIC Convert via CLI tool if file is HEIC ──
+            // ── Method 3: HEIC Convert via heif-convert CLI tool ──
             $sourceForGd = $realPath;
             $tempJpgCreated = false;
 
@@ -73,7 +82,7 @@ class ImageHelper
                 }
             }
 
-            // ── Method 3: GD Extension ──
+            // ── Method 4: GD Extension ──
             $image = null;
 
             if (function_exists('imagecreatefromstring')) {
