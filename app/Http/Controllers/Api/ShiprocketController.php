@@ -158,7 +158,7 @@ class ShiprocketController extends Controller
                     'message' => 'Delivery available',
                     'data' => [
                         'is_serviceable' => true,
-                        'shipping_charge' => $cheapestRate ?? 50, // Default ₹50 if not found
+                        'shipping_charge' => 100, // Flat ₹100 default shipping charge
                         'estimated_delivery_days' => $recommendedCourier['etd'] ?? '5-7',
                         'courier_name' => $recommendedCourier['courier_name'] ?? 'Standard',
                         'all_couriers' => $couriers
@@ -171,7 +171,7 @@ class ShiprocketController extends Controller
                 'message' => 'Delivery not available to this pincode',
                 'data' => [
                     'is_serviceable' => false,
-                    'shipping_charge' => 0
+                    'shipping_charge' => 100
                 ]
             ], 400);
 
@@ -182,7 +182,7 @@ class ShiprocketController extends Controller
                 'message' => 'Error checking serviceability',
                 'data' => [
                     'is_serviceable' => false,
-                    'shipping_charge' => 50 // Default fallback
+                    'shipping_charge' => 100 // Flat ₹100 fallback
                 ]
             ], 500);
         }

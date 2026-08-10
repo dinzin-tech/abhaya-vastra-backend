@@ -136,7 +136,7 @@ class OrderController extends Controller
                 'items' => $request->items,
                 'subtotal' => $request->subtotal,
                 'discount' => $request->discount ?? 0,
-                'shipping_charge' => $request->shipping_charge ?? 0,
+                'shipping_charge' => $request->shipping_charge ?? 100,
                 'total' => $request->total,
                 'coupon_code' => $request->coupon_code ?? null,
                 'status' => 'pending',
