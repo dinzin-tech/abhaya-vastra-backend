@@ -93,8 +93,8 @@ public function store(Request $request)
         // 'main_image'  => $request->id ? 'nullable|image' : 'required|image',
         // 'zoomed_image'=> $request->id ? 'nullable|image' : 'required|image',
 
-        'main_image'  => $request->id ? 'nullable|image' : 'required|file|mimes:jpeg,png,bmp,gif,svg,webp,avif',
-        'zoomed_image'=> $request->id ? 'nullable|image' : 'required|file|mimes:jpeg,png,bmp,gif,svg,webp,avif',
+        'main_image'  => $request->id ? 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480' : 'required|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
+        'zoomed_image'=> 'nullable|file|mimes:jpeg,png,bmp,gif,svg,webp,avif,heic,heif|max:20480',
     ]);
 
     $data = [
@@ -107,7 +107,7 @@ public function store(Request $request)
         if ($request->id && $category = Category::find($request->id)) {
             Storage::disk('public')->delete($category->main_image);
         }
-        $data['main_image'] = $request->file('main_image')->store('categories', 'public');
+        $data['main_image'] = \App\Helpers\ImageHelper::convertAndStoreToWebp($request->file('main_image'), 'categories');
     }
 
     // Handle zoomed image
@@ -115,7 +115,7 @@ public function store(Request $request)
         if ($request->id && $category = Category::find($request->id)) {
             Storage::disk('public')->delete($category->zoomed_image);
         }
-        $data['zoomed_image'] = $request->file('zoomed_image')->store('categories', 'public');
+        $data['zoomed_image'] = \App\Helpers\ImageHelper::convertAndStoreToWebp($request->file('zoomed_image'), 'categories');
     }
 
     if ($request->id) {

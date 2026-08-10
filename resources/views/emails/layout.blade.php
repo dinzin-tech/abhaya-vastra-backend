@@ -372,7 +372,7 @@
         <a href="http://localhost:3000/contact">Contact</a>
       </div>
       <div class="footer-address">
-        Abhaya Vastra — Premium Jewellery<br/>
+        Abhaya Vastra<br/>
         Bengaluru, Karnataka, India<br/>
         <a href="mailto:info@abhayavastra.store" style="color:#c9a96e;text-decoration:none;">info@abhayavastra.store</a>
       </div>

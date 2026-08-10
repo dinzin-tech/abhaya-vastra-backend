@@ -85,7 +85,7 @@ class ProductColorController extends Controller
                 })->ignore($request->id), // Ignore the current color record when updating
             ],
             
-            'images.*'   => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif' 
+            'images.*'   => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp,avif,heic,heif|max:20480' 
         ]);
 
         $data = [
@@ -93,11 +93,11 @@ class ProductColorController extends Controller
             'color'      => $request->color
         ];
 
-        // 1. Handle new images and store them in $newImages array
+        // 1. Handle new images and convert them to WebP format
         $newImages = [];
         if($request->hasFile('images')){
             foreach($request->file('images') as $img){
-                $newImages[] = $img->store('product-colors','public');
+                $newImages[] = \App\Helpers\ImageHelper::convertAndStoreToWebp($img, 'product-colors');
             }
         }
         

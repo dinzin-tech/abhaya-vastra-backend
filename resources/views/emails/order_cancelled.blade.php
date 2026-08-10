@@ -5,7 +5,6 @@
 <!-- HEADER -->
 <div class="email-header">
   <div class="brand-name">Abhaya Vastra</div>
-  <div class="brand-tagline">Premium Jewellery</div>
 </div>
 
 <!-- HERO -->
