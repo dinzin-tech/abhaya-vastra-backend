@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReturnStatusMail extends Mailable implements ShouldQueue
+class ReturnStatusMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,7 @@ class ReturnStatusMail extends Mailable implements ShouldQueue
      */
     public function __construct($return, $oldStatus = null)
     {
+        parent::__construct();
         $this->return = $return;
         $this->oldStatus = $oldStatus;
     }

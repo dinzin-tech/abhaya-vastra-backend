@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use App\Models\Setting;
 
-class WelcomeMail extends Mailable implements ShouldQueue
+class WelcomeMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -24,6 +24,7 @@ class WelcomeMail extends Mailable implements ShouldQueue
      */
     public function __construct(User $user)
     {
+        parent::__construct();
         $this->user = $user;
         
         // Fetch dynamic template from settings
@@ -56,9 +57,10 @@ class WelcomeMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.dynamic_template',
+            view: 'emails.welcome',
             with: [
-                'body' => $this->bodyContent,
+                'user'        => $this->user,
+                'bodyContent' => $this->bodyContent,
             ],
         );
     }

@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 
-class OrderPlacedMail extends Mailable implements ShouldQueue
+class OrderPlacedMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,7 @@ class OrderPlacedMail extends Mailable implements ShouldQueue
      */
     public function __construct(Order $order)
     {
+        parent::__construct();
         $this->order = $order;
     }
 
@@ -30,7 +31,7 @@ class OrderPlacedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Order has been Placed!',
+            subject: '💎 Order Confirmed — #' . $this->order->order_number,
         );
     }
 
@@ -40,7 +41,7 @@ class OrderPlacedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.orders.placed', // resources/views/emails/orders/placed.blade.php
+            view: 'emails.orders.placed',
         );
     }
 

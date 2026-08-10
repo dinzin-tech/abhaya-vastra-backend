@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\OrderExchange;
 
-class ExchangeRequestedMail extends Mailable implements ShouldQueue
+class ExchangeRequestedMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,7 @@ class ExchangeRequestedMail extends Mailable implements ShouldQueue
      */
     public function __construct(OrderExchange $exchange)
     {
+        parent::__construct();
         $this->exchange = $exchange;
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Coupon;
 
-class CouponMail extends Mailable implements ShouldQueue
+class CouponMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -17,6 +17,7 @@ class CouponMail extends Mailable implements ShouldQueue
 
     public function __construct(Coupon $coupon, $messageBody = null)
     {
+        parent::__construct();
         $this->coupon = $coupon;
         $this->messageBody = $messageBody;
     }

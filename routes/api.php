@@ -129,6 +129,7 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
 
 Route::group(['prefix' => 'coupon'], function () {
+    Route::get('active', [CouponController::class, 'activeCoupons']);
     Route::post('check', [CouponController::class, 'check']);
     Route::post('update-usage', [CouponController::class, 'updateUsage']);
 });

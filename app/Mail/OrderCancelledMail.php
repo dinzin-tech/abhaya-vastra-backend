@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderCancelledMail extends Mailable implements ShouldQueue
+class OrderCancelledMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,7 @@ class OrderCancelledMail extends Mailable implements ShouldQueue
      */
     public function __construct($order, $cancelReason = null)
     {
+        parent::__construct();
         $this->order = $order;
         $this->cancelReason = $cancelReason;
     }
@@ -31,7 +32,7 @@ class OrderCancelledMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Cancelled',
+            subject: 'Notice: Order #' . ($this->order->order_number ?? '') . ' Cancelled',
         );
     }
 
@@ -41,9 +42,9 @@ class OrderCancelledMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.order_cancelled',
+            view: 'emails.order_cancelled',
             with: [
-                'order' => $this->order,
+                'order'        => $this->order,
                 'cancelReason' => $this->cancelReason,
             ],
         );

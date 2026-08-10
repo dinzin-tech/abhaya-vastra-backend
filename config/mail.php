@@ -58,7 +58,12 @@ return [
     */
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'business@customizeddigitalsolutions.com'),
-        'name' => env('MAIL_FROM_NAME', 'Beyond Basic'),
+        'name' => env('MAIL_FROM_NAME', 'Abhaya Vastra'),
+    ],
+
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO', 'info@abhayavastra.store'),
+        'name' => env('MAIL_FROM_NAME', 'Abhaya Vastra'),
     ],
 
 ];

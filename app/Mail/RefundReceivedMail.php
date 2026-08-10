@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\OrderReturn;
 use App\Models\Payment;
 
-class RefundReceivedMail extends Mailable implements ShouldQueue
+class RefundReceivedMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -23,6 +23,7 @@ class RefundReceivedMail extends Mailable implements ShouldQueue
      */
     public function __construct(OrderReturn $return, Payment $payment)
     {
+        parent::__construct();
         $this->return = $return;
         $this->payment = $payment;
     }

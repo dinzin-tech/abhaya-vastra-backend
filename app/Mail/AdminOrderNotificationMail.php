@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AdminOrderNotificationMail extends Mailable implements ShouldQueue
+class AdminOrderNotificationMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -20,6 +20,7 @@ class AdminOrderNotificationMail extends Mailable implements ShouldQueue
      */
     public function __construct($order)
     {
+        parent::__construct();
         $this->order = $order;
     }
 

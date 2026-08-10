@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\OrderReturn;
 
-class AdminReturnNotificationMail extends Mailable implements ShouldQueue
+class AdminReturnNotificationMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -21,6 +21,7 @@ class AdminReturnNotificationMail extends Mailable implements ShouldQueue
      */
     public function __construct(OrderReturn $return)
     {
+        parent::__construct();
         $this->return = $return;
     }
 

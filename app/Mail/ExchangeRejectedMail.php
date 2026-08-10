@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ExchangeRejectedMail extends Mailable
+class ExchangeRejectedMail extends AppMail
 {
     use Queueable, SerializesModels;
 
@@ -20,6 +20,7 @@ class ExchangeRejectedMail extends Mailable
      */
     public function __construct($data)
     {
+        parent::__construct();
         $this->data = $data;
     }
 

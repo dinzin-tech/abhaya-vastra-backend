@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 
 
-class ContactFormMail extends Mailable implements ShouldQueue
+class ContactFormMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -22,6 +22,7 @@ class ContactFormMail extends Mailable implements ShouldQueue
      */
     public function __construct($data)
     {
+        parent::__construct();
         $this->data = $data;
     }
 

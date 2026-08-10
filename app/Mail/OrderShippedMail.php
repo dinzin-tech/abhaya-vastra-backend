@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderShippedMail extends Mailable implements ShouldQueue
+class OrderShippedMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -20,6 +20,7 @@ class OrderShippedMail extends Mailable implements ShouldQueue
      */
     public function __construct($order)
     {
+        parent::__construct();
         $this->order = $order; // Pass the order details to the email template
     }
 
@@ -29,7 +30,7 @@ class OrderShippedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Shipped Mail',
+            subject: '🚀 Your Order #' . ($this->order->order_number ?? '') . ' Has Been Shipped!',
         );
     }
 
@@ -39,7 +40,7 @@ class OrderShippedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.order_shipped', // Markdown template
+            view: 'emails.order_shipped',
         );
     }
 

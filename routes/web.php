@@ -233,3 +233,27 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/exchanges-mark-completed/{id}', 'App\Http\Controllers\Admin\ExchangeController@markCompleted')->name('exchanges.mark-completed');
     Route::delete('/delete-exchange', 'App\Http\Controllers\Admin\ExchangeController@destroy')->name('exchanges.delete');
 });
+
+// ─── Email Template Previews (local dev only) ────────────────────────────────
+Route::prefix('email-preview')->group(function () {
+    Route::get('/order-placed', function () {
+        $order = \App\Models\Order::first();
+        return new \App\Mail\OrderPlacedMail($order);
+    });
+    Route::get('/order-shipped', function () {
+        $order = \App\Models\Order::first();
+        return new \App\Mail\OrderShippedMail($order);
+    });
+    Route::get('/order-delivered', function () {
+        $order = \App\Models\Order::first();
+        return new \App\Mail\OrderDeliveredMail($order);
+    });
+    Route::get('/order-cancelled', function () {
+        $order = \App\Models\Order::first();
+        return new \App\Mail\OrderCancelledMail($order, 'Customer requested cancellation.');
+    });
+    Route::get('/welcome', function () {
+        $user = \App\Models\User::first();
+        return new \App\Mail\WelcomeMail($user);
+    });
+});

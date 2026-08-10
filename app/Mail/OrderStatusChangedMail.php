@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 use App\Models\Setting;
 
-class OrderStatusChangedMail extends Mailable implements ShouldQueue
+class OrderStatusChangedMail extends AppMail implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -24,6 +24,7 @@ class OrderStatusChangedMail extends Mailable implements ShouldQueue
      */
     public function __construct(Order $order)
     {
+        parent::__construct();
         $this->order = $order;
         
         // Fetch dynamic template from settings
@@ -58,9 +59,10 @@ class OrderStatusChangedMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.dynamic_template',
+            view: 'emails.dynamic_template',
             with: [
-                'body' => $this->bodyContent,
+                'order'       => $this->order,
+                'bodyContent' => $this->bodyContent,
             ],
         );
     }

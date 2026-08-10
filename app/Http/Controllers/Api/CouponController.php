@@ -203,5 +203,18 @@ class CouponController extends Controller
         ]);
     }
 
+    public function activeCoupons()
+    {
+        $coupons = Coupon::where('status', true)
+            ->where(function($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>=', now());
+            })
+            ->get(['id', 'code', 'type', 'value', 'min_cart_amount', 'expires_at']);
 
+        return response()->json([
+            'success' => true,
+            'data' => $coupons
+        ]);
+    }
 }

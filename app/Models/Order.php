@@ -60,9 +60,25 @@ class Order extends Model
     protected static function booted()
     {
         static::updated(function ($order) {
-            if ($order->isDirty('status')) {
+            if ($order->wasChanged('status') || $order->isDirty('status')) {
                 try {
-                    \Illuminate\Support\Facades\Mail::to($order->email)->send(new \App\Mail\OrderStatusChangedMail($order));
+                    $email = $order->email;
+                    if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        switch (strtolower($order->status)) {
+                            case 'shipped':
+                                \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OrderShippedMail($order));
+                                break;
+                            case 'delivered':
+                                \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OrderDeliveredMail($order));
+                                break;
+                            case 'cancelled':
+                                \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OrderCancelledMail($order));
+                                break;
+                            default:
+                                \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\OrderStatusChangedMail($order));
+                                break;
+                        }
+                    }
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error("Failed to send order status email for Order #{$order->order_number} to {$order->email}: " . $e->getMessage());
                 }
