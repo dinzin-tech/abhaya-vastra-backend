@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\OrderExchange;
 
-class ExchangeStatusMail extends AppMail implements ShouldQueue
+class ExchangeStatusMail extends AppMail
 {
     use Queueable, SerializesModels;
 

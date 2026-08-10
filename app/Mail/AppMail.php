@@ -17,7 +17,7 @@ abstract class AppMail extends Mailable
         $replyName = config('mail.reply_to.name', env('MAIL_FROM_NAME', 'Abhaya Vastra'));
 
         if ($replyTo) {
-            $this->replyTo([$replyTo => $replyName]);
+            $this->replyTo($replyTo, $replyName);
         }
     }
 }

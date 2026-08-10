@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\OrderReturn;
 use App\Models\Payment;
 
-class RefundReceivedMail extends AppMail implements ShouldQueue
+class RefundReceivedMail extends AppMail
 {
     use Queueable, SerializesModels;
 

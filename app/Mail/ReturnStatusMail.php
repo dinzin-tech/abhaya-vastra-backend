@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReturnStatusMail extends AppMail implements ShouldQueue
+class ReturnStatusMail extends AppMail
 {
     use Queueable, SerializesModels;
 

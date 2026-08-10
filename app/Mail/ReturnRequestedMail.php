@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\OrderReturn;
 
-class ReturnRequestedMail extends AppMail implements ShouldQueue
+class ReturnRequestedMail extends AppMail
 {
     use Queueable, SerializesModels;
 

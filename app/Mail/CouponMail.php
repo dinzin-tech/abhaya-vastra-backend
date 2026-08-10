@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Coupon;
 
-class CouponMail extends AppMail implements ShouldQueue
+class CouponMail extends AppMail
 {
     use Queueable, SerializesModels;
 

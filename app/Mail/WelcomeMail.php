@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use App\Models\Setting;
 
-class WelcomeMail extends AppMail implements ShouldQueue
+class WelcomeMail extends AppMail
 {
     use Queueable, SerializesModels;
 

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 
 
-class ContactFormMail extends AppMail implements ShouldQueue
+class ContactFormMail extends AppMail
 {
     use Queueable, SerializesModels;
 

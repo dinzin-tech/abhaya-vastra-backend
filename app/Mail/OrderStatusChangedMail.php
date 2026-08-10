@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 use App\Models\Setting;
 
-class OrderStatusChangedMail extends AppMail implements ShouldQueue
+class OrderStatusChangedMail extends AppMail
 {
     use Queueable, SerializesModels;
 

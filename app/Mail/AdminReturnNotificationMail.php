@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\OrderReturn;
 
-class AdminReturnNotificationMail extends AppMail implements ShouldQueue
+class AdminReturnNotificationMail extends AppMail
 {
     use Queueable, SerializesModels;
 
