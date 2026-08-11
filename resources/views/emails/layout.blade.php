@@ -367,9 +367,9 @@
       <div class="footer-brand">Abhaya Vastra</div>
       <div class="gold-line"></div>
       <div class="footer-links">
-        <a href="{{ config('app.frontend_url') }}">Shop</a>
-        <a href="{{ config('app.frontend_url') }}/orders">My Orders</a>
-        <a href="{{ config('app.frontend_url') }}/contact">Contact</a>
+        <a href="{{ rtrim(config('app.frontend_url', 'https://abhayavastra.store'), '/') }}">Shop</a>
+        <a href="{{ rtrim(config('app.frontend_url', 'https://abhayavastra.store'), '/') }}/orders">My Orders</a>
+        <a href="{{ rtrim(config('app.frontend_url', 'https://abhayavastra.store'), '/') }}/contact">Contact</a>
       </div>
       <div class="footer-address">
         Abhaya Vastra<br/>

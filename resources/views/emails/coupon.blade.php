@@ -47,7 +47,7 @@
 
   <!-- CTA BUTTON -->
   <div class="cta-wrapper" style="text-align: center; margin: 32px 0 20px;">
-    <a href="{{ config('app.frontend_url') }}/checkout?coupon={{ urlencode($coupon->code) }}" class="cta-button" style="display: inline-block; background: #1a1a1a; color: #c9a96e !important; text-decoration: none; padding: 14px 36px; font-size: 11px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; border: 1px solid #1a1a1a;">
+    <a href="{{ rtrim(config('app.frontend_url', 'https://abhayavastra.store'), '/') }}/checkout?coupon={{ urlencode($coupon->code) }}" class="cta-button" style="display: inline-block; background: #1a1a1a; color: #c9a96e !important; text-decoration: none; padding: 14px 36px; font-size: 11px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; border: 1px solid #1a1a1a;">
       USE COUPON NOW &rarr;
     </a>
   </div>
