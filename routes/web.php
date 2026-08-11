@@ -157,6 +157,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('/qikink/push-order', 'App\Http\Controllers\Admin\OrderController@qikinkCreateOrder')->name('admin.qikink.push-order');
     Route::post('/qikink/sync-order/{id}', 'App\Http\Controllers\Admin\OrderController@qikinkSyncOrder')->name('admin.qikink.sync-order');
 
+    // Active Carts & Cart Activity Tracker
+    Route::get('/active-carts', 'App\Http\Controllers\Admin\ActiveCartController@index')->name('admin.active-carts.index');
+    Route::post('/active-carts/send-coupon', 'App\Http\Controllers\Admin\ActiveCartController@sendCoupon')->name('admin.active-carts.send-coupon');
+    Route::post('/active-carts/bulk-send-coupon', 'App\Http\Controllers\Admin\ActiveCartController@bulkSendCoupon')->name('admin.active-carts.bulk-send-coupon');
+
     Route::resource('payments', 'App\Http\Controllers\Admin\PaymentController');
     Route::get('payments-list', 'App\Http\Controllers\Admin\PaymentController@listPayments')->name('payments.list');
     Route::post('/payments-update-status', 'App\Http\Controllers\Admin\PaymentController@updateStatus')->name('payments.update-status');

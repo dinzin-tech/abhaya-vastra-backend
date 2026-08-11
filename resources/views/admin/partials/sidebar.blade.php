@@ -285,6 +285,15 @@
                     </a>
                 </li>
 
+                <!-- Active User Carts Tracker -->
+                <li class="slide">
+                    <a href="{{ route('admin.active-carts.index') }}"
+                        class="sidebar__menu-item {{ areActiveRoutes(['admin.active-carts.index']) }}">
+                        <div class="side-menu__icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                        <span class="sidebar__menu-label">Active User Carts</span>
+                    </a>
+                </li>
+
                 <!-- Reward Points Management -->
                 <li class="slide has-sub {{ areActiveRoutes(['rewards.index', 'reward-settings.index', 'points.index'], 'open') }}">
                     <a href="javascript:void(0);" class="sidebar__menu-item">

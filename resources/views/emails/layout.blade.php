@@ -367,9 +367,9 @@
       <div class="footer-brand">Abhaya Vastra</div>
       <div class="gold-line"></div>
       <div class="footer-links">
-        <a href="http://localhost:3000">Shop</a>
-        <a href="http://localhost:3000/orders">My Orders</a>
-        <a href="http://localhost:3000/contact">Contact</a>
+        <a href="{{ config('app.frontend_url') }}">Shop</a>
+        <a href="{{ config('app.frontend_url') }}/orders">My Orders</a>
+        <a href="{{ config('app.frontend_url') }}/contact">Contact</a>
       </div>
       <div class="footer-address">
         Abhaya Vastra<br/>

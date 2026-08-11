@@ -124,20 +124,7 @@ class CouponController extends Controller
             return response()->json($response);
         }
 
-        // Mark coupon as used for this user
-        if ($request->user_id) {
-            $coupon->users()->syncWithoutDetaching([
-                $request->user_id => [
-                    'used' => true,
-                    'used_at' => now()
-                ]
-            ]);
-            
-            // Increment used count
-            $coupon->increment('used_count');
-        }
-
-        // Calculate discount
+        // Calculate discount (do NOT mark as used yet; usage is updated upon order placement)
         $discount = $coupon->getDiscount($request->amount);
         $finalAmount = $request->amount - $discount;
 

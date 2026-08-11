@@ -1,62 +1,60 @@
-<!-- resources/views/emails/coupon.blade.php -->
-<!DOCTYPE html>
-<html lang="en" style="margin:0; padding:0;">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Coupon</title>
-</head>
-<body style="font-family: 'Arial', sans-serif; margin:0; padding:0; background-color:#f4f4f4;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4; padding:30px 0;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 0 10px rgba(0,0,0,0.1);">
-                    
-                    <!-- Header -->
-                    <tr>
-                        <td style="background-color:#10b981; padding:20px; text-align:center;color:#fff;">
-                            <h1 style="margin:0; font-size:24px; color:#fff;" class="text-white">🎁 Special Coupon Just for You!</h1>
-                        </td>
-                    </tr>
+@extends('emails.layout', [
+    'emailTitle' => 'Special Coupon - Abhaya Vastra',
+    'heroBg' => '#1a1a1a'
+])
 
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding:30px; color:#333;">
-                            @if($messageBody)
-                                <p style="font-size:16px; line-height:1.5;">{{ $messageBody }}</p>
-                            @else
-                                <p style="font-size:16px; line-height:1.5;">We are excited to give you an exclusive coupon to enjoy discounts on your next purchase!</p>
-                            @endif
+@section('content')
 
-                            <table cellpadding="0" cellspacing="0" style="margin:20px 0; width:100%; border:1px dashed #ccc; border-radius:8px; text-align:center;">
-                                <tr>
-                                    <td style="padding:20px;">
-                                        <h2 style="margin:0; font-size:20px; color:#8B4513;">{{ $coupon->code }}</h2>
-                                        <p style="margin:5px 0 0 0; font-size:16px;">Value: <strong>{{ $coupon->value }}{{ $coupon->type == 'percentage' ? '%' : '₹' }}</strong></p>
-                                        @if($coupon->expires_at)
-                                            <p style="margin:5px 0 0 0; font-size:14px; color:#555;">Expires: {{ \Carbon\Carbon::parse($coupon->expires_at)->format('d M Y') }}</p>
-                                        @endif
-                                    </td>
-                                </tr>
-                            </table>
+<!-- HERO -->
+<div class="email-hero">
+  <span class="status-icon">🎁</span>
+  <h1 class="email-title">Special Coupon Just for You</h1>
+  <p class="email-subtitle">Exclusive Savings on Your Next Order</p>
+</div>
 
-                            <p style="text-align:center; margin:30px 0 0 0;">
-                                <a href="{{ url('/') }}" style="background-color:#8B4513; color:#fff; text-decoration:none; padding:12px 25px; border-radius:5px; font-weight:bold;">Use Coupon Now</a>
-                            </p>
-                        </td>
-                    </tr>
+<!-- BODY -->
+<div class="email-body">
+  <p class="greeting">
+    @if($messageBody)
+      {!! nl2br(e($messageBody)) !!}
+    @else
+      We are delighted to present you with an exclusive discount coupon to enjoy on your next purchase at <strong>Abhaya Vastra</strong>.
+    @endif
+  </p>
 
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color:#f4f4f4; padding:15px; text-align:center; font-size:12px; color:#888;">
-                            <p style="margin:0;">You are receiving this email because you subscribed to our newsletter.</p>
-                            <p style="margin:0;">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-                        </td>
-                    </tr>
+  <!-- COUPON BADGE -->
+  <div style="background: #fdf6ec; border: 1.5px dashed #c9a96e; border-radius: 8px; padding: 24px 20px; margin: 28px 0; text-align: center;">
+    <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #888; margin-bottom: 6px;">
+      YOUR EXCLUSIVE PROMO CODE
+    </div>
+    <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 700; color: #1a1a1a; letter-spacing: 0.15em; margin: 6px 0;">
+      {{ $coupon->code }}
+    </div>
+    <div style="font-size: 15px; font-weight: 600; color: #c9a96e; margin-top: 4px;">
+      SAVINGS: {{ $coupon->type == 'percentage' ? intval($coupon->value) . '% OFF' : '₹' . intval($coupon->value) . ' OFF' }}
+      @if($coupon->min_cart_amount > 0)
+        <span style="font-size: 12px; color: #666; font-weight: 400; display: block; margin-top: 4px;">
+          (Valid on orders above ₹{{ number_format($coupon->min_cart_amount, 2) }})
+        </span>
+      @endif
+    </div>
+    @if($coupon->expires_at)
+      <div style="font-size: 12px; color: #888; margin-top: 10px; font-weight: 400;">
+        ⏰ Expires on {{ \Carbon\Carbon::parse($coupon->expires_at)->format('M d, Y') }}
+      </div>
+    @endif
+  </div>
 
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+  <!-- CTA BUTTON -->
+  <div class="cta-wrapper" style="text-align: center; margin: 32px 0 20px;">
+    <a href="{{ config('app.frontend_url') }}/checkout?coupon={{ urlencode($coupon->code) }}" class="cta-button" style="display: inline-block; background: #1a1a1a; color: #c9a96e !important; text-decoration: none; padding: 14px 36px; font-size: 11px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; border: 1px solid #1a1a1a;">
+      USE COUPON NOW &rarr;
+    </a>
+  </div>
+
+  <p style="font-size: 12px; color: #777; text-align: center; margin-top: 16px;">
+    Simply click the button above or enter <strong>{{ $coupon->code }}</strong> at checkout to redeem your savings.
+  </p>
+</div>
+
+@endsection

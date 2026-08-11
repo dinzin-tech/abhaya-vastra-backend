@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'frontend_url' => env('FRONTEND_URL', env('APP_ENV') === 'local' ? 'http://localhost:3000' : 'https://abhayavastra.store'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
