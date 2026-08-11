@@ -133,6 +133,15 @@ class ProductController extends Controller
                     'qikink_sku'              => $request->qikink_sku,
                     'qikink_print_type_id'    => $request->qikink_print_type_id ?? 1,
                     'search_from_my_products' => $request->has('search_from_my_products') ? 1 : 0,
+                    // Combo product fields
+                    'is_combo'    => $request->has('is_combo') ? 1 : 0,
+                    'combo_type'  => $request->input('combo_type'),
+                    'male_sizes'  => $request->has('is_combo') && $request->input('male_sizes')
+                        ? array_values(array_filter(array_map('trim', explode(',', $request->input('male_sizes')))))
+                        : null,
+                    'female_sizes'=> $request->has('is_combo') && $request->input('female_sizes')
+                        ? array_values(array_filter(array_map('trim', explode(',', $request->input('female_sizes')))))
+                        : null,
                 ];
 
                 // Handle main image

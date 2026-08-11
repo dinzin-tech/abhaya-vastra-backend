@@ -209,18 +209,30 @@
             if (item.custom_preview_url) {
                 designLink += `<a href="${item.custom_preview_url}" target="_blank" class="badge text-white mt-1" style="background-color: #3b82f6; text-decoration: none; padding: 4px 8px; font-size: 0.72rem; border-radius: 4px;"><i class="fa-solid fa-shirt"></i> View Mockup</a>`;
             }
+            // Build size display - combo shows two sizes, regular shows one
+            let sizeDisplay = 'N/A';
+            if (item.male_size || item.female_size) {
+                let parts = [];
+                if (item.male_size) parts.push(`\ud83d\udc54 M: ${item.male_size}`);
+                if (item.female_size) parts.push(`\ud83d\udc57 F: ${item.female_size}`);
+                sizeDisplay = parts.join(' &middot; ');
+            } else {
+                sizeDisplay = item.size || item.selectedSize || 'N/A';
+            }
+
             itemsHtml += `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${item.name}${designLink}</td>
                     <td>₹${parseFloat(item.price).toFixed(2)}</td>
                     <td>${item.quantity || 1}</td>
-                    <td>${item.size || item.selectedSize || 'N/A'}</td>
+                    <td>${sizeDisplay}</td>
                     <td>${item.color || item.selectedColor || 'N/A'}</td>
                     <td><strong>₹${(item.price * item.quantity).toFixed(2)}</strong></td>
                 </tr>
             `;
         });
+
         
         let paymentStatusBadge = '';
         if(order.payment_status === 'completed') {

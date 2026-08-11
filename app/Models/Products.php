@@ -27,7 +27,18 @@ class Products extends Model
         'is_qikink_product',
         'qikink_sku',
         'qikink_print_type_id',
-        'search_from_my_products'
+        'search_from_my_products',
+        // Combo product fields
+        'is_combo',
+        'combo_type',
+        'male_sizes',
+        'female_sizes',
+    ];
+
+    protected $casts = [
+        'is_combo'    => 'boolean',
+        'male_sizes'  => 'array',
+        'female_sizes'=> 'array',
     ];
 
     public function category()

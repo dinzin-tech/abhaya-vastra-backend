@@ -487,6 +487,58 @@
                         <div class="pf-toggle-track"></div>
                         <span class="pf-toggle-label"><i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6"></i> Customizable</span>
                     </label>
+                    <label class="pf-toggle">
+                        <input type="checkbox" name="is_combo" id="is_combo" value="1"
+                            {{ optional($item)->is_combo ? 'checked' : '' }}
+                            onchange="toggleComboSection(this.checked)">
+                        <div class="pf-toggle-track"></div>
+                        <span class="pf-toggle-label"><i class="fa-solid fa-people-group" style="color:#0ea5e9"></i> Combo Product (Brothers/Sisters/Couples)</span>
+                    </label>
+                </div>
+
+                {{-- Combo Product Configuration Section --}}
+                <div id="combo-section" style="{{ optional($item)->is_combo ? '' : 'display:none;' }} margin-top: 20px; background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 10px; padding: 20px;">
+                    <p class="section-heading" style="color:#0369a1; margin-bottom:16px;">
+                        <i class="fa-solid fa-people-group me-2"></i>Combo Product Settings
+                    </p>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Combo Type</label>
+                            <select name="combo_type" id="combo_type" class="form-select">
+                                <option value="male_female" {{ optional($item)->combo_type == 'male_female' ? 'selected' : '' }}>Male + Female (Couples / Brother-Sister)</option>
+                                <option value="siblings"    {{ optional($item)->combo_type == 'siblings'    ? 'selected' : '' }}>Siblings Set</option>
+                                <option value="friends"     {{ optional($item)->combo_type == 'friends'     ? 'selected' : '' }}>Friends / Unisex Combo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fa-solid fa-person me-1" style="color:#3b82f6"></i>Men's Sizes
+                                <small class="text-muted fw-normal">(comma-separated, e.g. S,M,L,XL,XXL)</small>
+                            </label>
+                            <input type="text" name="male_sizes" id="male_sizes" class="form-control"
+                                placeholder="S,M,L,XL,XXL"
+                                value="{{ optional($item)->male_sizes ? implode(',', optional($item)->male_sizes) : '' }}">
+                            <div class="mt-2 d-flex flex-wrap gap-1" id="male-size-preview"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fa-solid fa-person-dress me-1" style="color:#ec4899"></i>Women's Sizes
+                                <small class="text-muted fw-normal">(comma-separated, e.g. XS,S,M,L,XL)</small>
+                            </label>
+                            <input type="text" name="female_sizes" id="female_sizes" class="form-control"
+                                placeholder="XS,S,M,L,XL"
+                                value="{{ optional($item)->female_sizes ? implode(',', optional($item)->female_sizes) : '' }}">
+                            <div class="mt-2 d-flex flex-wrap gap-1" id="female-size-preview"></div>
+                        </div>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Customers will see two separate size selectors on the product page — one for Men's and one for Women's sizing.
+                    </small>
                 </div>
             </div>
 
@@ -1103,6 +1155,35 @@ function toggleQikinkFields(checked) {
         qikinkSearch.style.display = 'none';
     }
 }
+
+function toggleComboSection(checked) {
+    const section = document.getElementById('combo-section');
+    section.style.display = checked ? 'block' : 'none';
+}
+
+function renderSizePills(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    if (!input || !preview) return;
+    const sizes = input.value.split(',').map(s => s.trim()).filter(Boolean);
+    preview.innerHTML = sizes.map(s =>
+        `<span class="badge bg-dark text-white px-2 py-1">${s}</span>`
+    ).join('');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Live preview for combo sizes
+    const maleSizesInput = document.getElementById('male_sizes');
+    const femaleSizesInput = document.getElementById('female_sizes');
+    if (maleSizesInput) {
+        maleSizesInput.addEventListener('input', () => renderSizePills('male_sizes', 'male-size-preview'));
+        renderSizePills('male_sizes', 'male-size-preview');
+    }
+    if (femaleSizesInput) {
+        femaleSizesInput.addEventListener('input', () => renderSizePills('female_sizes', 'female-size-preview'));
+        renderSizePills('female_sizes', 'female-size-preview');
+    }
+});
 
 // Init for existing color dropzones on edit
 @if($item)

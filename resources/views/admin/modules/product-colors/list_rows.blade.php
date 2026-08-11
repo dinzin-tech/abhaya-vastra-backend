@@ -8,6 +8,9 @@
     <!-- Product Name -->
     <td style="font-weight:700;color:#1e293b;font-size:.9rem;">
         {{ $item->product->name ?? '-' }}
+        @if(optional($item->product)->is_combo)
+            <span class="badge bg-info text-dark ms-1" style="font-size:0.7rem;font-weight:600;"><i class="fa-solid fa-people-group me-1"></i>Combo</span>
+        @endif
     </td>
 
     <!-- Color -->

@@ -71,7 +71,12 @@ class ProductController extends Controller
                 'total_price' => $minPrice,
                 'gender' => $product->gender ?? 'unisex',
                 'color' => $product->colors->first()->color ?? 'black',
-                'sizes' => $product->variants->pluck('size')->unique()->values()->toArray() ?: ['S', 'M', 'L', 'XL'],
+                'sizes' => $product->is_combo ? [] : ($product->variants->pluck('size')->unique()->values()->toArray() ?: ['S', 'M', 'L', 'XL']),
+                // Combo fields
+                'is_combo'    => (bool)($product->is_combo ?? false),
+                'combo_type'  => $product->combo_type ?? null,
+                'male_sizes'  => is_string($product->male_sizes) ? (json_decode($product->male_sizes, true) ?: []) : ($product->male_sizes ?? []),
+                'female_sizes'=> is_string($product->female_sizes) ? (json_decode($product->female_sizes, true) ?: []) : ($product->female_sizes ?? []),
                 'variants' => $variantsData,
                 'image' => $product->main_image ? asset('storage/products/' . basename($product->main_image)) : null,
                 'hoverImage' => $product->zoomed_image ? asset('storage/products/' . basename($product->zoomed_image)) : null,
@@ -195,7 +200,7 @@ class ProductController extends Controller
                     'variants:id,product_id,color_id,size,stock,price,discount,total_price',
                     'reviews:id,product_id,user_id,name,review,rating,image,created_at'
                 ])
-                ->select('id', 'category_id', 'gender',  'name', 'main_image', 'zoomed_image', 'description');
+                ->select('id', 'category_id', 'gender', 'name', 'main_image', 'zoomed_image', 'description', 'is_combo', 'combo_type', 'male_sizes', 'female_sizes', 'slug');
                 
                 if (is_numeric($id)) {
                     $product = $query->where('id', '=', $id)->first();
@@ -270,6 +275,12 @@ class ProductController extends Controller
                     'total_price' => $minPrice,
                     'gender' => $product->gender ?? 'unisex',
                     'description' => $product->description,
+                    // Combo fields
+                    'is_combo'    => (bool)($product->is_combo ?? false),
+                    'combo_type'  => $product->combo_type ?? null,
+                    'male_sizes'  => is_string($product->male_sizes) ? (json_decode($product->male_sizes, true) ?: []) : ($product->male_sizes ?? []),
+                    'female_sizes'=> is_string($product->female_sizes) ? (json_decode($product->female_sizes, true) ?: []) : ($product->female_sizes ?? []),
+                    'slug' => $product->slug ?? null,
                 ];
 
                 $variantData = $product->variants->map(function($v) {

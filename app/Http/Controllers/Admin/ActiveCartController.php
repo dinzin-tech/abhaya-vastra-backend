@@ -71,15 +71,18 @@ class ActiveCartController extends Controller
                 $totalQuantity += $item->quantity;
 
                 $formattedItems[] = [
-                    'id' => $item->id,
-                    'product_id' => $item->product_id,
+                    'id'           => $item->id,
+                    'product_id'   => $item->product_id,
                     'product_name' => $item->product ? $item->product->name : 'Product #' . $item->product_id,
-                    'image' => $item->product ? ($item->product->main_image ? asset('storage/products/' . basename($item->product->main_image)) : asset('assets/images/placeholder.jpg')) : '',
-                    'size' => $item->size,
-                    'color' => $item->color,
-                    'quantity' => $item->quantity,
-                    'price' => $price,
-                    'line_total' => $lineTotal,
+                    'image'        => $item->product ? ($item->product->main_image ? asset('storage/products/' . basename($item->product->main_image)) : asset('assets/images/placeholder.jpg')) : '',
+                    'size'         => $item->selected_size,
+                    'color'        => $item->selected_color,
+                    // Combo size fields
+                    'male_size'    => $item->male_size,
+                    'female_size'  => $item->female_size,
+                    'quantity'     => $item->quantity,
+                    'price'        => $price,
+                    'line_total'   => $lineTotal,
                 ];
             }
 

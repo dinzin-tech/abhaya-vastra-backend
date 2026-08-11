@@ -189,7 +189,12 @@
                                                     <div class="flex-grow-1" style="font-size: 0.82rem;">
                                                         <div class="fw-semibold text-dark">{{ $item['product_name'] }}</div>
                                                         <div class="text-muted" style="font-size: 0.75rem;">
-                                                            @if($item['size'])<span class="me-2">Size: <strong>{{ $item['size'] }}</strong></span>@endif
+                                                            @if(!empty($item['male_size']) || !empty($item['female_size']))
+                                                                @if(!empty($item['male_size']))<span class="me-2">👔 M: <strong>{{ $item['male_size'] }}</strong></span>@endif
+                                                                @if(!empty($item['female_size']))<span>👗 F: <strong>{{ $item['female_size'] }}</strong></span>@endif
+                                                            @elseif($item['size'])
+                                                                <span class="me-2">Size: <strong>{{ $item['size'] }}</strong></span>
+                                                            @endif
                                                             @if($item['color'])<span>Color: <strong>{{ $item['color'] }}</strong></span>@endif
                                                         </div>
                                                     </div>

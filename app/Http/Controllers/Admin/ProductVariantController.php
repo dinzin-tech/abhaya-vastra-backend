@@ -199,9 +199,18 @@ class ProductVariantController extends Controller
         // Validate input to ensure product_id is sent
         $request->validate(['product_id' => 'required|exists:products,id']);
         
-        // Query colors associated with the requested product ID
+        $product = Products::find($request->product_id);
         $colors = ProductColor::where('product_id', $request->product_id)->get(['id', 'color']);
         
-        return response()->json($colors);
+        $maleSizes = is_string($product->male_sizes) ? (json_decode($product->male_sizes, true) ?: []) : ($product->male_sizes ?? []);
+        $femaleSizes = is_string($product->female_sizes) ? (json_decode($product->female_sizes, true) ?: []) : ($product->female_sizes ?? []);
+
+        return response()->json([
+            'is_combo'     => (bool)($product->is_combo ?? false),
+            'combo_type'   => $product->combo_type ?? null,
+            'male_sizes'   => array_values($maleSizes),
+            'female_sizes' => array_values($femaleSizes),
+            'colors'       => $colors
+        ]);
     }
 }

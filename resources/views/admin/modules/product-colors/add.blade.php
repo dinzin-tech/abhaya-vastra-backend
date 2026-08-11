@@ -164,7 +164,7 @@
                         @foreach($products as $product)
                             <option value="{{ $product->id }}" 
                                 {{ ($item && $item->product_id == $product->id) ? 'selected' : '' }}>
-                                {{ $product->name }}
+                                {{ $product->is_combo ? '[Combo] 👥 ' : '' }}{{ $product->name }}
                             </option>
                         @endforeach
                     </select>

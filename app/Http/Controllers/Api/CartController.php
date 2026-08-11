@@ -76,22 +76,35 @@ class CartController extends Controller
                         }
                     }
 
+                    // Build cartKey - for combos include both sizes
+                    $cartKey = (string)$product->id;
+                    if ($item->male_size || $item->female_size) {
+                        $cartKey = "{$product->id}-M:{$item->male_size}-F:{$item->female_size}";
+                    } elseif ($item->selected_size) {
+                        $cartKey = "{$product->id}-{$item->selected_size}";
+                    }
+
                     return [
-                        'cart_id' => $item->id,
-                        'product_id' => $product->id,
-                        'name' => $product->name,
-                        'price' => $totalPrice, // Use total_price (after discount) for display
-                        'original_price' => $price,
-                        'image' => $product->main_image ? asset('storage/products/' . basename($product->main_image)) : null,
-                        'hoverImage' => $product->zoomed_image ? asset('storage/products/' . basename($product->zoomed_image)) : null,
-                        'selectedSize' => $item->selected_size,
-                        'selectedColor' => $item->selected_color,
-                        'quantity' => $item->quantity,
-                        'cartKey' => $item->selected_size ? "{$product->id}-{$item->selected_size}" : (string)$product->id,
-                        'added_at' => $item->created_at,
-                        'custom_design_url' => $item->product_details['custom_design_url'] ?? null,
+                        'cart_id'            => $item->id,
+                        'product_id'         => $product->id,
+                        'name'               => $product->name,
+                        'price'              => $totalPrice,
+                        'original_price'     => $price,
+                        'image'              => $product->main_image ? asset('storage/products/' . basename($product->main_image)) : null,
+                        'hoverImage'         => $product->zoomed_image ? asset('storage/products/' . basename($product->zoomed_image)) : null,
+                        'selectedSize'       => $item->selected_size,
+                        'selectedColor'      => $item->selected_color,
+                        // Combo size fields
+                        'is_combo'           => (bool)($product->is_combo ?? false),
+                        'combo_type'         => $product->combo_type ?? null,
+                        'male_size'          => $item->male_size,
+                        'female_size'        => $item->female_size,
+                        'quantity'           => $item->quantity,
+                        'cartKey'            => $cartKey,
+                        'added_at'           => $item->created_at,
+                        'custom_design_url'  => $item->product_details['custom_design_url'] ?? null,
                         'custom_preview_url' => $item->product_details['custom_preview_url'] ?? null,
-                        'custom_text' => $item->product_details['custom_text'] ?? null,
+                        'custom_text'        => $item->product_details['custom_text'] ?? null,
                     ];
                 }
                 return null;
@@ -129,27 +142,36 @@ class CartController extends Controller
             $selectedSize = $request->input('selectedSize', '');
             $selectedColor = $request->input('selectedColor', '');
             $quantity = $request->input('quantity', 1);
+            // Combo-specific sizes
+            $maleSize   = $request->input('male_size', null);
+            $femaleSize = $request->input('female_size', null);
+            $isCombo    = !empty($maleSize) || !empty($femaleSize);
 
             // Check if item already exists in cart with the same parameters (and custom design if applicable)
             $existingItem = null;
             $customDesignUrl = $request->input('custom_design_url');
             
-            $existingQuery = Cart::where('product_id', $productId)
-                ->where('selected_size', $selectedSize);
-                
+            $existingQuery = Cart::where('product_id', $productId);
+
+            if ($isCombo) {
+                // For combo products, deduplicate by male+female size pair
+                $existingQuery->where('male_size', $maleSize)->where('female_size', $femaleSize);
+            } else {
+                $existingQuery->where('selected_size', $selectedSize);
+            }
+
             if ($user) {
                 $existingQuery->where('user_id', $user->id);
             } else if ($sessionId) {
                 $existingQuery->where('session_id', $sessionId)->whereNull('user_id');
             }
-            
+
             $existingItems = $existingQuery->get();
-            
+
             foreach ($existingItems as $item) {
                 $details = $item->product_details ?? [];
                 $itemDesignUrl = $details['custom_design_url'] ?? null;
-                
-                // Only group if sizes, colors, and custom designs match perfectly
+
                 if ($itemDesignUrl === $customDesignUrl && $item->selected_color === $selectedColor) {
                     $existingItem = $item;
                     break;
@@ -172,8 +194,10 @@ class CartController extends Controller
 
             // Create new cart item
             $productDetails = [
-                'selectedSize' => $selectedSize,
+                'selectedSize'  => $isCombo ? null : $selectedSize,
                 'selectedColor' => $selectedColor,
+                'male_size'     => $maleSize,
+                'female_size'   => $femaleSize,
             ];
 
             if ($request->has('custom_design_url')) {
@@ -187,11 +211,13 @@ class CartController extends Controller
             }
 
             $cartData = [
-                'product_id' => $productId,
-                'quantity' => $quantity,
-                'selected_size' => $selectedSize,
+                'product_id'     => $productId,
+                'quantity'       => $quantity,
+                'selected_size'  => $isCombo ? null : $selectedSize,
                 'selected_color' => $selectedColor,
-                'product_details' => $productDetails
+                'male_size'      => $maleSize,
+                'female_size'    => $femaleSize,
+                'product_details'=> $productDetails,
             ];
 
             if ($user) {

@@ -14,7 +14,9 @@ class Cart extends Model
         'selected_size',
         'selected_color',
         'product_details',
-        'session_id'
+        'session_id',
+        'male_size',
+        'female_size',
     ];
 
     protected $casts = [

@@ -116,11 +116,44 @@
                         @foreach($products as $product)
                             <option value="{{ $product->id }}" 
                                 {{ ($item && $item->product_id == $product->id) ? 'selected' : '' }}>
-                                {{ $product->name }}
+                                {{ $product->is_combo ? '[Combo] 👥 ' : '' }}{{ $product->name }}
                             </option>
                         @endforeach
                     </select>
                 </div>
+            </div>
+
+            {{-- Combo Size Helper Block --}}
+            <div id="combo-size-helper" style="display:none; margin-bottom: 20px; background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 12px; padding: 18px;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span style="color: #0369a1; font-weight: 700; font-size: 0.88rem;">
+                        <i class="fa-solid fa-people-group me-1"></i> Combo Product Size Assistant
+                    </span>
+                    <span class="badge bg-info text-dark" style="font-size:0.72rem;">Combo Sizing Active</span>
+                </div>
+                <p class="text-muted mb-2" style="font-size: 0.78rem;">
+                    Select Men's and Women's sizes below to automatically populate or construct the size format for this combo variant:
+                </p>
+                <div class="row g-2 align-items-end mb-2">
+                    <div class="col-md-5">
+                        <label class="form-label mb-1 fw-bold" style="font-size:0.78rem; color:#2563eb;">👔 Men's Size</label>
+                        <select id="helper_male_size" class="form-select form-select-sm" onchange="updateComboSizeFromHelper()">
+                            <option value="">Select Men's Size</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label mb-1 fw-bold" style="font-size:0.78rem; color:#db2777;">👗 Women's Size</label>
+                        <select id="helper_female_size" class="form-select form-select-sm" onchange="updateComboSizeFromHelper()">
+                            <option value="">Select Women's Size</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-sm btn-primary w-100" onclick="applyComboSizePreset()">
+                            <i class="fa-solid fa-check me-1"></i> Apply
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap" id="combo-preset-badges"></div>
             </div>
 
             <div class="pvf-row pvf-row-2">
@@ -132,10 +165,10 @@
                 </div>
 
                 <div class="pvf-field">
-                    <label for="size">Size <span class="req">*</span></label>
+                    <label for="size">Size <span class="req">*</span> <small id="size_hint_label" class="text-muted fw-normal"></small></label>
                     <input type="text" name="size" id="size" class="form-control"
                            value="{{ $item->size ?? '' }}" {{ $item ? 'readonly' : '' }} required
-                           placeholder="e.g. S, M, XL, Free Size">
+                           placeholder="e.g. S, M, XL, or Combo size e.g. M-S">
                 </div>
             </div>
 
@@ -204,20 +237,48 @@
         }
     }
 
+    function updateComboSizeFromHelper() {
+        const male = $('#helper_male_size').val();
+        const female = $('#helper_female_size').val();
+        if (male && female) {
+            $('#size').val(`👔 M: ${male} · 👗 F: ${female}`);
+        } else if (male) {
+            $('#size').val(`Men's ${male}`);
+        } else if (female) {
+            $('#size').val(`Women's ${female}`);
+        }
+    }
+
+    function setComboSizeDirect(val) {
+        $('#size').val(val);
+    }
+
+    function applyComboSizePreset() {
+        updateComboSizeFromHelper();
+    }
+
     function loadProductColors(productId, selectedColorId = null) {
         const colorSelect = $('#color_id');
+        const helperBox = $('#combo-size-helper');
         colorSelect.empty().append('<option value="">Loading Colors...</option>').prop('disabled', true);
         
         if (!productId) {
             colorSelect.empty().append('<option value="">Select Product First</option>');
+            helperBox.hide();
             return;
         }
 
         axios.post(fetchColorUrl, { product_id: productId })
             .then(response => {
+                const resData = response.data;
+                const colorsList = Array.isArray(resData) ? resData : (resData.colors || []);
+                const isCombo = resData.is_combo || false;
+                const maleSizes = resData.male_sizes || [];
+                const femaleSizes = resData.female_sizes || [];
+
                 colorSelect.empty().append('<option value="">Select Color</option>');
-                if (response.data.length > 0) {
-                    response.data.forEach(color => {
+                if (colorsList.length > 0) {
+                    colorsList.forEach(color => {
                         const isSelected = selectedColorId && selectedColorId == color.id ? 'selected' : '';
                         colorSelect.append(`<option value="${color.id}" ${isSelected}>${color.color}</option>`);
                     });
@@ -225,9 +286,37 @@
                     colorSelect.append('<option value="">No Colors Found</option>');
                 }
                 colorSelect.prop('disabled', false);
+
+                // Handle Combo Assistant UI
+                if (isCombo) {
+                    $('#size_hint_label').text('(Combo product sizes available below)');
+                    helperBox.show();
+                    
+                    const mSelect = $('#helper_male_size').empty().append('<option value="">Select Men\'s Size</option>');
+                    const fSelect = $('#helper_female_size').empty().append('<option value="">Select Women\'s Size</option>');
+
+                    (maleSizes.length > 0 ? maleSizes : ['S','M','L','XL','XXL']).forEach(s => {
+                        mSelect.append(`<option value="${s}">${s}</option>`);
+                    });
+
+                    (femaleSizes.length > 0 ? femaleSizes : ['XS','S','M','L','XL']).forEach(s => {
+                        fSelect.append(`<option value="${s}">${s}</option>`);
+                    });
+
+                    // Quick presets
+                    const badgesContainer = $('#combo-preset-badges').empty();
+                    badgesContainer.append('<span class="text-muted style-small" style="font-size:0.75rem;">Quick Presets:</span>');
+                    ['Free Combo Size', 'All Sizes Combo', 'Standard Set'].forEach(p => {
+                        badgesContainer.append(`<button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:0.72rem;" onclick="setComboSizeDirect('${p}')">${p}</button>`);
+                    });
+                } else {
+                    $('#size_hint_label').text('');
+                    helperBox.hide();
+                }
             })
             .catch(error => {
                 colorSelect.empty().append('<option value="">Error Loading Colors</option>');
+                helperBox.hide();
             });
     }
 
