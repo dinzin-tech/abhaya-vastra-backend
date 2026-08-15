@@ -104,7 +104,6 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     // Lookbook Routes
     Route::resource('lookbook', 'App\Http\Controllers\Admin\LookbookController');
     Route::get('lookbook-list', 'App\Http\Controllers\Admin\LookbookController@listLookbooks')->name('lookbook.list');
-    Route::post('lookbook-store', 'App\Http\Controllers\Admin\LookbookController@store')->name('lookbook.store');
     Route::delete('/delete-lookbook', 'App\Http\Controllers\Admin\LookbookController@delete')->name('lookbook.delete');
 
     Route::resource('gallery', 'App\Http\Controllers\Admin\GalleryController');
